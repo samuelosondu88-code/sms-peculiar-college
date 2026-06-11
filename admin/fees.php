@@ -20,7 +20,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0"><i class="fas fa-money-bill me-2"></i>Fee Management</h4>
-    <a href="/accountant/fees.php" class="btn btn-primary"><i class="fas fa-cog me-1"></i>Manage Fee Structure</a>
+    <a href="<?= BASE_URL ?>/accountant/fees.php" class="btn btn-primary"><i class="fas fa-cog me-1"></i>Manage Fee Structure</a>
 </div>
 
 <div class="row g-3 mb-4">

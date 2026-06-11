@@ -32,7 +32,7 @@ require_once __DIR__ . '/../includes/header.php';
         <h4 class="fw-bold mb-0">Accountant Dashboard</h4>
         <p class="text-muted small">Welcome, <?= sanitizeInput($_SESSION['user_name']) ?>!</p>
     </div>
-    <a href="/accountant/payments.php" class="btn btn-warning fw-bold">
+    <a href="<?= BASE_URL ?>/accountant/payments.php" class="btn btn-warning fw-bold">
         <i class="fas fa-clock me-1"></i><?= $pendingPayments ?> Pending
     </a>
 </div>
@@ -64,7 +64,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="card">
     <div class="card-header d-flex justify-content-between">
         <span><i class="fas fa-clock me-2"></i>Pending Payment Verifications</span>
-        <a href="/accountant/payments.php" class="btn btn-sm btn-outline-primary">View All</a>
+        <a href="<?= BASE_URL ?>/accountant/payments.php" class="btn btn-sm btn-outline-primary">View All</a>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -81,7 +81,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <td><small><?= sanitizeInput($p['transaction_ref'] ?? '-') ?></small></td>
                         <td><small><?= formatDate($p['payment_date']) ?></small></td>
                         <td>
-                            <a href="/accountant/payments.php?verify=<?= $p['id'] ?>" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
+                            <a href="<?= BASE_URL ?>/accountant/payments.php?verify=<?= $p['id'] ?>" class="btn btn-sm btn-success"><i class="fas fa-check"></i></a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

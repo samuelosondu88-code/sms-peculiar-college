@@ -1,16 +1,16 @@
 <?php
-session_start();
+require_once __DIR__ . '/config/session.php';
+require_once __DIR__ . '/includes/functions.php';
+
 if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'];
     switch ($role) {
-        case 'admin': header('Location: admin/index.php'); break;
-        case 'teacher': header('Location: teacher/index.php'); break;
-        case 'student': header('Location: student/index.php'); break;
-        case 'parent': header('Location: parent/index.php'); break;
-        case 'accountant': header('Location: accountant/index.php'); break;
-        default: header('Location: public/index.php');
+        case 'admin': redirect('/admin/index.php'); break;
+        case 'teacher': redirect('/teacher/index.php'); break;
+        case 'student': redirect('/student/index.php'); break;
+        case 'parent': redirect('/parent/index.php'); break;
+        case 'accountant': redirect('/accountant/index.php'); break;
+        default: redirect('/public/index.php');
     }
-    exit;
 }
-header('Location: public/index.php');
-exit;
+redirect('/public/index.php');

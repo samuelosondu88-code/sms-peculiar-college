@@ -55,10 +55,10 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
                 <p class="small text-muted mb-2"><i class="fas fa-id-card me-1"></i>Admission: <?= sanitizeInput($child['admission_no']) ?></p>
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="/parent/attendance.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-primary"><i class="fas fa-check-circle me-1"></i>Attendance</a>
-                    <a href="/parent/results.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-success"><i class="fas fa-file-alt me-1"></i>Results</a>
-                    <a href="/parent/fees.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-warning"><i class="fas fa-money-bill me-1"></i>Fees</a>
-                    <a href="/parent/timetable.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-info"><i class="fas fa-calendar-alt me-1"></i>Timetable</a>
+                    <a href="<?= BASE_URL ?>/parent/attendance.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-primary"><i class="fas fa-check-circle me-1"></i>Attendance</a>
+                    <a href="<?= BASE_URL ?>/parent/results.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-success"><i class="fas fa-file-alt me-1"></i>Results</a>
+                    <a href="<?= BASE_URL ?>/parent/fees.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-warning"><i class="fas fa-money-bill me-1"></i>Fees</a>
+                    <a href="<?= BASE_URL ?>/parent/timetable.php?student_id=<?= $child['student_id'] ?>" class="btn btn-sm btn-outline-info"><i class="fas fa-calendar-alt me-1"></i>Timetable</a>
                 </div>
             </div>
         </div>

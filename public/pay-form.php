@@ -55,14 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purchase Admission Form - <?= SCHOOL_NAME ?></title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendors/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark public-header">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/public/index.php"><i class="fas fa-school me-2"></i><?= SCHOOL_NAME ?></a>
+            <a class="navbar-brand fw-bold" href="index.php"><i class="fas fa-school me-2"></i><?= SCHOOL_NAME ?></a>
         </div>
     </nav>
 
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error) {
                                     <p class="mb-1 small">Account Name: Peculiar International College</p>
                                     <p class="mb-1 small">Account No: 2034567890</p>
                                     <hr>
-                                    <a href="/public/apply.php?ref=<?= $applicationRef ?>" class="btn btn-outline-primary w-100">
+                                    <a href="apply.php?ref=<?= $applicationRef ?>" class="btn btn-outline-primary w-100">
                                         <i class="fas fa-check me-2"></i>I've Paid, Continue Application
                                     </a>
                                 </div>
@@ -137,6 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error) {
         </div>
     </section>
 
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -74,12 +74,12 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="card-header">Quick Links</div>
             <div class="card-body">
                 <div class="row g-2">
-                    <div class="col-6"><a href="/student/timetable.php" class="btn btn-outline-primary w-100"><i class="fas fa-calendar-alt me-1"></i>Timetable</a></div>
-                    <div class="col-6"><a href="/student/attendance.php" class="btn btn-outline-success w-100"><i class="fas fa-check-circle me-1"></i>Attendance</a></div>
-                    <div class="col-6"><a href="/student/results.php" class="btn btn-outline-warning w-100"><i class="fas fa-file-alt me-1"></i>Results</a></div>
-                    <div class="col-6"><a href="/student/assignments.php" class="btn btn-outline-info w-100"><i class="fas fa-tasks me-1"></i>Assignments</a></div>
-                    <div class="col-6"><a href="/student/fees.php" class="btn btn-outline-danger w-100"><i class="fas fa-money-bill me-1"></i>Fees</a></div>
-                    <div class="col-6"><a href="/student/library.php" class="btn btn-outline-secondary w-100"><i class="fas fa-book-open me-1"></i>Library</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/timetable.php" class="btn btn-outline-primary w-100"><i class="fas fa-calendar-alt me-1"></i>Timetable</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/attendance.php" class="btn btn-outline-success w-100"><i class="fas fa-check-circle me-1"></i>Attendance</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/results.php" class="btn btn-outline-warning w-100"><i class="fas fa-file-alt me-1"></i>Results</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/assignments.php" class="btn btn-outline-info w-100"><i class="fas fa-tasks me-1"></i>Assignments</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/fees.php" class="btn btn-outline-danger w-100"><i class="fas fa-money-bill me-1"></i>Fees</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/library.php" class="btn btn-outline-secondary w-100"><i class="fas fa-book-open me-1"></i>Library</a></div>
                 </div>
             </div>
         </div>

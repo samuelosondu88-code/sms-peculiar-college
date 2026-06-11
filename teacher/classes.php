@@ -47,8 +47,8 @@ require_once __DIR__ . '/../includes/header.php';
                 <p class="small text-muted mb-1">Students: <?= $c['student_count'] ?? 0 ?> / <?= $c['capacity'] ?? '-' ?></p>
                 <p class="small text-muted mb-3">Subjects: <?= $c['subject_count'] ?? 0 ?></p>
                 <div class="d-flex gap-2">
-                    <a href="/teacher/attendance.php?class_id=<?= $c['id'] ?>" class="btn btn-sm btn-primary"><i class="fas fa-check-circle me-1"></i>Attendance</a>
-                    <a href="/teacher/grades.php?class_id=<?= $c['id'] ?>" class="btn btn-sm btn-success"><i class="fas fa-star me-1"></i>Grades</a>
+                    <a href="<?= BASE_URL ?>/teacher/attendance.php?class_id=<?= $c['id'] ?>" class="btn btn-sm btn-primary"><i class="fas fa-check-circle me-1"></i>Attendance</a>
+                    <a href="<?= BASE_URL ?>/teacher/grades.php?class_id=<?= $c['id'] ?>" class="btn btn-sm btn-success"><i class="fas fa-star me-1"></i>Grades</a>
                 </div>
             </div>
         </div>

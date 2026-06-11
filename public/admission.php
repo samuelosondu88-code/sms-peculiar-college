@@ -9,23 +9,23 @@ $pageTitle = 'Admission';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admission - <?= SCHOOL_NAME ?></title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendors/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark public-header">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/public/index.php"><i class="fas fa-school me-2"></i><?= SCHOOL_NAME ?></a>
+            <a class="navbar-brand fw-bold" href="index.php"><i class="fas fa-school me-2"></i><?= SCHOOL_NAME ?></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="publicNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/public/index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/public/admission.php">Admission</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/public/application-status.php">Check Status</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/public/contact.php">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="admission.php">Admission</a></li>
+                    <li class="nav-item"><a class="nav-link" href="application-status.php">Check Status</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -73,11 +73,11 @@ $pageTitle = 'Admission';
                             <h5 class="fw-bold">Application Form</h5>
                             <p class="display-6 fw-bold text-primary mb-2">₦<?= number_format(ADMISSION_FORM_PRICE, 0) ?></p>
                             <p class="text-muted small">One-time payment</p>
-                            <a href="/public/pay-form.php" class="btn btn-primary btn-lg w-100 fw-bold">
+                            <a href="pay-form.php" class="btn btn-primary btn-lg w-100 fw-bold">
                                 <i class="fas fa-shopping-cart me-2"></i>Purchase Form
                             </a>
                             <hr>
-                            <a href="/public/application-status.php" class="btn btn-outline-primary w-100">
+                            <a href="application-status.php" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-search me-2"></i>Check Application Status
                             </a>
                         </div>
@@ -93,6 +93,6 @@ $pageTitle = 'Admission';
         </div>
     </footer>
 
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -110,7 +110,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
-<script src="/assets/vendors/chart.js/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 var ctx = document.getElementById('financeChart').getContext('2d');
 new Chart(ctx, {

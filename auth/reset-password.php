@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("UPDATE password_resets SET used = 1 WHERE token = ?");
             $stmt->execute([$token]);
 
-            $message = 'Password reset successfully. <a href="/auth/login.php">Login now</a>.';
+            $message = 'Password reset successfully. <a href="login.php">Login now</a>.';
         } else {
             $error = 'Invalid or expired reset token.';
         }
@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - <?= SCHOOL_NAME ?></title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendors/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body class="login-page">
@@ -85,10 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
         </form>
         <div class="text-center mt-3">
-            <a href="/auth/login.php" class="small">&larr; Back to Login</a>
+            <a href="login.php" class="small">&larr; Back to Login</a>
         </div>
         <?php endif; ?>
     </div>
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

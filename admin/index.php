@@ -41,10 +41,10 @@ require_once __DIR__ . '/../includes/header.php';
         <p class="text-muted small mb-0">Welcome back, <?= $_SESSION['user_name'] ?>!</p>
     </div>
     <div>
-        <a href="/admin/applications.php" class="btn btn-warning me-2">
+        <a href="<?= BASE_URL ?>/admin/applications.php" class="btn btn-warning me-2">
             <i class="fas fa-file-signature me-1"></i>Pending: <?= $stats['pending_applications'] ?>
         </a>
-        <a href="/admin/users.php?action=add" class="btn btn-primary">
+        <a href="<?= BASE_URL ?>/admin/users.php?action=add" class="btn btn-primary">
             <i class="fas fa-plus me-1"></i>Add User
         </a>
     </div>
@@ -86,7 +86,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-users me-2"></i>Recent Users</span>
-                <a href="/admin/users.php" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="<?= BASE_URL ?>/admin/users.php" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-file-signature me-2"></i>Recent Applications</span>
-                <a href="/admin/applications.php" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="<?= BASE_URL ?>/admin/applications.php" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">

@@ -27,7 +27,7 @@ require_once __DIR__ . '/../includes/header.php';
         <h4 class="fw-bold mb-0">Teacher Dashboard</h4>
         <p class="text-muted small">Welcome back, <?= sanitizeInput($_SESSION['user_name']) ?>!</p>
     </div>
-    <a href="/teacher/attendance.php" class="btn btn-primary">
+    <a href="<?= BASE_URL ?>/teacher/attendance.php" class="btn btn-primary">
         <i class="fas fa-check-circle me-1"></i>Mark Attendance
     </a>
 </div>
@@ -64,9 +64,9 @@ require_once __DIR__ . '/../includes/header.php';
                 <h5 class="fw-bold"><?= sanitizeInput($class['name']) ?> <?= sanitizeInput($class['section'] ?? '') ?></h5>
                 <p class="text-muted"><?= $class['student_count'] ?> Students</p>
                 <div class="d-flex gap-2">
-                    <a href="/teacher/attendance.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-primary">Attendance</a>
-                    <a href="/teacher/grades.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-success">Grades</a>
-                    <a href="/teacher/assignments.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-info">Assignments</a>
+                    <a href="<?= BASE_URL ?>/teacher/attendance.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-primary">Attendance</a>
+                    <a href="<?= BASE_URL ?>/teacher/grades.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-success">Grades</a>
+                    <a href="<?= BASE_URL ?>/teacher/assignments.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-info">Assignments</a>
                 </div>
             </div>
         </div>

@@ -9,14 +9,14 @@ $pageTitle = 'Welcome';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= SCHOOL_NAME ?> - Excellence in Education</title>
     <meta name="description" content="Peculiar International College - A premier institution committed to academic excellence and character development.">
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendors/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark public-header">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/public/index.php">
+            <a class="navbar-brand fw-bold" href="index.php">
                 <i class="fas fa-school me-2"></i><?= SCHOOL_NAME ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav">
@@ -24,11 +24,11 @@ $pageTitle = 'Welcome';
             </button>
             <div class="collapse navbar-collapse" id="publicNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/public/index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/public/admission.php">Admission</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/public/application-status.php">Check Status</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/public/contact.php">Contact</a></li>
-                    <li class="nav-item ms-2"><a class="btn btn-warning fw-bold" href="/auth/login.php"><i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admission.php">Admission</a></li>
+                    <li class="nav-item"><a class="nav-link" href="application-status.php">Check Status</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
+                    <li class="nav-item ms-2"><a class="btn btn-warning fw-bold" href="../auth/login.php"><i class="fas fa-sign-in-alt me-1"></i>Login</a></li>
                 </ul>
             </div>
         </div>
@@ -39,10 +39,10 @@ $pageTitle = 'Welcome';
             <h1><i class="fas fa-graduation-cap me-3"></i><?= SCHOOL_NAME ?></h1>
             <p class="lead">Building future leaders through academic excellence, character development, and innovative education. Join us in shaping tomorrow's champions today.</p>
             <div class="mt-4">
-                <a href="/public/admission.php" class="btn btn-warning btn-lg fw-bold me-3">
+                <a href="admission.php" class="btn btn-warning btn-lg fw-bold me-3">
                     <i class="fas fa-file-signature me-2"></i>Apply Now - ₦<?= number_format(ADMISSION_FORM_PRICE, 0) ?>
                 </a>
-                <a href="/public/application-status.php" class="btn btn-outline-light btn-lg">
+                <a href="application-status.php" class="btn btn-outline-light btn-lg">
                     <i class="fas fa-search me-2"></i>Check Application Status
                 </a>
             </div>
@@ -106,7 +106,7 @@ $pageTitle = 'Welcome';
         <div class="container text-center">
             <h2 class="fw-bold text-primary">Start Your Journey Today</h2>
             <p class="text-muted mb-4">Admission is now open for the 2025/2026 academic session. Purchase your application form online.</p>
-            <a href="/public/admission.php" class="btn btn-primary btn-lg fw-bold px-5">
+            <a href="admission.php" class="btn btn-primary btn-lg fw-bold px-5">
                 <i class="fas fa-file-signature me-2"></i>Apply Now - ₦<?= number_format(ADMISSION_FORM_PRICE, 0) ?>
             </a>
         </div>
@@ -122,9 +122,9 @@ $pageTitle = 'Welcome';
                 <div class="col-md-4">
                     <h6 class="fw-bold text-white">Quick Links</h6>
                     <ul class="list-unstyled small">
-                        <li><a href="/public/admission.php" class="text-white-50">Admission</a></li>
-                        <li><a href="/public/application-status.php" class="text-white-50">Check Status</a></li>
-                        <li><a href="/auth/login.php" class="text-white-50">Portal Login</a></li>
+                        <li><a href="admission.php" class="text-white-50">Admission</a></li>
+                        <li><a href="application-status.php" class="text-white-50">Check Status</a></li>
+                        <li><a href="../auth/login.php" class="text-white-50">Portal Login</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
@@ -141,7 +141,7 @@ $pageTitle = 'Welcome';
         </div>
     </footer>
 
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/main.js"></script>
 </body>
 </html>

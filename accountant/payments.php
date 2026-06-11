@@ -22,8 +22,7 @@ if (isset($_GET['verify'])) {
         $stmt->execute([$pay['amount_paid'], $pay['fee_id']]);
     }
     $msg = "Payment {$action} successfully.";
-    header("Location: /accountant/payments.php?msg=" . urlencode($msg));
-    exit;
+    redirect("/accountant/payments.php?msg=" . urlencode($msg));
 }
 
 $payments = $db->query("SELECT p.*, u.first_name, u.last_name, fs.fee_name FROM payments p JOIN fees f ON p.fee_id = f.id JOIN fee_structure fs ON f.fee_structure_id = fs.id JOIN students s ON f.student_id = s.id JOIN users u ON s.user_id = u.id ORDER BY p.created_at DESC LIMIT 50")->fetchAll();
