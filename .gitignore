@@ -1,0 +1,22 @@
+# OS
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Environment
+.env
+.env.local
+
+# Composer
+/vendor/
+composer.lock
+
+# Uploads
+/uploads/
+
+# Logs
+*.log
