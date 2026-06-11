@@ -18,7 +18,7 @@ if (isset($_GET['verify'])) {
     $pay = $stmt->fetch();
 
     if ($pay && $action === 'approved') {
-        $stmt = $db->prepare("UPDATE fees SET paid_amount = paid_amount + ?, balance = total_amount - paid_amount, status = CASE WHEN balance <= 0 THEN 'paid' ELSE 'partial' END WHERE id = ?");
+        $stmt = $db->prepare("UPDATE fees SET paid_amount = paid_amount + ?, balance = total_amount - paid_amount, status = CASE WHEN total_amount < paid_amount THEN 'overpaid' WHEN total_amount - paid_amount <= 0 THEN 'paid' ELSE 'partial' END WHERE id = ?");
         $stmt->execute([$pay['amount_paid'], $pay['fee_id']]);
     }
     $msg = "Payment {$action} successfully.";

@@ -19,7 +19,7 @@ if ($parent) {
     $children = $children->fetchAll();
 }
 
-$studentId = (int)($_GET['student_id'] ?? ($children[0]['id'] ?? 0));
+$studentId = (int)($_GET['student_id'] ?? (!empty($children) ? ($children[0]['id'] ?? 0) : 0));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_payment'])) {
     $feeId = (int)($_POST['fee_id'] ?? 0);

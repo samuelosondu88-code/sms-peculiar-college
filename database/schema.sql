@@ -228,7 +228,8 @@ CREATE TABLE attendance (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
     FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL,
-    FOREIGN KEY (marked_by) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (marked_by) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_attendance (student_id, class_id, date)
 ) ENGINE=InnoDB;
 
 -- Exams

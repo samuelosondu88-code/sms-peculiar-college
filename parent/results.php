@@ -18,7 +18,7 @@ if ($parent) {
     $children = $children->fetchAll();
 }
 
-$studentId = (int)($_GET['student_id'] ?? ($children[0]['id'] ?? 0));
+$studentId = (int)($_GET['student_id'] ?? (!empty($children) ? ($children[0]['id'] ?? 0) : 0));
 $selectedExam = (int)($_GET['exam_id'] ?? 0);
 
 $exams = [];
