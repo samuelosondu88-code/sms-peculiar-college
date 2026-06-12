@@ -1,0 +1,71 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Environment & Config
+.env
+.env.local
+.env.production
+config/database.local.php
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Logs
+/logs/
+*.log
+error_log
+
+# Uploads (keep structure, ignore files)
+/documents/*
+!/documents/index.html
+/assets/uploads/*
+!/assets/uploads/index.html
+
+# Temp files
+/tmp/
+/temp/
+/cache/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# Build
+/dist/
+/build/
+
+# Database backups (don't commit actual data)
+*.sql.gz
+*.sql.zip
+*.bak
+*.sql.bak
+
+# Keep schema files
+!database/*_schema.sql
+!database/schema.sql
+
+# OS junk
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Git
+.gitattributes
+
+# PHP
+*.php.bak
+*.php.old
