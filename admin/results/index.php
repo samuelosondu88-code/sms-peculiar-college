@@ -219,15 +219,15 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <?php
+$chartLabels = json_encode(array_map(fn($c) => $c['class'], $classPerformance));
+$chartValues = json_encode(array_map(fn($c) => $c['average'], $classPerformance));
 $extraScripts = <<<SCRIPT
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const labels = ["'Performance by Class'"];
-    const dataValues = [0];
-    const ctx = document.getElementById('classPerformanceChart');
+    var ctx = document.getElementById('classPerformanceChart');
     if (ctx) {
-        const labels = [<?= "'" . implode("','", array_map(fn($c) => $c['class'], $classPerformance)) . "'" ?>];
-        const dataValues = [<?= implode(',', array_map(fn($c) => $c['average'], $classPerformance)) ?>];
+        var labels = {$chartLabels};
+        var dataValues = {$chartValues};
         new Chart(ctx, {
             type: 'bar',
             data: {
