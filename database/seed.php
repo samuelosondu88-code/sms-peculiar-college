@@ -150,6 +150,20 @@ try {
         ('Staff Meeting Notice', 'All staff are required to attend the general staff meeting on Friday at 2pm in the staff room.', 'teacher', 'normal', 1)");
     echo "  Notices created\n";
 
+    // Seed result settings
+    $stmt = $db->prepare("INSERT IGNORE INTO result_settings (session_id, term_id, ca_weight, exam_weight, pass_mark, grade_a_min, grade_b_min, grade_c_min, grade_d_min, grade_e_min) VALUES (?, ?, 40, 60, 40, 75, 60, 50, 40, 30)");
+    $terms = $db->query("SELECT id FROM terms WHERE session_id = 1")->fetchAll();
+    foreach ($terms as $t) {
+        $stmt->execute([1, $t['id']]);
+    }
+
+    // Seed promotion config for JSS1
+    $classIds = $db->query("SELECT id FROM classes WHERE academic_session_id = 1")->fetchAll(PDO::FETCH_COLUMN);
+    $pStmt = $db->prepare("INSERT IGNORE INTO promotion_config (session_id, class_id, pass_mark, min_subjects_pass) VALUES (?, ?, 40, 5)");
+    foreach ($classIds as $cid) {
+        $pStmt->execute([1, $cid]);
+    }
+
     echo "\nSeeding complete! Login credentials:\n";
     echo "  Admin:       admin@peculiarcollege.edu.ng / Password@123\n";
     echo "  Teacher:     teacher@peculiarcollege.edu.ng / Password@123\n";

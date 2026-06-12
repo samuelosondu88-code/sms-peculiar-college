@@ -19,6 +19,15 @@ $stats['pending_payments'] = (int)$stmt->fetchColumn();
 $stmt = $db->query("SELECT COUNT(*) FROM applications WHERE status = 'submitted' OR status = 'reviewing'");
 $stats['pending_applications'] = (int)$stmt->fetchColumn();
 
+$stmt = $db->query("SELECT COUNT(DISTINCT student_id) FROM results");
+$stats['students_with_results'] = (int)$stmt->fetchColumn();
+
+$stmt = $db->query("SELECT COUNT(*) FROM results WHERE status = 'submitted'");
+$stats['pending_approvals'] = (int)$stmt->fetchColumn();
+
+$stmt = $db->query("SELECT COUNT(*) FROM results WHERE status = 'published'");
+$stats['published_results'] = (int)$stmt->fetchColumn();
+
 $recentUsers = $db->query("SELECT id, first_name, last_name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll();
 
 $recentPayments = $db->query("
@@ -77,6 +86,30 @@ require_once __DIR__ . '/../includes/header.php';
             <i class="fas fa-credit-card stat-icon"></i>
             <div class="stat-value"><?= $stats['pending_payments'] ?></div>
             <div class="stat-label">Pending Payments</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card stat-primary">
+            <i class="fas fa-user-graduate stat-icon"></i>
+            <div class="stat-value"><?= $stats['students_with_results'] ?></div>
+            <div class="stat-label">Students with Results</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card stat-warning">
+            <i class="fas fa-clock stat-icon"></i>
+            <div class="stat-value"><?= $stats['pending_approvals'] ?></div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card stat-success">
+            <i class="fas fa-check-circle stat-icon"></i>
+            <div class="stat-value"><?= $stats['published_results'] ?></div>
+            <div class="stat-label">Published Results</div>
         </div>
     </div>
 </div>

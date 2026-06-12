@@ -33,6 +33,16 @@ $stmt->execute([$userId]); $pubEx = (int)$stmt->fetchColumn();
 $stmt = $db->prepare("SELECT COUNT(DISTINCT student_id) FROM exam_attempts ea JOIN teacher_exams te ON ea.exam_id = te.id WHERE te.teacher_id = ?");
 $stmt->execute([$userId]); $assessedEx = (int)$stmt->fetchColumn();
 
+// Result stats
+$stmt = $db->prepare("SELECT COUNT(*) FROM subject_allocations sa JOIN subjects s ON sa.subject_id = s.id WHERE s.teacher_id = ?");
+$stmt->execute([$userId]); $totalSubjects = (int)$stmt->fetchColumn();
+$stmt = $db->prepare("SELECT COUNT(*) FROM results r JOIN subjects s ON r.subject_id = s.id WHERE s.teacher_id = ? AND r.status = 'draft'");
+$stmt->execute([$userId]); $draftResults = (int)$stmt->fetchColumn();
+$stmt = $db->prepare("SELECT COUNT(*) FROM results r JOIN subjects s ON r.subject_id = s.id WHERE s.teacher_id = ? AND r.status = 'submitted'");
+$stmt->execute([$userId]); $submittedResults = (int)$stmt->fetchColumn();
+$stmt = $db->prepare("SELECT COUNT(*) FROM results r JOIN subjects s ON r.subject_id = s.id WHERE s.teacher_id = ? AND r.status = 'published'");
+$stmt->execute([$userId]); $publishedResults = (int)$stmt->fetchColumn();
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -114,6 +124,37 @@ require_once __DIR__ . '/../includes/header.php';
             <i class="fas fa-user-graduate stat-icon"></i>
             <div class="stat-value"><?= $assessedEx ?></div>
             <div class="stat-label">Students Assessed</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card stat-primary">
+            <i class="fas fa-book stat-icon"></i>
+            <div class="stat-value"><?= $totalSubjects ?></div>
+            <div class="stat-label">Subjects Assigned</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-warning">
+            <i class="fas fa-pen stat-icon"></i>
+            <div class="stat-value"><?= $draftResults ?></div>
+            <div class="stat-label">Drafts</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-info">
+            <i class="fas fa-paper-plane stat-icon"></i>
+            <div class="stat-value"><?= $submittedResults ?></div>
+            <div class="stat-label">Submitted</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-success">
+            <i class="fas fa-check-circle stat-icon"></i>
+            <div class="stat-value"><?= $publishedResults ?></div>
+            <div class="stat-label">Published</div>
         </div>
     </div>
 </div>
