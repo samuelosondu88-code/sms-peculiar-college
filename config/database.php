@@ -1,8 +1,8 @@
 <?php
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'sms_peculiar_college');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_USER', getenv('DB_USER') ?: 'peculiar_user');
+define('DB_PASS', getenv('DB_PASS') ?: 'wOZLp35NnB8cYjXRbMgV');
 
 function getDB(): PDO {
     static $pdo = null;

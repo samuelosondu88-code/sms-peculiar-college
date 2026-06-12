@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['subscribe'])) {
         $stmt->execute([SCHOOL_NAME, SCHOOL_EMAIL, $planId, $billing, $amount, $start, $end]);
         $subId = $db->lastInsertId();
         $invNo = generateReceiptNo();
-        $db->prepare("INSERT INTO payments (subscription_id, invoice_no, amount, payment_method, payment_status, paid_at) VALUES (?, ?, ?, 'online', 'completed', NOW())")->execute([$subId, $invNo, $amount]);
+        $db->prepare("INSERT INTO payments (subscription_id, invoice_no, amount_paid, payment_method, payment_status, paid_at) VALUES (?, ?, ?, 'online', 'completed', NOW())")->execute([$subId, $invNo, $amount]);
         $msg = "Subscribed to {$plan['name']} plan successfully.";
         logAudit('subscription_create', 'subscriptions', $subId, null, "Plan: {$plan['name']}, Billing: $billing");
     }

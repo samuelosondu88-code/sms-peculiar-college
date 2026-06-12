@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', 0);
 !defined('APP_NAME') && define('APP_NAME', 'Peculiar International College - School Management System');
 !defined('APP_SHORT_NAME') && define('APP_SHORT_NAME', 'PIC SMS');
 !defined('APP_VERSION') && define('APP_VERSION', '2.0.0');
