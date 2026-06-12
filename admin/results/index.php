@@ -12,7 +12,7 @@ $currentSessionId = $currentTerm['session_id'] ?? 0;
 $currentTermId = $currentTerm['id'] ?? 0;
 
 $sessions = $db->query("SELECT id, session_name FROM academic_sessions ORDER BY start_date DESC")->fetchAll();
-$terms = $db->query("SELECT id, term_name FROM terms WHERE session_id = ? ORDER BY id", [$currentSessionId])->fetchAll();
+$tStmt = $db->prepare("SELECT id, term_name FROM terms WHERE session_id = ? ORDER BY id"); $tStmt->execute([$currentSessionId]); $terms = $tStmt->fetchAll();
 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
 
 $totalStudents = $db->query("SELECT COUNT(*) FROM students WHERE status = 'active'")->fetchColumn();
@@ -24,7 +24,7 @@ $promotionRate = 0;
 $classPerformance = [];
 
 if ($currentSessionId && $currentTermId) {
-    $stats = $db->query("
+    $sStmt = $db->prepare("
         SELECT COUNT(DISTINCT student_id) as total,
             AVG(avg_score) as overall_avg
         FROM (
@@ -33,7 +33,7 @@ if ($currentSessionId && $currentTermId) {
             WHERE session_id = ? AND term_id = ?
             GROUP BY student_id
         ) t
-    ", [$currentSessionId, $currentTermId])->fetch();
+    "); $sStmt->execute([$currentSessionId, $currentTermId]); $stats = $sStmt->fetch();
 
     $totalWithScores = (int)$stats['total'];
     $overallAvg = round((float)$stats['overall_avg'], 2);
@@ -41,7 +41,7 @@ if ($currentSessionId && $currentTermId) {
     $settings = $totalWithScores > 0 ? getResultSettings($db, $currentSessionId, $currentTermId) : ['pass_mark' => 40];
     $passMark = $settings['pass_mark'];
 
-    $passFail = $db->query("
+    $pfStmt = $db->prepare("
         SELECT 
             SUM(CASE WHEN avg_score >= ? THEN 1 ELSE 0 END) as pass_count,
             SUM(CASE WHEN avg_score < ? THEN 1 ELSE 0 END) as fail_count,
@@ -52,7 +52,7 @@ if ($currentSessionId && $currentTermId) {
             WHERE session_id = ? AND term_id = ?
             GROUP BY student_id
         ) t
-    ", [$passMark, $passMark, $currentSessionId, $currentTermId])->fetch();
+    "); $pfStmt->execute([$passMark, $passMark, $currentSessionId, $currentTermId]); $passFail = $pfStmt->fetch();
 
     $passCount = (int)$passFail['pass_count'];
     $failCount = (int)$passFail['fail_count'];
@@ -60,18 +60,18 @@ if ($currentSessionId && $currentTermId) {
     $passRate = $totalCount > 0 ? round(($passCount / $totalCount) * 100) : 0;
     $failRate = $totalCount > 0 ? round(($failCount / $totalCount) * 100) : 0;
 
-    $promoCount = $db->query("
+    $pcStmt = $db->prepare("
         SELECT COUNT(*) FROM promotion_results
         WHERE session_id = ? AND promotion_status = 'promoted'
-    ", [$currentSessionId])->fetchColumn();
-    $totalPromo = $db->query("
+    "); $pcStmt->execute([$currentSessionId]); $promoCount = $pcStmt->fetchColumn();
+    $tpStmt = $db->prepare("
         SELECT COUNT(*) FROM promotion_results
         WHERE session_id = ?
-    ", [$currentSessionId])->fetchColumn();
+    "); $tpStmt->execute([$currentSessionId]); $totalPromo = $tpStmt->fetchColumn();
     $promotionRate = $totalPromo > 0 ? round(((int)$promoCount / $totalPromo) * 100) : 0;
 
     foreach ($classes as $c) {
-        $cls = $db->query("
+        $clsStmt = $db->prepare("
             SELECT AVG(avg_score) as cls_avg
             FROM (
                 SELECT student_id, AVG(total_score) as avg_score
@@ -79,7 +79,7 @@ if ($currentSessionId && $currentTermId) {
                 WHERE class_id = ? AND session_id = ? AND term_id = ?
                 GROUP BY student_id
             ) t
-        ", [$c['id'], $currentSessionId, $currentTermId])->fetch();
+        "); $clsStmt->execute([$c['id'], $currentSessionId, $currentTermId]); $cls = $clsStmt->fetch();
         if ($cls['cls_avg'] !== null) {
             $classPerformance[] = [
                 'class' => $c['name'] . ' ' . $c['section'],
