@@ -19,13 +19,13 @@ $stats['pending_payments'] = (int)$stmt->fetchColumn();
 $stmt = $db->query("SELECT COUNT(*) FROM applications WHERE status = 'submitted' OR status = 'reviewing'");
 $stats['pending_applications'] = (int)$stmt->fetchColumn();
 
-$stmt = $db->query("SELECT COUNT(DISTINCT student_id) FROM results");
+$stmt = $db->query("SELECT COUNT(DISTINCT student_id) FROM result_scores");
 $stats['students_with_results'] = (int)$stmt->fetchColumn();
 
-$stmt = $db->query("SELECT COUNT(*) FROM results WHERE status = 'submitted'");
+$stmt = $db->query("SELECT COUNT(*) FROM result_scores WHERE status = 'submitted'");
 $stats['pending_approvals'] = (int)$stmt->fetchColumn();
 
-$stmt = $db->query("SELECT COUNT(*) FROM results WHERE status = 'published'");
+$stmt = $db->query("SELECT COUNT(*) FROM result_scores WHERE status = 'published'");
 $stats['published_results'] = (int)$stmt->fetchColumn();
 
 $recentUsers = $db->query("SELECT id, first_name, last_name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll();

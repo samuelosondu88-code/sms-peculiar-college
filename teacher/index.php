@@ -36,11 +36,11 @@ $stmt->execute([$userId]); $assessedEx = (int)$stmt->fetchColumn();
 // Result stats
 $stmt = $db->prepare("SELECT COUNT(*) FROM subject_allocations sa JOIN subjects s ON sa.subject_id = s.id WHERE s.teacher_id = ?");
 $stmt->execute([$userId]); $totalSubjects = (int)$stmt->fetchColumn();
-$stmt = $db->prepare("SELECT COUNT(*) FROM results r JOIN subjects s ON r.subject_id = s.id WHERE s.teacher_id = ? AND r.status = 'draft'");
+$stmt = $db->prepare("SELECT COUNT(*) FROM result_scores rs JOIN subjects s ON rs.subject_id = s.id WHERE s.teacher_id = ? AND rs.status = 'draft'");
 $stmt->execute([$userId]); $draftResults = (int)$stmt->fetchColumn();
-$stmt = $db->prepare("SELECT COUNT(*) FROM results r JOIN subjects s ON r.subject_id = s.id WHERE s.teacher_id = ? AND r.status = 'submitted'");
+$stmt = $db->prepare("SELECT COUNT(*) FROM result_scores rs JOIN subjects s ON rs.subject_id = s.id WHERE s.teacher_id = ? AND rs.status = 'submitted'");
 $stmt->execute([$userId]); $submittedResults = (int)$stmt->fetchColumn();
-$stmt = $db->prepare("SELECT COUNT(*) FROM results r JOIN subjects s ON r.subject_id = s.id WHERE s.teacher_id = ? AND r.status = 'published'");
+$stmt = $db->prepare("SELECT COUNT(*) FROM result_scores rs JOIN subjects s ON rs.subject_id = s.id WHERE s.teacher_id = ? AND rs.status = 'published'");
 $stmt->execute([$userId]); $publishedResults = (int)$stmt->fetchColumn();
 
 require_once __DIR__ . '/../includes/header.php';
