@@ -2,37 +2,44 @@
 require_once __DIR__ . '/../config/session.php';
 requireRole('teacher');
 require_once __DIR__ . '/../includes/functions.php';
+if (!defined('RESULT_FUNCTIONS_LOADED')) require_once __DIR__ . '/../includes/result_functions.php';
 
 $pageTitle = 'Student Performance Reports';
 $db = getDB();
 $userId = $_SESSION['user_id'];
+$currentTerm = getCurrentTerm();
+$sessionId = (int)($currentTerm['session_id'] ?? 0);
 
 $selectedClass = (int)($_GET['class_id'] ?? 0);
-$selectedExam = (int)($_GET['exam_id'] ?? 0);
+$selectedTerm = (int)($_GET['term_id'] ?? 0);
 
 $classes = $db->prepare("SELECT c.id, c.name, c.section FROM classes c WHERE c.class_teacher_id = ?");
 $classes->execute([$userId]);
 $myClasses = $classes->fetchAll();
 
-$exams = [];
+$terms = [];
 $students = [];
 if ($selectedClass) {
-    $exams = $db->prepare("SELECT id, name FROM exams WHERE class_id = ? OR class_id IS NULL ORDER BY created_at DESC");
-    $exams->execute([$selectedClass]);
-    $exams = $exams->fetchAll();
+    $terms = $db->prepare("SELECT id, term_name FROM terms WHERE session_id = ? ORDER BY id");
+    $terms->execute([$sessionId]);
+    $terms = $terms->fetchAll();
 
-    if ($selectedExam) {
+    if (!$selectedTerm && !empty($terms)) {
+        $selectedTerm = $terms[0]['id'];
+    }
+
+    if ($selectedTerm) {
         $students = $db->prepare("
             SELECT s.id, u.first_name, u.last_name, s.admission_no,
-                   r.score, r.grade, sub.name as subject_name
+                   rs.total_score as score, rs.grade, sub.name as subject_name
             FROM students s
             JOIN users u ON s.user_id = u.id
             JOIN subjects sub ON sub.class_id = s.class_id
-            LEFT JOIN results r ON r.student_id = s.id AND r.exam_id = ? AND r.subject_id = sub.id
+            LEFT JOIN result_scores rs ON rs.student_id = s.id AND rs.subject_id = sub.id AND rs.session_id = ? AND rs.term_id = ?
             WHERE s.class_id = ? AND s.status = 'active'
             ORDER BY u.first_name, sub.name
         ");
-        $students->execute([$selectedExam, $selectedClass]);
+        $students->execute([$sessionId, $selectedTerm, $selectedClass]);
         $students = $students->fetchAll();
 
         $grouped = [];
@@ -67,14 +74,14 @@ require_once __DIR__ . '/../includes/header.php';
             <?php endforeach; ?>
         </select>
     </div>
-    <?php if (!empty($exams)): ?>
+    <?php if (!empty($terms)): ?>
     <div class="col-md-4">
-        <label class="form-label">Exam</label>
-        <select name="exam_id" class="form-select" onchange="this.form.submit()">
+        <label class="form-label">Term</label>
+        <select name="term_id" class="form-select" onchange="this.form.submit()">
             <option value="">Select</option>
-            <?php foreach ($exams as $e): ?>
-            <option value="<?= $e['id'] ?>" <?= $selectedExam === $e['id'] ? 'selected' : '' ?>>
-                <?= sanitizeInput($e['name']) ?>
+            <?php foreach ($terms as $t): ?>
+            <option value="<?= $t['id'] ?>" <?= $selectedTerm === $t['id'] ? 'selected' : '' ?>>
+                <?= sanitizeInput($t['term_name']) ?>
             </option>
             <?php endforeach; ?>
         </select>
@@ -120,9 +127,15 @@ require_once __DIR__ . '/../includes/header.php';
                         <td><?= sanitizeInput($s['admission']) ?></td>
                         <?php foreach ($subjectNames as $sn):
                             $score = $s['subjects'][$sn]['score'] ?? '-';
+                            $grade = $s['subjects'][$sn]['grade'] ?? '-';
                             if (is_numeric($score)) { $total += $score; $count++; }
                         ?>
-                        <td class="text-center"><strong><?= is_numeric($score) ? $score : $score ?></strong></td>
+                        <td class="text-center">
+                            <strong><?= is_numeric($score) ? $score : $score ?></strong>
+                            <?php if (is_numeric($score)): ?>
+                            <br><small class="text-muted"><?= $grade ?></small>
+                            <?php endif; ?>
+                        </td>
                         <?php endforeach; ?>
                         <td class="text-center"><strong><?= $total ?></strong></td>
                         <td class="text-center"><strong><?= $count > 0 ? number_format($total / $count, 1) : '-' ?></strong></td>
@@ -134,7 +147,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </div>
 <?php elseif ($selectedClass): ?>
-<div class="alert alert-info">Select an exam to view the report.</div>
+<div class="alert alert-info">Select a term to view the report.</div>
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

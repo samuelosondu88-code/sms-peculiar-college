@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/app.php';
 
 function redirect(string $path): void {
+    session_write_close();
     header('Location: ' . BASE_URL . $path);
     exit;
 }

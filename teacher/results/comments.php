@@ -136,15 +136,34 @@ require_once __DIR__ . '/../../includes/header.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $i = 1; foreach ($students as $student):
+                    <?php 
+                    $presetRemarks = [
+                        'Excellent performance, keep it up!',
+                        'Very good, but needs to work harder.',
+                        'Good, but has room for improvement.',
+                        'Fair performance, needs more effort.',
+                        'Poor performance, requires serious attention.',
+                        'Shows improvement this term.',
+                        'Outstanding conduct and academic excellence.',
+                        'Satisfactory progress, can do better.',
+                    ];
+                    $i = 1; foreach ($students as $student):
                         $remark = $existingMap[$student['id']]['class_teacher_remark'] ?? '';
+                        $matched = in_array($remark, $presetRemarks) ? $remark : '';
                     ?>
                     <tr>
                         <td><?= $i++ ?></td>
                         <td><small><?= sanitizeInput($student['admission_no']) ?></small></td>
                         <td class="fw-medium"><?= sanitizeInput($student['last_name'] . ' ' . $student['first_name']) ?></td>
                         <td>
-                            <textarea name="remark_<?= $student['id'] ?>" class="form-control form-control-sm" rows="2" maxlength="500" placeholder="Enter remark for this student..."><?= sanitizeInput($remark) ?></textarea>
+                            <select class="form-select form-select-sm mb-1 preset-remark" data-student="<?= $student['id'] ?>">
+                                <option value="">-- Choose a remark --</option>
+                                <?php foreach ($presetRemarks as $pr): ?>
+                                <option value="<?= sanitizeInput($pr) ?>" <?= $matched === $pr ? 'selected' : '' ?>><?= sanitizeInput($pr) ?></option>
+                                <?php endforeach; ?>
+                                <option value="__custom__" <?= $matched === '' && $remark !== '' ? 'selected' : '' ?>>Custom remark...</option>
+                            </select>
+                            <textarea name="remark_<?= $student['id'] ?>" id="remark_<?= $student['id'] ?>" class="form-control form-control-sm" rows="2" maxlength="500" placeholder="Enter or choose a remark..."><?= sanitizeInput($remark) ?></textarea>
                             <small class="text-muted">Max 500 characters</small>
                         </td>
                     </tr>
@@ -159,4 +178,15 @@ require_once __DIR__ . '/../../includes/header.php';
 </form>
 <?php endif; ?>
 
+<script>
+document.querySelectorAll('.preset-remark').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+        var sid = this.dataset.student;
+        var ta = document.getElementById('remark_' + sid);
+        if (this.value && this.value !== '__custom__') {
+            ta.value = this.value;
+        }
+    });
+});
+</script>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

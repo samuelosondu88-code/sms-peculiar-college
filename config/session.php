@@ -45,6 +45,7 @@ function regenerateSession(): void {
     $oldData = $_SESSION;
     session_destroy();
     initSecureSession();
-    $_SESSION = $oldData;
     session_regenerate_id(true);
+    $_SESSION = $oldData;
+    $_SESSION['_last_activity'] = time();
 }

@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_email'])) {
             $_SESSION['user_id'] = (int)$user['id'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['last_name'] = $user['last_name'];
             if ($remember === '1') { $_SESSION['_remember'] = true; }
             regenerateSession();
             setSessionFingerprint();
@@ -36,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_email'])) {
             $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
             logActivity($user['id'], 'login');
+            session_write_close();
             redirect('/index.php');
         }
         recordLoginAttempt($email, $ip, false);
@@ -78,10 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
                 $_SESSION['user_id'] = (int)$student['user_id'];
                 $_SESSION['role'] = 'student';
                 $_SESSION['user_name'] = $student['first_name'] . ' ' . $student['last_name'];
+                $_SESSION['first_name'] = $student['first_name'];
+                $_SESSION['last_name'] = $student['last_name'];
                 regenerateSession();
                 setSessionFingerprint();
                 $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
                 $stmt->execute([$student['user_id']]);
+                session_write_close();
                 redirect('/student/index.php');
             } else {
                 if ($pinRecord === false) {

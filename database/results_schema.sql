@@ -5,13 +5,19 @@
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 START TRANSACTION;
 
--- Result Settings (CA weight, exam weight, grade boundaries)
+-- Result Settings (CA weight, exam weight, grade boundaries, component max scores)
 CREATE TABLE IF NOT EXISTS result_settings (
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     session_id INT(11) NOT NULL,
     term_id INT(11) NOT NULL,
     ca_weight DECIMAL(5,2) NOT NULL DEFAULT 40.00,
     exam_weight DECIMAL(5,2) NOT NULL DEFAULT 60.00,
+    max_assign1 DECIMAL(5,2) DEFAULT 10.00,
+    max_assign2 DECIMAL(5,2) DEFAULT 10.00,
+    max_test1 DECIMAL(5,2) DEFAULT 10.00,
+    max_test2 DECIMAL(5,2) DEFAULT 10.00,
+    max_exam DECIMAL(5,2) DEFAULT 60.00,
+    ca_max DECIMAL(5,2) DEFAULT 40.00,
     pass_mark DECIMAL(5,2) NOT NULL DEFAULT 40.00,
     grade_a_min DECIMAL(5,2) NOT NULL DEFAULT 75.00,
     grade_b_min DECIMAL(5,2) NOT NULL DEFAULT 60.00,
@@ -35,9 +41,12 @@ CREATE TABLE IF NOT EXISTS result_scores (
     term_id INT(11) NOT NULL,
     -- CA Components
     assignment_score DECIMAL(5,2) DEFAULT 0.00,
+    assignment2_score DECIMAL(5,2) DEFAULT 0.00,
     test_score DECIMAL(5,2) DEFAULT 0.00,
-    project_score DECIMAL(5,2) DEFAULT 0.00,
+    test2_score DECIMAL(5,2) DEFAULT 0.00,
     ca_total DECIMAL(5,2) DEFAULT 0.00,
+    -- Project / Practical
+    project_score DECIMAL(5,2) DEFAULT 0.00,
     -- Exam
     exam_score DECIMAL(5,2) DEFAULT 0.00,
     -- Computed
@@ -217,6 +226,20 @@ CREATE TABLE IF NOT EXISTS academic_insights (
     FOREIGN KEY (session_id) REFERENCES academic_sessions(id) ON DELETE CASCADE,
     FOREIGN KEY (term_id) REFERENCES terms(id) ON DELETE CASCADE,
     UNIQUE KEY unique_student_term_insight (student_id, session_id, term_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Broadcast / Notification Log
+CREATE TABLE IF NOT EXISTS broadcast_log (
+    id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    recipient_id INT(11) NOT NULL,
+    recipient_type ENUM('student','parent','teacher','all') NOT NULL DEFAULT 'student',
+    channel ENUM('sms','email','both') NOT NULL,
+    message TEXT NOT NULL,
+    status ENUM('sent','failed','pending') NOT NULL DEFAULT 'sent',
+    sent_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_recipient (recipient_id, recipient_type),
+    INDEX idx_sent_at (sent_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 COMMIT;

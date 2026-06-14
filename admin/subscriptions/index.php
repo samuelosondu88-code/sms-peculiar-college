@@ -22,8 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['subscribe'])) {
         $stmt = $db->prepare("INSERT INTO subscriptions (school_name, school_email, plan_id, billing_cycle, amount, start_date, end_date, status, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 'online')");
         $stmt->execute([SCHOOL_NAME, SCHOOL_EMAIL, $planId, $billing, $amount, $start, $end]);
         $subId = $db->lastInsertId();
-        $invNo = generateReceiptNo();
-        $db->prepare("INSERT INTO payments (subscription_id, invoice_no, amount_paid, payment_method, payment_status, paid_at) VALUES (?, ?, ?, 'online', 'completed', NOW())")->execute([$subId, $invNo, $amount]);
         $msg = "Subscribed to {$plan['name']} plan successfully.";
         logAudit('subscription_create', 'subscriptions', $subId, null, "Plan: {$plan['name']}, Billing: $billing");
     }
@@ -39,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel'])) {
 $plans = $db->query("SELECT * FROM subscription_plans WHERE is_active = 1 ORDER BY price_monthly")->fetchAll();
 $activeSub = $db->query("SELECT s.*, sp.name as plan_name, sp.features FROM subscriptions s JOIN subscription_plans sp ON s.plan_id = sp.id WHERE s.status IN ('active','trial') ORDER BY s.created_at DESC LIMIT 1")->fetch();
 $allSubs = $db->query("SELECT s.*, sp.name as plan_name FROM subscriptions s JOIN subscription_plans sp ON s.plan_id = sp.id ORDER BY s.created_at DESC LIMIT 10")->fetchAll();
-$payments = $db->query("SELECT p.*, sp.name as plan_name FROM payments p JOIN subscriptions s ON p.subscription_id = s.id JOIN subscription_plans sp ON s.plan_id = sp.id ORDER BY p.created_at DESC LIMIT 20")->fetchAll();
+$payments = [];
 
 $features = [];
 if ($activeSub && $activeSub['features']) {

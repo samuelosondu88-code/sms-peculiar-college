@@ -195,9 +195,10 @@ require_once __DIR__ . '/../../includes/header.php';
                         <th>#</th>
                         <th>Student</th>
                         <th>Admission</th>
-                        <th>Assignment</th>
-                        <th>Test</th>
-                        <th>Project</th>
+                        <th>Assign 1</th>
+                        <th>Assign 2</th>
+                        <th>Test 1</th>
+                        <th>Test 2</th>
                         <th>CA Total</th>
                         <th>Exam</th>
                         <th>Total</th>
@@ -213,8 +214,9 @@ require_once __DIR__ . '/../../includes/header.php';
                         <td><?= sanitizeInput($s['last_name'] . ', ' . $s['first_name']) ?></td>
                         <td><?= sanitizeInput($s['admission_no']) ?></td>
                         <td><?= $r ? $r['assignment_score'] : '-' ?></td>
+                        <td><?= $r ? $r['assignment2_score'] : '-' ?></td>
                         <td><?= $r ? $r['test_score'] : '-' ?></td>
-                        <td><?= $r ? $r['project_score'] : '-' ?></td>
+                        <td><?= $r ? $r['test2_score'] : '-' ?></td>
                         <td><?= $r ? $r['ca_total'] : '-' ?></td>
                         <td><?= $r ? $r['exam_score'] : '-' ?></td>
                         <td><strong><?= $r ? $r['total_score'] : '-' ?></strong></td>

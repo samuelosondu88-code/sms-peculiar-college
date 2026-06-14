@@ -22,6 +22,8 @@ $passRate = 0;
 $failRate = 0;
 $promotionRate = 0;
 $classPerformance = [];
+$subjectPerformance = [];
+$termTrend = [];
 
 if ($currentSessionId && $currentTermId) {
     $sStmt = $db->prepare("
@@ -60,14 +62,10 @@ if ($currentSessionId && $currentTermId) {
     $passRate = $totalCount > 0 ? round(($passCount / $totalCount) * 100) : 0;
     $failRate = $totalCount > 0 ? round(($failCount / $totalCount) * 100) : 0;
 
-    $pcStmt = $db->prepare("
-        SELECT COUNT(*) FROM promotion_results
-        WHERE session_id = ? AND promotion_status = 'promoted'
-    "); $pcStmt->execute([$currentSessionId]); $promoCount = $pcStmt->fetchColumn();
-    $tpStmt = $db->prepare("
-        SELECT COUNT(*) FROM promotion_results
-        WHERE session_id = ?
-    "); $tpStmt->execute([$currentSessionId]); $totalPromo = $tpStmt->fetchColumn();
+    $pcStmt = $db->prepare("SELECT COUNT(*) FROM promotion_results WHERE session_id = ? AND promotion_status = 'promoted'");
+    $pcStmt->execute([$currentSessionId]); $promoCount = $pcStmt->fetchColumn();
+    $tpStmt = $db->prepare("SELECT COUNT(*) FROM promotion_results WHERE session_id = ?");
+    $tpStmt->execute([$currentSessionId]); $totalPromo = $tpStmt->fetchColumn();
     $promotionRate = $totalPromo > 0 ? round(((int)$promoCount / $totalPromo) * 100) : 0;
 
     foreach ($classes as $c) {
@@ -87,16 +85,34 @@ if ($currentSessionId && $currentTermId) {
             ];
         }
     }
+
+    $subjStmt = $db->prepare("
+        SELECT s.name, AVG(rs.total_score) as subj_avg
+        FROM result_scores rs
+        JOIN subjects s ON rs.subject_id = s.id
+        WHERE rs.session_id = ? AND rs.term_id = ?
+        GROUP BY rs.subject_id
+        ORDER BY subj_avg DESC
+        LIMIT 10
+    ");
+    $subjStmt->execute([$currentSessionId, $currentTermId]);
+    $subjectPerformance = $subjStmt->fetchAll();
+
+    $allTermsStmt = $db->prepare("SELECT id, term_name FROM terms WHERE session_id = ? ORDER BY id");
+    $allTermsStmt->execute([$currentSessionId]);
+    $allTerms = $allTermsStmt->fetchAll();
+    foreach ($allTerms as $at) {
+        $avgStmt = $db->prepare("SELECT AVG(avg_score) FROM (SELECT AVG(total_score) as avg_score FROM result_scores WHERE session_id = ? AND term_id = ? GROUP BY student_id) t");
+        $avgStmt->execute([$currentSessionId, $at['id']]);
+        $termAvg = $avgStmt->fetchColumn();
+        if ($termAvg !== null && $termAvg !== false) {
+            $termTrend[] = ['term' => $at['term_name'], 'average' => round((float)$termAvg, 2)];
+        }
+    }
 }
 
-$pendingApprovals = $db->query("
-    SELECT COUNT(DISTINCT ra.class_id) FROM result_approvals ra
-    WHERE ra.status = 'pending'
-")->fetchColumn();
-
-$pendingPromotions = $db->query("
-    SELECT COUNT(*) FROM promotion_config WHERE is_active = 1
-")->fetchColumn();
+$pendingApprovals = $db->query("SELECT COUNT(DISTINCT ra.class_id) FROM result_approvals ra WHERE ra.status = 'pending'")->fetchColumn();
+$pendingPromotions = $db->query("SELECT COUNT(*) FROM promotion_config WHERE is_active = 1")->fetchColumn();
 
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -110,7 +126,8 @@ require_once __DIR__ . '/../../includes/header.php';
         <a href="<?= BASE_URL ?>/admin/results/settings.php" class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-cog me-1"></i>Settings</a>
         <a href="<?= BASE_URL ?>/admin/results/approve.php" class="btn btn-sm btn-outline-warning me-1"><i class="fas fa-check-double me-1"></i>Approvals <?= $pendingApprovals > 0 ? '<span class="badge bg-danger">' . $pendingApprovals . '</span>' : '' ?></a>
         <a href="<?= BASE_URL ?>/admin/results/pins.php" class="btn btn-sm btn-outline-info me-1"><i class="fas fa-key me-1"></i>PINs</a>
-        <a href="<?= BASE_URL ?>/admin/results/promotion.php" class="btn btn-sm btn-outline-success"><i class="fas fa-arrow-up me-1"></i>Promotion</a>
+        <a href="<?= BASE_URL ?>/admin/results/promotion.php" class="btn btn-sm btn-outline-success me-1"><i class="fas fa-arrow-up me-1"></i>Promotion</a>
+        <a href="<?= BASE_URL ?>/admin/results/pdf.php" class="btn btn-sm btn-outline-danger"><i class="fas fa-file-pdf me-1"></i>PDF</a>
     </div>
 </div>
 
@@ -173,28 +190,60 @@ require_once __DIR__ . '/../../includes/header.php';
     </div>
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header"><i class="fas fa-link me-2"></i>Quick Links</div>
+            <div class="card-header"><i class="fas fa-link me-2"></i>Result Management Links</div>
             <div class="card-body">
                 <div class="row g-2">
-                    <div class="col-6"><a href="<?= BASE_URL ?>/admin/results/manage.php" class="btn btn-primary w-100"><i class="fas fa-list me-1"></i>View All Results</a></div>
-                    <div class="col-6"><a href="<?= BASE_URL ?>/admin/results/psychomotor.php" class="btn btn-info w-100 text-white"><i class="fas fa-running me-1"></i>Psychomotor</a></div>
-                    <div class="col-6"><a href="<?= BASE_URL ?>/admin/results/affective.php" class="btn btn-secondary w-100"><i class="fas fa-heart me-1"></i>Affective</a></div>
-                    <div class="col-6"><a href="<?= BASE_URL ?>/admin/results/comments.php" class="btn btn-dark w-100"><i class="fas fa-comment me-1"></i>Comments</a></div>
+                    <div class="col-4"><a href="<?= BASE_URL ?>/admin/results/manage.php" class="btn btn-primary w-100 btn-sm"><i class="fas fa-list me-1"></i>Manage</a></div>
+                    <div class="col-4"><a href="<?= BASE_URL ?>/admin/results/psychomotor.php" class="btn btn-info w-100 btn-sm text-white"><i class="fas fa-running me-1"></i>Psychomotor</a></div>
+                    <div class="col-4"><a href="<?= BASE_URL ?>/admin/results/affective.php" class="btn btn-secondary w-100 btn-sm"><i class="fas fa-heart me-1"></i>Affective</a></div>
+                    <div class="col-4"><a href="<?= BASE_URL ?>/admin/results/comments.php" class="btn btn-dark w-100 btn-sm"><i class="fas fa-comment me-1"></i>Comments</a></div>
+                    <div class="col-4"><a href="<?= BASE_URL ?>/admin/results/annual.php" class="btn btn-success w-100 btn-sm"><i class="fas fa-calendar-alt me-1"></i>Annual</a></div>
+                    <div class="col-4"><a href="<?= BASE_URL ?>/admin/results/import.php" class="btn btn-outline-primary w-100 btn-sm"><i class="fas fa-file-import me-1"></i>Import</a></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-3">
+<div class="row g-3 mb-4">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header"><i class="fas fa-chart-bar me-2"></i>Average Performance by Class</div>
             <div class="card-body">
-                <canvas id="classPerformanceChart" height="250"></canvas>
+                <canvas id="classPerformanceChart" height="200"></canvas>
             </div>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-chart-pie me-2"></i>Pass / Fail Distribution</div>
+            <div class="card-body">
+                <canvas id="passFailChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-chart-line me-2"></i>Term Trend (Session Avg)</div>
+            <div class="card-body">
+                <canvas id="termTrendChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-book me-2"></i>Subject Performance (Top 10)</div>
+            <div class="card-body">
+                <canvas id="subjectChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
     <div class="col-md-4">
         <div class="card">
             <div class="card-header"><i class="fas fa-tasks me-2"></i>Pending Actions</div>
@@ -212,7 +261,38 @@ require_once __DIR__ . '/../../includes/header.php';
                         Classes with Scores
                         <span class="badge bg-primary rounded-pill"><?= count($classPerformance) ?></span>
                     </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Broadcast History
+                        <a href="<?= BASE_URL ?>/admin/results/broadcast.php" class="btn btn-sm btn-outline-primary"><i class="fas fa-bullhorn me-1"></i>Broadcast</a>
+                    </li>
                 </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle me-2"></i>Quick Actions</div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <a href="<?= BASE_URL ?>/admin/results/pdf.php" class="btn btn-outline-danger w-100"><i class="fas fa-file-pdf me-1"></i>Download PDF Report Card</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="<?= BASE_URL ?>/admin/results/annual.php" class="btn btn-outline-success w-100"><i class="fas fa-calendar-alt me-1"></i>Cumulative Annual Report</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="<?= BASE_URL ?>/admin/results/import.php" class="btn btn-outline-primary w-100"><i class="fas fa-file-import me-1"></i>Import Scores from CSV</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="<?= BASE_URL ?>/admin/results/broadcast.php" class="btn btn-outline-warning w-100"><i class="fas fa-bullhorn me-1"></i>Broadcast Results</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="<?= BASE_URL ?>/result-checker.php" class="btn btn-outline-info w-100" target="_blank"><i class="fas fa-external-link-alt me-1"></i>Public Result Checker</a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="<?= BASE_URL ?>/admin/results/pins.php" class="btn btn-outline-secondary w-100"><i class="fas fa-key me-1"></i>Generate Result PINs</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -221,14 +301,21 @@ require_once __DIR__ . '/../../includes/header.php';
 <?php
 $chartLabels = json_encode(array_map(fn($c) => $c['class'], $classPerformance));
 $chartValues = json_encode(array_map(fn($c) => $c['average'], $classPerformance));
+
+$trendLabels = json_encode(array_map(fn($t) => $t['term'], $termTrend));
+$trendValues = json_encode(array_map(fn($t) => $t['average'], $termTrend));
+
+$subjLabels = json_encode(array_map(fn($s) => $s['name'], $subjectPerformance));
+$subjValues = json_encode(array_map(fn($s) => round((float)$s['subj_avg'], 1), $subjectPerformance));
+
 $extraScripts = <<<SCRIPT
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var ctx = document.getElementById('classPerformanceChart');
-    if (ctx) {
+    var ctx1 = document.getElementById('classPerformanceChart');
+    if (ctx1) {
         var labels = {$chartLabels};
         var dataValues = {$chartValues};
-        new Chart(ctx, {
+        new Chart(ctx1, {
             type: 'bar',
             data: {
                 labels: labels,
@@ -247,6 +334,83 @@ document.addEventListener('DOMContentLoaded', function() {
                 scales: {
                     y: { beginAtZero: true, max: 100 },
                     x: { ticks: { maxRotation: 45 } }
+                }
+            }
+        });
+    }
+
+    var ctx2 = document.getElementById('passFailChart');
+    if (ctx2) {
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pass ({$passRate}%)', 'Fail ({$failRate}%)'],
+                datasets: [{
+                    data: [{$passRate}, {$failRate}],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    var ctx3 = document.getElementById('termTrendChart');
+    if (ctx3) {
+        new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: {$trendLabels},
+                datasets: [{
+                    label: 'Session Average',
+                    data: {$trendValues},
+                    borderColor: 'rgba(212, 175, 55, 1)',
+                    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: 'rgba(11, 31, 58, 1)',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                }
+            }
+        });
+    }
+
+    var ctx4 = document.getElementById('subjectChart');
+    if (ctx4) {
+        new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: {$subjLabels},
+                datasets: [{
+                    label: 'Average Score',
+                    data: {$subjValues},
+                    backgroundColor: [
+                        'rgba(212,175,55,0.7)','rgba(11,31,58,0.7)','rgba(40,167,69,0.7)',
+                        'rgba(0,123,255,0.7)','rgba(108,117,125,0.7)','rgba(220,53,69,0.7)',
+                        'rgba(23,162,184,0.7)','rgba(255,193,7,0.7)','rgba(111,66,193,0.7)',
+                        'rgba(253,126,20,0.7)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, max: 100 }
                 }
             }
         });

@@ -157,9 +157,10 @@ require_once __DIR__ . '/../../includes/header.php';
                         <th>#</th>
                         <th>Admission No</th>
                         <th>Student Name</th>
-                        <th>Assignment</th>
-                        <th>Test</th>
-                        <th>Project</th>
+                        <th>Assign 1</th>
+                        <th>Assign 2</th>
+                        <th>Test 1</th>
+                        <th>Test 2</th>
                         <th>CA Total</th>
                         <th>Exam</th>
                         <th>Total</th>
@@ -175,8 +176,9 @@ require_once __DIR__ . '/../../includes/header.php';
                         <td><small><?= sanitizeInput($score['admission_no']) ?></small></td>
                         <td class="fw-medium"><?= sanitizeInput($score['last_name'] . ' ' . $score['first_name']) ?></td>
                         <td><?= (float)$score['assignment_score'] ?></td>
+                        <td><?= (float)$score['assignment2_score'] ?></td>
                         <td><?= (float)$score['test_score'] ?></td>
-                        <td><?= (float)$score['project_score'] ?></td>
+                        <td><?= (float)$score['test2_score'] ?></td>
                         <td class="fw-bold"><?= (float)$score['ca_total'] ?></td>
                         <td><?= (float)$score['exam_score'] ?></td>
                         <td class="fw-bold"><?= (float)$score['total_score'] ?></td>

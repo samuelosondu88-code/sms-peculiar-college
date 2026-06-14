@@ -96,9 +96,9 @@ if ($promoFilterSession) { $sqlCount .= " AND pr.session_id = ?"; $sqlData .= " 
 if ($promoFilterClass) { $sqlCount .= " AND pr.from_class_id = ?"; $sqlData .= " AND pr.from_class_id = ?"; $params[] = $promoFilterClass; }
 if ($promoFilterStatus) { $sqlCount .= " AND pr.promotion_status = ?"; $sqlData .= " AND pr.promotion_status = ?"; $params[] = $promoFilterStatus; }
 
-$promoCount = (int)$db->prepare($sqlCount);
-$promoCount->execute($params);
-$promoCount = $promoCount->fetchColumn();
+$promoStmt = $db->prepare($sqlCount);
+$promoStmt->execute($params);
+$promoCount = (int)$promoStmt->fetchColumn();
 
 $sqlData .= " ORDER BY pr.annual_average DESC LIMIT $limit OFFSET $offset";
 $stmt = $db->prepare($sqlData);

@@ -175,6 +175,20 @@ a:hover { color: var(--gold); }
     font-weight: 600;
     border-left: 3px solid var(--gold);
 }
+#sidebar-wrapper .nav-item .nav-link {
+    color: rgba(255,255,255,0.7);
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 0;
+}
+#sidebar-wrapper .nav-item .nav-link:hover {
+    color: white;
+    background: rgba(255,255,255,0.08);
+}
+#sidebar-wrapper .nav-item .nav-link[aria-expanded="true"] {
+    color: var(--gold);
+    background: rgba(212,175,55,0.08);
+}
 
 /* ===== NAVBAR ===== */
 .navbar {
@@ -217,6 +231,7 @@ a:hover { color: var(--gold); }
 .stat-success { background: linear-gradient(135deg, #059669, #34d399); }
 .stat-warning { background: linear-gradient(135deg, #d97706, #fbbf24); color: var(--primary); }
 .stat-info { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+.stat-danger { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 
 /* ===== DASHBOARD FEATURE CARDS ===== */
 .feature-card {
@@ -725,5 +740,50 @@ a:hover { color: var(--gold); }
     #page-content-wrapper { margin-left: 0 !important; }
     .container-fluid { padding: 0 !important; }
 }
+
+/* ===================== Exam Security Styles ===================== */
+.exam-warning-overlay { position: fixed; top: 0; left: 0; right: 0; z-index: 99999; padding: 12px; pointer-events: none; }
+.exam-warning-box { max-width: 600px; margin: 0 auto; padding: 16px 20px; border-radius: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: auto; }
+.exam-warning-danger { background: #fef2f2; border-left: 4px solid #dc2626; color: #991b1b; }
+.exam-warning-warning { background: #fffbeb; border-left: 4px solid #d97706; color: #92400e; }
+.exam-warning-info { background: #eff6ff; border-left: 4px solid #2563eb; color: #1e40af; }
+.exam-warning-icon { font-size: 24px; flex-shrink: 0; }
+.exam-warning-msg { flex: 1; font-size: 14px; font-weight: 500; }
+.exam-warning-close { cursor: pointer; font-size: 20px; opacity: 0.5; padding: 0 4px; }
+.exam-warning-close:hover { opacity: 1; }
+
+.connection-badge { position: fixed; bottom: 16px; right: 16px; z-index: 9999; font-size: 12px; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+
+.security-step { display: none; }
+.security-step.active { display: block; }
+.step-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; }
+.step-dot { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; background: #e5e7eb; color: #6b7280; transition: all 0.3s; }
+.step-dot.active { background: #0B1F3A; color: #fff; }
+.step-dot.done { background: #059669; color: #fff; }
+
+.question-btn.flagged { border-color: #d97706; position: relative; }
+.question-btn.flagged::after { content: '!'; position: absolute; top: -5px; right: -5px; background: #d97706; color: #fff; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; line-height: 16px; }
+#timer.warning { color: #d97706; }
+#timer.danger { color: #dc2626; animation: pulse 1s infinite; }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.pulse-dot .fa-circle { animation: pulseDot 1.5s infinite; font-size: 8px; vertical-align: middle; }
+
+body.exam-mode { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+.option-shuffled-label { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; font-weight: bold; font-size: 13px; margin-right: 8px; background: #e5e7eb; }
+.option-shuffled-label.selected { background: #0B1F3A; color: #fff; }
+
+.stat-card { position: relative; padding: 20px; border-radius: 12px; color: #fff; overflow: hidden; }
+.stat-card .stat-icon { position: absolute; right: 16px; bottom: 16px; font-size: 48px; opacity: 0.2; }
+.stat-card .stat-value { font-size: 28px; font-weight: 800; }
+.stat-card .stat-label { font-size: 13px; opacity: 0.85; }
+.stat-primary { background: linear-gradient(135deg, #0B1F3A 0%, #1a3a6b 100%); }
+.stat-success { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+.stat-warning { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+.stat-danger { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
+.stat-info { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');

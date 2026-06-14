@@ -94,7 +94,7 @@ $params = [];
 if ($filterStatus) { $sql .= " AND sp.status = ?"; $params[] = $filterStatus; }
 if ($filterClass) { $sql .= " AND s.class_id = ?"; $params[] = $filterClass; }
 if ($search) { $sql .= " AND (u.first_name LIKE ? OR u.last_name LIKE ? OR s.admission_no LIKE ?)"; $s = "%$search%"; $params[] = $s; $params[] = $s; $params[] = $s; }
-$sql .= " ORDER BY sp.generated_at DESC LIMIT 100";
+$sql .= " ORDER BY sp.created_at DESC LIMIT 100";
 $pins = $db->prepare($sql);
 $pins->execute($params);
 $pinList = $pins->fetchAll();
@@ -184,7 +184,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <td><code><?= sanitizeInput($p['pin']) ?></code></td>
                         <td><?= getStatusBadge($p['status']) ?></td>
                         <td><?= $p['attempts'] ?>/<?= $p['max_attempts'] ?></td>
-                        <td><small><?= timeAgo($p['generated_at']) ?></small></td>
+                        <td><small><?= timeAgo($p['created_at']) ?></small></td>
                         <td><?= $p['expires_at'] ? formatDate($p['expires_at']) : '-' ?></td>
                         <td>
                             <?php if ($p['status'] === 'active'): ?>

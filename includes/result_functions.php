@@ -49,16 +49,18 @@ if (!defined('RESULT_FUNCTIONS_LOADED')) {
         return $settings ?: [
             'ca_weight' => 40, 'exam_weight' => 60, 'pass_mark' => 40,
             'grade_a_min' => 75, 'grade_b_min' => 60, 'grade_c_min' => 50,
-            'grade_d_min' => 40, 'grade_e_min' => 30
+            'grade_d_min' => 40, 'grade_e_min' => 30,
+            'max_assign1' => 10, 'max_assign2' => 10, 'max_test1' => 10,
+            'max_test2' => 10, 'max_exam' => 60, 'ca_max' => 40
         ];
     }
 
-    function computeCaTotal(float $assignment, float $test, float $project): float {
-        return min($assignment + $test + $project, 100);
+    function computeCaTotal(float $assign1, float $assign2, float $test1, float $test2, float $caMax = 40): float {
+        return min($assign1 + $assign2 + $test1 + $test2, $caMax);
     }
 
     function computeTotalScore(float $caTotal, float $examScore): float {
-        return min($caTotal + $examScore, 100);
+        return $caTotal + $examScore;
     }
 
     function computeAndSaveResult(PDO $db, int $scoreId, int $sessionId, int $termId): void {
@@ -68,7 +70,7 @@ if (!defined('RESULT_FUNCTIONS_LOADED')) {
         if (!$row) return;
 
         $settings = getResultSettings($db, $sessionId, $termId);
-        $caTotal = computeCaTotal($row['assignment_score'], $row['test_score'], $row['project_score']);
+        $caTotal = computeCaTotal($row['assignment_score'], $row['assignment2_score'], $row['test_score'], $row['test2_score'], $settings['ca_max']);
         $totalScore = computeTotalScore($caTotal, $row['exam_score']);
         $grade = getGrade($totalScore, $settings['grade_a_min'], $settings['grade_b_min'], $settings['grade_c_min'], $settings['grade_d_min'], $settings['grade_e_min']);
 
@@ -390,7 +392,7 @@ if (!defined('RESULT_FUNCTIONS_LOADED')) {
     }
 
     function getResultApprovalStatus(PDO $db, int $classId, int $sessionId, int $termId): array {
-        $stmt = $db->prepare("SELECT sa.approval_stage, sa.status, sa.comment, u.full_name as approved_by_name, sa.updated_at FROM result_approvals sa LEFT JOIN users u ON sa.approved_by = u.id WHERE sa.class_id = ? AND sa.session_id = ? AND sa.term_id = ? AND sa.subject_id IS NULL ORDER BY FIELD(sa.approval_stage, 'subject_teacher','class_teacher','principal','published')");
+        $stmt = $db->prepare("SELECT sa.approval_stage, sa.status, sa.comment, CONCAT(u.first_name, ' ', u.last_name) as approved_by_name, sa.updated_at FROM result_approvals sa LEFT JOIN users u ON sa.approved_by = u.id WHERE sa.class_id = ? AND sa.session_id = ? AND sa.term_id = ? AND sa.subject_id IS NULL ORDER BY FIELD(sa.approval_stage, 'subject_teacher','class_teacher','principal','published')");
         $stmt->execute([$classId, $sessionId, $termId]);
         return $stmt->fetchAll();
     }

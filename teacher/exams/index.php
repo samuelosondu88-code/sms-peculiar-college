@@ -187,6 +187,8 @@ require_once __DIR__ . '/../../includes/header.php';
                                     <li><a class="dropdown-item" href="set-questions.php?exam_id=<?= $ex['id'] ?>"><i class="fas fa-list me-2"></i>Questions</a></li>
                                     <li><a class="dropdown-item" href="create.php?id=<?= $ex['id'] ?>"><i class="fas fa-edit me-2"></i>Edit</a></li>
                                     <li><a class="dropdown-item" href="results.php?exam_id=<?= $ex['id'] ?>"><i class="fas fa-chart-bar me-2"></i>Results</a></li>
+                                    <li><a class="dropdown-item" href="security-settings.php?exam_id=<?= $ex['id'] ?>"><i class="fas fa-shield-alt me-2"></i>Security</a></li>
+                                    <li><a class="dropdown-item" href="monitor.php?exam_id=<?= $ex['id'] ?>"><i class="fas fa-tv me-2"></i>Live Monitor</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="POST" class="d-inline">

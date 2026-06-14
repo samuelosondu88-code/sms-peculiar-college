@@ -52,7 +52,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <?php elseif ($exam['attempt_status'] === 'submitted' || $exam['attempt_status'] === 'graded'): ?>
                 <a href="results.php?exam_id=<?= $exam['id'] ?>" class="btn btn-outline-primary w-100"><i class="fas fa-eye me-1"></i>View Results</a>
                 <?php else: ?>
-                <a href="take-exam.php?exam_id=<?= $exam['id'] ?>" class="btn btn-primary w-100"><i class="fas fa-play me-1"></i>Start Exam</a>
+                <a href="security-check.php?exam_id=<?= $exam['id'] ?>" class="btn btn-primary w-100"><i class="fas fa-shield-alt me-1"></i>Start Exam</a>
                 <?php endif; ?>
             </div>
         </div>

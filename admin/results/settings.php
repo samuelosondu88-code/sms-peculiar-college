@@ -28,6 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
         'grade_c_min' => (float)($_POST['grade_c_min'] ?? 50),
         'grade_d_min' => (float)($_POST['grade_d_min'] ?? 40),
         'grade_e_min' => (float)($_POST['grade_e_min'] ?? 30),
+        'max_assign1' => (float)($_POST['max_assign1'] ?? 10),
+        'max_assign2' => (float)($_POST['max_assign2'] ?? 10),
+        'max_test1' => (float)($_POST['max_test1'] ?? 10),
+        'max_test2' => (float)($_POST['max_test2'] ?? 10),
+        'max_exam' => (float)($_POST['max_exam'] ?? 60),
+        'ca_max' => (float)($_POST['ca_max'] ?? 40),
     ];
 
     $stmt = $db->prepare("SELECT id FROM result_settings WHERE session_id = ? AND term_id = ?");
@@ -35,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $existing = $stmt->fetch();
 
     if ($existing) {
-        $stmt = $db->prepare("UPDATE result_settings SET ca_weight = ?, exam_weight = ?, pass_mark = ?, grade_a_min = ?, grade_b_min = ?, grade_c_min = ?, grade_d_min = ?, grade_e_min = ? WHERE session_id = ? AND term_id = ?");
-        $stmt->execute([$settings['ca_weight'], $settings['exam_weight'], $settings['pass_mark'], $settings['grade_a_min'], $settings['grade_b_min'], $settings['grade_c_min'], $settings['grade_d_min'], $settings['grade_e_min'], $sessionId, $termId]);
+        $stmt = $db->prepare("UPDATE result_settings SET ca_weight = ?, exam_weight = ?, pass_mark = ?, grade_a_min = ?, grade_b_min = ?, grade_c_min = ?, grade_d_min = ?, grade_e_min = ?, max_assign1 = ?, max_assign2 = ?, max_test1 = ?, max_test2 = ?, max_exam = ?, ca_max = ? WHERE session_id = ? AND term_id = ?");
+        $stmt->execute([$settings['ca_weight'], $settings['exam_weight'], $settings['pass_mark'], $settings['grade_a_min'], $settings['grade_b_min'], $settings['grade_c_min'], $settings['grade_d_min'], $settings['grade_e_min'], $settings['max_assign1'], $settings['max_assign2'], $settings['max_test1'], $settings['max_test2'], $settings['max_exam'], $settings['ca_max'], $sessionId, $termId]);
     } else {
-        $stmt = $db->prepare("INSERT INTO result_settings (session_id, term_id, ca_weight, exam_weight, pass_mark, grade_a_min, grade_b_min, grade_c_min, grade_d_min, grade_e_min) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$sessionId, $termId, $settings['ca_weight'], $settings['exam_weight'], $settings['pass_mark'], $settings['grade_a_min'], $settings['grade_b_min'], $settings['grade_c_min'], $settings['grade_d_min'], $settings['grade_e_min']]);
+        $stmt = $db->prepare("INSERT INTO result_settings (session_id, term_id, ca_weight, exam_weight, pass_mark, grade_a_min, grade_b_min, grade_c_min, grade_d_min, grade_e_min, max_assign1, max_assign2, max_test1, max_test2, max_exam, ca_max) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$sessionId, $termId, $settings['ca_weight'], $settings['exam_weight'], $settings['pass_mark'], $settings['grade_a_min'], $settings['grade_b_min'], $settings['grade_c_min'], $settings['grade_d_min'], $settings['grade_e_min'], $settings['max_assign1'], $settings['max_assign2'], $settings['max_test1'], $settings['max_test2'], $settings['max_exam'], $settings['ca_max']]);
     }
 
     logAudit('result_settings_update', 'result_settings', null, null, "Session=$sessionId, Term=$termId");
@@ -104,6 +110,15 @@ require_once __DIR__ . '/../../includes/header.php';
                             <input type="number" name="exam_weight" class="form-control" value="<?= $currentSettings['exam_weight'] ?? 60 ?>" min="0" max="100" step="0.5" required>
                         </div>
                     </div>
+                    <h6 class="fw-bold mt-4 mb-2">CA Component Max Scores</h6>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4"><label class="form-label">Assign 1</label><input type="number" name="max_assign1" class="form-control" value="<?= $currentSettings['max_assign1'] ?? 10 ?>" min="0" max="100" step="0.5" required></div>
+                        <div class="col-4"><label class="form-label">Assign 2</label><input type="number" name="max_assign2" class="form-control" value="<?= $currentSettings['max_assign2'] ?? 10 ?>" min="0" max="100" step="0.5" required></div>
+                        <div class="col-4"><label class="form-label">Test 1</label><input type="number" name="max_test1" class="form-control" value="<?= $currentSettings['max_test1'] ?? 10 ?>" min="0" max="100" step="0.5" required></div>
+                        <div class="col-4"><label class="form-label">Test 2</label><input type="number" name="max_test2" class="form-control" value="<?= $currentSettings['max_test2'] ?? 10 ?>" min="0" max="100" step="0.5" required></div>
+                        <div class="col-4"><label class="form-label">CA Total Cap</label><input type="number" name="ca_max" class="form-control" value="<?= $currentSettings['ca_max'] ?? 40 ?>" min="0" max="100" step="0.5" required></div>
+                        <div class="col-4"><label class="form-label">Exam</label><input type="number" name="max_exam" class="form-control" value="<?= $currentSettings['max_exam'] ?? 60 ?>" min="0" max="100" step="0.5" required></div>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Pass Mark (%)</label>
                         <input type="number" name="pass_mark" class="form-control" value="<?= $currentSettings['pass_mark'] ?? 40 ?>" min="0" max="100" step="0.5" required>
@@ -133,6 +148,12 @@ require_once __DIR__ . '/../../includes/header.php';
                                 <th>Term</th>
                                 <th>CA</th>
                                 <th>Exam</th>
+                                <th>Max A1</th>
+                                <th>Max A2</th>
+                                <th>Max T1</th>
+                                <th>Max T2</th>
+                                <th>CA Cap</th>
+                                <th>Max Ex</th>
                                 <th>Pass</th>
                                 <th>A</th>
                                 <th>B</th>
@@ -148,6 +169,12 @@ require_once __DIR__ . '/../../includes/header.php';
                                 <td><?= sanitizeInput($s['term_name']) ?></td>
                                 <td><?= $s['ca_weight'] ?>%</td>
                                 <td><?= $s['exam_weight'] ?>%</td>
+                                <td><?= $s['max_assign1'] ?></td>
+                                <td><?= $s['max_assign2'] ?></td>
+                                <td><?= $s['max_test1'] ?></td>
+                                <td><?= $s['max_test2'] ?></td>
+                                <td><?= $s['ca_max'] ?></td>
+                                <td><?= $s['max_exam'] ?></td>
                                 <td><span class="badge bg-<?= $s['pass_mark'] >= 40 ? 'success' : 'warning' ?>"><?= $s['pass_mark'] ?></span></td>
                                 <td><?= $s['grade_a_min'] ?>+</td>
                                 <td><?= $s['grade_b_min'] ?>+</td>
@@ -157,7 +184,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             </tr>
                             <?php endforeach; ?>
                             <?php if (empty($allSettings)): ?>
-                            <tr><td colspan="10" class="text-center text-muted py-3">No settings configured yet.</td></tr>
+                            <tr><td colspan="16" class="text-center text-muted py-3">No settings configured yet.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>

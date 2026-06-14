@@ -127,8 +127,11 @@ function checkSessionFingerprint(): void {
         setSessionFingerprint();
         return;
     }
-    $current = hash('sha256', ($_SERVER['HTTP_USER_AGENT'] ?? '') . '-' . ($_SERVER['REMOTE_ADDR'] ?? ''));
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $current = hash('sha256', $ua . '-' . $ip);
     if ($_SESSION['_fingerprint'] !== $current) {
+        error_log('[SESSION HIJACK] stored=' . $_SESSION['_fingerprint'] . ' current=' . $current . ' ua=' . $ua . ' ip=' . $ip . ' session_id=' . session_id());
         $_SESSION = [];
         session_destroy();
         $url = defined('BASE_URL') ? BASE_URL : '';

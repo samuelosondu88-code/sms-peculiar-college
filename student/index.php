@@ -23,7 +23,7 @@ $stmt = $db->prepare("SELECT COUNT(*) FROM assignments a JOIN subjects s ON a.su
 $stmt->execute([$student['class_id'] ?? 0]);
 $pendingAssignments = (int)$stmt->fetchColumn();
 
-$stmt = $db->prepare("SELECT r.score, r.grade, sub.name as subject_name, e.name as exam_name FROM results r JOIN exams e ON r.exam_id = e.id JOIN subjects sub ON r.subject_id = sub.id WHERE r.student_id = ? ORDER BY e.created_at DESC LIMIT 5");
+$stmt = $db->prepare("SELECT rs.total_score as score, rs.grade, sub.name as subject_name, t.term_name, s.session_name FROM result_scores rs JOIN subjects sub ON rs.subject_id = sub.id JOIN academic_sessions s ON rs.session_id = s.id JOIN terms t ON rs.term_id = t.id WHERE rs.student_id = ? AND rs.status = 'published' ORDER BY rs.updated_at DESC LIMIT 5");
 $stmt->execute([$student['id'] ?? 0]);
 $recentResults = $stmt->fetchAll();
 
@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="row g-2">
                     <div class="col-6"><a href="<?= BASE_URL ?>/student/timetable.php" class="btn btn-outline-primary w-100"><i class="fas fa-calendar-alt me-1"></i>Timetable</a></div>
                     <div class="col-6"><a href="<?= BASE_URL ?>/student/attendance.php" class="btn btn-outline-success w-100"><i class="fas fa-check-circle me-1"></i>Attendance</a></div>
-                    <div class="col-6"><a href="<?= BASE_URL ?>/student/results.php" class="btn btn-outline-warning w-100"><i class="fas fa-file-alt me-1"></i>Results</a></div>
+                    <div class="col-6"><a href="<?= BASE_URL ?>/student/results/index.php" class="btn btn-outline-warning w-100"><i class="fas fa-file-alt me-1"></i>Results</a></div>
                     <div class="col-6"><a href="<?= BASE_URL ?>/student/assignments.php" class="btn btn-outline-info w-100"><i class="fas fa-tasks me-1"></i>Assignments</a></div>
                     <div class="col-6"><a href="<?= BASE_URL ?>/student/fees.php" class="btn btn-outline-danger w-100"><i class="fas fa-money-bill me-1"></i>Fees</a></div>
                     <div class="col-6"><a href="<?= BASE_URL ?>/student/library.php" class="btn btn-outline-secondary w-100"><i class="fas fa-book-open me-1"></i>Library</a></div>
@@ -91,13 +91,13 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead>
-                            <tr><th>Subject</th><th>Exam</th><th>Score</th><th>Grade</th></tr>
+                            <tr><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th></tr>
                         </thead>
                         <tbody>
                             <?php foreach ($recentResults as $r): ?>
                             <tr>
                                 <td><?= sanitizeInput($r['subject_name']) ?></td>
-                                <td><?= sanitizeInput($r['exam_name']) ?></td>
+                                <td><?= sanitizeInput($r['term_name'] . ' (' . $r['session_name'] . ')') ?></td>
                                 <td><?= $r['score'] ?? '-' ?></td>
                                 <td><strong><?= $r['grade'] ?? '-' ?></strong></td>
                             </tr>

@@ -47,31 +47,52 @@ try {
     echo "  Users created\n";
 
     // 5. Classes
-    $db->exec("INSERT INTO classes (name, section, code, capacity, class_teacher_id) VALUES
-        ('JSS1', 'A', 'JSS1A', 40, 2),
-        ('JSS1', 'B', 'JSS1B', 40, 3),
-        ('JSS2', 'A', 'JSS2A', 40, NULL),
-        ('JSS3', 'A', 'JSS3A', 35, NULL),
-        ('SS1', 'Science', 'SS1SCI', 35, NULL),
-        ('SS1', 'Arts', 'SS1ART', 35, NULL),
-        ('SS1', 'Commercial', 'SS1COM', 35, NULL),
-        ('SS2', 'Science', 'SS2SCI', 35, NULL),
-        ('SS2', 'Arts', 'SS2ART', 35, NULL),
-        ('SS3', 'Science', 'SS3SCI', 30, NULL)");
+    $db->exec("INSERT INTO classes (name, section, capacity, class_teacher_id, department_id, academic_session_id) VALUES
+        ('JSS1', 'A', 40, 2, 1, 1),
+        ('JSS1', 'B', 40, 3, 1, 1),
+        ('JSS2', 'A', 40, NULL, 1, 1),
+        ('JSS3', 'A', 35, NULL, 1, 1),
+        ('SS1', 'Science', 35, NULL, 1, 1),
+        ('SS1', 'Arts', 35, NULL, 2, 1),
+        ('SS1', 'Commercial', 35, NULL, 3, 1),
+        ('SS2', 'Science', 35, NULL, 1, 1),
+        ('SS2', 'Arts', 35, NULL, 2, 1),
+        ('SS3', 'Science', 30, NULL, 1, 1)");
 
     echo "  Classes created\n";
 
-    // 6. Subjects
+    // 6. Subjects (unique codes per row)
     $subjects = [
-        [1, 'Mathematics', 'MATH', 1], [1, 'English Language', 'ENG', 1], [1, 'Basic Science', 'BASCI', 1],
-        [1, 'Social Studies', 'SOC', 1], [1, 'Computer Studies', 'COMPS', 1],
-        [4, 'Mathematics', 'MATH', 1], [4, 'English Language', 'ENG', 1], [4, 'Basic Science', 'BASCI', 1],
-        [5, 'Mathematics', 'MATH', 1], [5, 'English Language', 'ENG', 1], [5, 'Physics', 'PHY', 1],
-        [5, 'Chemistry', 'CHM', 1], [5, 'Biology', 'BIO', 1],
-        [6, 'English Language', 'ENG', 1], [6, 'Literature', 'LIT', 1], [6, 'Government', 'GOV', 1],
-        [6, 'History', 'HIST', 1], [6, 'French', 'FREN', 1],
-        [7, 'English Language', 'ENG', 1], [7, 'Economics', 'ECO', 1], [7, 'Accounting', 'ACCT', 1],
-        [7, 'Commerce', 'COMM', 1], [7, 'Mathematics', 'MATH', 1],
+        [1, 'English Language', 'ENG_1', 1], [1, 'Mathematics', 'MTH_1', 1], [1, 'Basic Science', 'BSC_1', 1],
+        [1, 'Social Studies', 'SST_1', 1], [1, 'Computer Studies', 'ICT_1', 1], [1, 'Civic Education', 'CIV_1', 1],
+        [1, 'Agricultural Science', 'AGR_1', 1], [1, 'Home Economics', 'HME_1', 1], [1, 'Physical Education', 'PHE_1', 1],
+        [2, 'English Language', 'ENG_2', 1], [2, 'Mathematics', 'MTH_2', 1], [2, 'Basic Science', 'BSC_2', 1],
+        [2, 'Social Studies', 'SST_2', 1], [2, 'Computer Studies', 'ICT_2', 1], [2, 'Civic Education', 'CIV_2', 1],
+        [2, 'Agricultural Science', 'AGR_2', 1], [2, 'Home Economics', 'HME_2', 1], [2, 'Physical Education', 'PHE_2', 1],
+        [3, 'English Language', 'ENG_3', 1], [3, 'Mathematics', 'MTH_3', 1], [3, 'Basic Science', 'BSC_3', 1],
+        [3, 'Computer Studies', 'ICT_3', 1], [3, 'Civic Education', 'CIV_3', 1], [3, 'Agricultural Science', 'AGR_3', 1],
+        [3, 'Home Economics', 'HME_3', 1], [3, 'Social Studies', 'SST_3', 1],
+        [4, 'English Language', 'ENG_4', 1], [4, 'Mathematics', 'MTH_4', 1], [4, 'Basic Science', 'BSC_4', 1],
+        [4, 'Computer Studies', 'ICT_4', 1], [4, 'Civic Education', 'CIV_4', 1], [4, 'Agricultural Science', 'AGR_4', 1],
+        [4, 'Social Studies', 'SST_4', 1],
+        [5, 'English Language', 'ENG_5', 1], [5, 'Mathematics', 'MTH_5', 1], [5, 'Physics', 'PHY_5', 1],
+        [5, 'Chemistry', 'CHM_5', 1], [5, 'Biology', 'BIO_5', 1], [5, 'Civic Education', 'CIV_5', 1],
+        [5, 'Computer Studies', 'ICT_5', 1],
+        [6, 'English Language', 'ENG_6', 1], [6, 'Mathematics', 'MTH_6', 1], [6, 'Literature in English', 'LIT_6', 1],
+        [6, 'Government', 'GOV_6', 1], [6, 'Christian Religious Studies', 'CRS_6', 1], [6, 'Civic Education', 'CIV_6', 1],
+        [6, 'Computer Studies', 'ICT_6', 1],
+        [7, 'English Language', 'ENG_7', 1], [7, 'Mathematics', 'MTH_7', 1], [7, 'Economics', 'ECO_7', 1],
+        [7, 'Commerce', 'COM_7', 1], [7, 'Financial Accounting', 'ACC_7', 1], [7, 'Civic Education', 'CIV_7', 1],
+        [7, 'Computer Studies', 'ICT_7', 1],
+        [8, 'English Language', 'ENG_8', 1], [8, 'Mathematics', 'MTH_8', 1], [8, 'Physics', 'PHY_8', 1],
+        [8, 'Chemistry', 'CHM_8', 1], [8, 'Biology', 'BIO_8', 1], [8, 'Further Mathematics', 'FUR_8', 1],
+        [8, 'Civic Education', 'CIV_8', 1], [8, 'Computer Studies', 'ICT_8', 1],
+        [9, 'English Language', 'ENG_9', 1], [9, 'Mathematics', 'MTH_9', 1], [9, 'Literature in English', 'LIT_9', 1],
+        [9, 'Government', 'GOV_9', 1], [9, 'Christian Religious Studies', 'CRS_9', 1], [9, 'Civic Education', 'CIV_9', 1],
+        [9, 'Computer Studies', 'ICT_9', 1],
+        [10, 'English Language', 'ENG_10', 1], [10, 'Mathematics', 'MTH_10', 1], [10, 'Physics', 'PHY_10', 1],
+        [10, 'Chemistry', 'CHM_10', 1], [10, 'Biology', 'BIO_10', 1], [10, 'Further Mathematics', 'FUR_10', 1],
+        [10, 'Civic Education', 'CIV_10', 1], [10, 'Computer Studies', 'ICT_10', 1],
     ];
     $subjStmt = $db->prepare("INSERT INTO subjects (class_id, name, code, teacher_id) VALUES (?, ?, ?, ?)");
     foreach ($subjects as $s) { $subjStmt->execute($s); }
@@ -83,14 +104,19 @@ try {
         (3, 'TCH002', 'B.A. English Studies', 2, '2023-09-01')");
     echo "  Teachers created\n";
 
-    // 8. Subject allocations (teacher-class-subject)
-    $allocStmt = $db->prepare("INSERT INTO subject_allocations (teacher_id, class_id, subject_id, academic_session_id) VALUES (?, ?, ?, 1)");
+    // 8. Subject allocations (teacher-class-subject) - look up by code
+    $allocStmt = $db->prepare("INSERT INTO subject_allocations (teacher_id, class_id, subject_id, academic_session_id) VALUES (?, ?, ?, ?)");
+    $getSubj = $db->prepare("SELECT id FROM subjects WHERE class_id = ? AND code = ?");
     // Teacher 2 (John Okafor) - Math for JSS1A and SS1 Science
-    $allocStmt->execute([2, 1, 1, 1]); // Math JSS1A
-    $allocStmt->execute([2, 5, 9, 1]);  // Math SS1 Science
+    $getSubj->execute([1, 'MTH_1']); $math1 = $getSubj->fetchColumn();
+    $getSubj->execute([5, 'MTH_5']); $math5 = $getSubj->fetchColumn();
+    if ($math1) $allocStmt->execute([2, 1, $math1, 1]);
+    if ($math5) $allocStmt->execute([2, 5, $math5, 1]);
     // Teacher 3 (Sandra Eze) - English for JSS1A and SS1 Arts
-    $allocStmt->execute([3, 1, 2, 1]);  // English JSS1A
-    $allocStmt->execute([3, 6, 14, 1]); // English SS1 Arts
+    $getSubj->execute([1, 'ENG_1']); $eng1 = $getSubj->fetchColumn();
+    $getSubj->execute([6, 'ENG_6']); $eng6 = $getSubj->fetchColumn();
+    if ($eng1) $allocStmt->execute([3, 1, $eng1, 1]);
+    if ($eng6) $allocStmt->execute([3, 6, $eng6, 1]);
     echo "  Subject allocations created\n";
 
     // 9. Student

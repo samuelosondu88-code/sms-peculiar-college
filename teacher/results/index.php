@@ -37,12 +37,12 @@ $draftCount = 0;
 $submittedCount = 0;
 $publishedCount = 0;
 foreach ($mySubjects as $subj) {
-    $stmt = $db->prepare("SELECT status, COUNT(*) FROM result_scores WHERE class_id = ? AND subject_id = ? AND session_id = ? AND term_id = ? GROUP BY status");
+    $stmt = $db->prepare("SELECT status, COUNT(*) as count FROM result_scores WHERE class_id = ? AND subject_id = ? AND session_id = ? AND term_id = ? GROUP BY status");
     $stmt->execute([$subj['class_id'], $subj['id'], $sessionId, $termId]);
     foreach ($stmt as $row) {
-        if ($row['status'] === 'draft') $draftCount += (int)$row['COUNT(*)'];
-        elseif ($row['status'] === 'submitted') $submittedCount += (int)$row['COUNT(*)'];
-        elseif ($row['status'] === 'approved' || $row['status'] === 'published') $publishedCount += (int)$row['COUNT(*)'];
+        if ($row['status'] === 'draft') $draftCount += (int)$row['count'];
+        elseif ($row['status'] === 'submitted') $submittedCount += (int)$row['count'];
+        elseif ($row['status'] === 'approved' || $row['status'] === 'published') $publishedCount += (int)$row['count'];
     }
 }
 

@@ -20,6 +20,9 @@ RewriteRule ^(database/|config/|includes/|vendor/)(.*)$ - [F,L]
     Require all denied
 </FilesMatch>
 
+# Fix accidental double results/results/ path
+RedirectMatch 301 ^/sms-peculiar-college/(admin|teacher)/results/results/(.*)$ /sms-peculiar-college/$1/results/$2
+
 # Error pages (Apache 2.4 supports 403, 404, 500 only)
 ErrorDocument 404 /sms-peculiar-college/error-404.php
 ErrorDocument 403 /sms-peculiar-college/error-403.php
