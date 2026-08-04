@@ -9,6 +9,12 @@
  *   --no-parents Skip parent account generation
  */
 
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    header('Content-Type: text/plain');
+    exit("Forbidden: database/test_data_seeder.php may only be run from the command line.\n");
+}
+
 // Config
 $OPT_STUDENTS  = 1000;
 $OPT_TEACHERS  = 50;

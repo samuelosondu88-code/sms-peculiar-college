@@ -234,6 +234,16 @@ and this project adheres to Semantic Versioning.
   from `.env`, so `--restore` always targets the database named in `.env`;
   restore was validated against a copy via a self-contained PDO harness.
 
+### Security
+- **`database/` seeder scripts were only protected by `.htaccess`.** The web root
+  `.htaccess` returns 403 for `database/*` (verified), but on shared hosts where
+  `AllowOverride` is disabled the unguarded `database/seed.php`,
+  `database/cbt_seed.php` and `database/test_data_seeder.php` would execute
+  INSERTs against the configured database from an unauthenticated HTTP request.
+  All three now carry the same CLI-only guard used by the root `seed.php` /
+  `setup.php` (non-CLI request → plain-text `403 Forbidden`), so the scripts
+  are inert over HTTP regardless of Apache configuration.
+
 ## [2.0.0] - Baseline
 - Existing procedural school management system snapshot (pre-refactor).
 

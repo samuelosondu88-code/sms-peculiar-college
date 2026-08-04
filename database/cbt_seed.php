@@ -1,4 +1,9 @@
 <?php
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    header('Content-Type: text/plain');
+    exit("Forbidden: database/cbt_seed.php may only be run from the command line.\n");
+}
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/app.php';
 
