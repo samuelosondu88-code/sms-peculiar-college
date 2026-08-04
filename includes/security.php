@@ -284,7 +284,7 @@ function sendSecurityHeaders(): void {
         header('X-Frame-Options: DENY');
         header('X-XSS-Protection: 1; mode=block');
         header('Referrer-Policy: strict-origin-when-cross-origin');
-        header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline' https://www.google.com; style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; connect-src 'self'; frame-ancestors 'none';");
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline' https://www.google.com https://js.paystack.co; style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; connect-src 'self' https://api.paystack.co; frame-src 'self' https://meet.jit.si; frame-ancestors 'none';");
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         header('Permissions-Policy: geolocation=(), microphone=(), camera=(self)');
         header('Cross-Origin-Opener-Policy: same-origin-allow-popups');

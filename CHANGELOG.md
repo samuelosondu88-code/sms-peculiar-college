@@ -235,6 +235,17 @@ and this project adheres to Semantic Versioning.
   restore was validated against a copy via a self-contained PDO harness.
 
 ### Security
+- **Strict CSP blocked the Paystack checkout and the Jitsi classroom.** The
+  `Content-Security-Policy` allowed only `'self'` plus the jsDelivr/Cloudflare
+  CDNs in `script-src`, so `student/fees.php`'s `js.paystack.co/v1/inline.js`
+  checkout popup never loaded and the Jitsi Meet iframe on
+  `student|teacher/classroom/view.php` was refused by `frame-src 'self'`
+  (payment and live-class features were silently broken by the header). The
+  CSP (in both `.htaccess` and `includes/security.php`) now allows
+  `https://js.paystack.co` (`script-src`), `https://api.paystack.co`
+  (`connect-src`) and `https://meet.jit.si` (`frame-src`). Google Charts QR
+  codes are `<img>` URLs already covered by `img-src https:`. Served headers
+  verified over HTTPS; suite still green.
 - **`app/`, `scripts/` and `tests/` were web-reachable.** `app/Config/bootstrap.php`
   and `app/Helpers/helpers.php` returned `200` and `scripts/migrate.php` /
   `scripts/backup.php` executed (`500`) over HTTP — only `app/Core`,
