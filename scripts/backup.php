@@ -122,10 +122,14 @@ function restore(PDO $db, string $file): void
     $statements = array_filter(array_map('trim', explode(SQL_GO, $raw)));
     $db->exec('SET FOREIGN_KEY_CHECKS=0');
     foreach ($statements as $stmt) {
-        if ($stmt === '' || str_starts_with($stmt, '--')) {
+        $sql = implode("\n", array_values(array_filter(
+            array_map('trim', explode("\n", $stmt)),
+            static fn (string $line): bool => $line !== '' && !str_starts_with($line, '--')
+        )));
+        if ($sql === '') {
             continue;
         }
-        $db->exec($stmt);
+        $db->exec($sql);
     }
     $db->exec('SET FOREIGN_KEY_CHECKS=1');
 }

@@ -221,6 +221,19 @@ and this project adheres to Semantic Versioning.
   `notices` insert → redirect → flash) was also exercised end-to-end against
   the live DB and cleaned up afterwards.
 
+### Fixed
+- **`scripts/backup.php --restore` never recreated tables.** Each backup chunk
+  starts with a `-- Table: xyz` comment, and the restore loop skipped any chunk
+  whose first line began with `--`, so the embedded `CREATE TABLE` statements
+  were dropped and every subsequent `INSERT` failed (duplicate / missing-table
+  errors) — a restored database was unusable. `restore()` now strips leading
+  `--` comment lines from within each chunk and executes the remaining SQL.
+  Verified by restoring a live dump into a throwaway `sms_restore_*` database
+  (88 tables recreated, row counts identical to live), then deleting the
+  scratch database. Note: `config/env.php` deliberately repopulates DB_* values
+  from `.env`, so `--restore` always targets the database named in `.env`;
+  restore was validated against a copy via a self-contained PDO harness.
+
 ## [2.0.0] - Baseline
 - Existing procedural school management system snapshot (pre-refactor).
 
