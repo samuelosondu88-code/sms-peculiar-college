@@ -44,8 +44,10 @@ $exams = $db->prepare($sql);
 $exams->execute($params);
 $examList = $exams->fetchAll();
 
-$subjects = $db->query("SELECT DISTINCT s.id, s.name FROM subjects s WHERE s.teacher_id = $userId")->fetchAll();
-$classes = $db->query("SELECT DISTINCT c.id, c.name, c.section FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = $userId")->fetchAll();
+$subjectsQ = $db->prepare("SELECT DISTINCT s.id, s.name FROM subjects s WHERE s.teacher_id = ?");
+$subjectsQ->execute([$userId]); $subjects = $subjectsQ->fetchAll();
+$classesQ = $db->prepare("SELECT DISTINCT c.id, c.name, c.section FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
+$classesQ->execute([$userId]); $classes = $classesQ->fetchAll();
 
 $totalExams = count($examList);
 $publishedCount = $db->prepare("SELECT COUNT(*) FROM teacher_exams WHERE teacher_id = ? AND is_published = 1");

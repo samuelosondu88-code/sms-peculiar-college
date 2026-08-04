@@ -41,6 +41,18 @@ require_once __DIR__ . '/../includes/header.php';
     <h4 class="fw-bold mb-0"><i class="fas fa-money-bill me-2"></i>My Fees</h4>
 </div>
 
+<?php if (isset($_GET['success'])): ?>
+<div class="alert alert-success alert-dismissible fade show">
+    <i class="fas fa-check-circle me-2"></i>Payment successful! Your fee record has been updated.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<?php elseif (isset($_GET['error'])): ?>
+<div class="alert alert-danger alert-dismissible fade show">
+    <i class="fas fa-exclamation-circle me-2"></i>Payment error: <?= sanitizeInput($_GET['error']) ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<?php endif; ?>
+
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="stat-card stat-primary">
@@ -79,6 +91,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <th>Balance</th>
                         <th>Status</th>
                         <th>Due Date</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,10 +104,17 @@ require_once __DIR__ . '/../includes/header.php';
                         <td><strong><?= formatCurrency($f['balance']) ?></strong></td>
                         <td><?= getStatusBadge($f['status']) ?></td>
                         <td><?= $f['due_date'] ? formatDate($f['due_date']) : '-' ?></td>
+                        <td>
+                            <?php if ($f['balance'] > 0): ?>
+                            <button class="btn btn-sm btn-success pay-online" data-fee-id="<?= $f['id'] ?>" data-amount="<?= formatCurrency($f['balance']) ?>">
+                                <i class="fas fa-credit-card me-1"></i>Pay Online
+                            </button>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                     <?php if (empty($fees)): ?>
-                    <tr><td colspan="7" class="text-center text-muted py-3">No fee records found.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-3">No fee records found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -102,4 +122,37 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+document.querySelectorAll('.pay-online').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const feeId = this.dataset.feeId;
+        const amount = this.dataset.amount;
+        const origText = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
+
+        fetch('<?= BASE_URL ?>/payments/init.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'fee_id=' + feeId
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.authorization_url) {
+                window.location.href = data.authorization_url;
+            } else {
+                alert(data.error || 'Payment initialization failed.');
+                this.disabled = false;
+                this.innerHTML = origText;
+            }
+        })
+        .catch(() => {
+            alert('Network error. Try again.');
+            this.disabled = false;
+            this.innerHTML = origText;
+        });
+    });
+});
+</script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

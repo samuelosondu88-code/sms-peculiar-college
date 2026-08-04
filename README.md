@@ -159,6 +159,62 @@ Before deploying to production, complete the [Security Checklist](SECURITY.md):
 
 The system undergoes continuous security scanning. Run the Security Dashboard at `/admin/security/` to view the current rating and address any issues.
 
+## Modular Refactor & Operations
+
+The application is being incrementally modularised into a namespaced `app/` layer that co-exists with the legacy procedural code — every existing feature is preserved.
+
+### Architecture
+```
+app/
+├── Config/       bootstrap.php      # env, autoloader, logger wiring
+├── Core/         ErrorHandler.php   # central error/exception/shutdown handling
+├── Helpers/      helpers.php        # new helpers (logger, app_env, send_email_template, ...)
+├── Repositories/ User, Student, Payment repositories  (PDO data access)
+├── Services/     Mail, ReportCard, Auth, Student, Result, Payment, Upload services
+└── Modules/      (future feature modules)
+config/           legacy config (env, app, database, session, logging)
+includes/         legacy shared functions + templates (preserved)
+storage/          logs, backups, cache, tmp, templates (web-protected via .htaccess)
+scripts/          CLI utilities (backups)
+```
+
+- `config/session.php` (every page's entry point) now boots `app/Config/bootstrap.php`,
+  registers `App\Core\ErrorHandler`, sends security headers, and enforces maintenance mode.
+- **No Composer required to run:** `autoload.php` falls back to a lightweight PSR-4 loader when
+  `vendor/` is absent. When Composer *is* available (`composer install`), mPDF/Monolog/PHPMailer
+  are used automatically (report cards render via mPDF, logs via Monolog).
+
+### Maintenance mode
+Set `APP_MAINTENANCE=true` in `.env` to take the site offline. Non-admins see `/maintenance.php`.
+Admins (or `?down_for_maintenance=<token>` derived from `APP_KEY`) can bypass to restore the site.
+
+### Backups
+```bash
+php scripts/backup.php             # create a gzip'd SQL backup in storage/backups/
+php scripts/backup.php --list      # list backups
+php scripts/backup.php --restore=FILE.sql.gz
+php scripts/backup.php --rotate=10 # keep the 10 most recent
+```
+
+### Database
+After installing the schema, run the optimisation migration once. Either via phpMyAdmin
+(Import `database/migration_indexes.sql`) or from the CLI:
+```
+php scripts/migrate.php            # apply indexes (idempotent)
+php scripts/migrate.php --check    # dry-run: show existing indexes
+```
+
+### Tests
+```
+composer install
+php vendor/bin/phpunit             # 15 unit tests for AuthService + UploadService
+```
+
+### Security headers / password policy
+Standard security headers are emitted on every response. New/updated passwords must meet the
+strength policy (8+ chars, upper & lower case, a digit, a special character). Upload folders
+disable PHP execution via `.htaccess`.
+
 ## Deployment
 
 ### Free Hosting (Not Recommended)

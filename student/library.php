@@ -10,11 +10,21 @@ $userId = $_SESSION['user_id'];
 $search = sanitizeInput($_GET['search'] ?? '');
 $books = [];
 
-$sql = "SELECT * FROM books WHERE 1=1";
+$sql = "SELECT id, title, author, isbn, category, quantity, available, description FROM books WHERE 1=1";
 $params = [];
 if ($search) {
-    $sql .= " AND (title LIKE ? OR author LIKE ? OR isbn LIKE ?)";
-    $params = ["%$search%", "%$search%", "%$search%"];
+    $hasFulltext = false;
+    try {
+        $ftCheck = $db->query("SHOW INDEX FROM books WHERE Key_name = 'ft_books_search'");
+        $hasFulltext = (bool)$ftCheck->fetch();
+    } catch (Exception $e) {}
+    if ($hasFulltext) {
+        $sql .= " AND MATCH(title, author, isbn) AGAINST(? IN BOOLEAN MODE)";
+        $params[] = '+' . implode('* +', explode(' ', $search)) . '*';
+    } else {
+        $sql .= " AND (title LIKE ? OR author LIKE ? OR isbn LIKE ?)";
+        $params = ["%$search%", "%$search%", "%$search%"];
+    }
 }
 $sql .= " ORDER BY title LIMIT 50";
 

@@ -20,6 +20,11 @@ $studentStmt->execute([$userId]);
 $student = $studentStmt->fetch();
 if (!$student) redirect('/student/exams/index.php');
 
+if ((int)$exam['class_id'] !== (int)$student['class_id']) {
+    logSecurityEvent('exam_class_mismatch', ['exam_id' => $examId, 'exam_class' => $exam['class_id'], 'student_class' => $student['class_id']]);
+    redirect('/student/exams/index.php');
+}
+
 $secSettings = getExamSecuritySettings($db, $examId);
 
 $attemptStmt = $db->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND student_id = ? ORDER BY created_at DESC LIMIT 1");
@@ -85,11 +90,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $faceCount = (int)($_POST['face_count'] ?? 0);
         $imageData = $_POST['image_data'] ?? '';
         if ($imageData) {
-            $imageData = substr($imageData, strpos($imageData, ',') + 1);
-            $imageData = base64_decode($imageData);
+            $commaPos = strpos($imageData, ',');
+            $imageData = $commaPos !== false ? substr($imageData, $commaPos + 1) : $imageData;
+            $decoded = base64_decode($imageData, true);
+            $imageData = $decoded !== false ? $decoded : null;
+        } else {
+            $imageData = null;
         }
         $stmt = $db->prepare("INSERT INTO exam_proctoring_evidence (attempt_id, violation_type, face_count, image_data) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$attemptId, $vType, $faceCount, $imageData ?? null]);
+        $stmt->execute([$attemptId, $vType, $faceCount, $imageData]);
         logViolation($db, $attemptId, $vType, ['face_count' => $faceCount]);
         echo 'OK'; exit;
     }
@@ -126,6 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             logExamActivity($db, $attemptId, 'login', ['ip' => $_SERVER['REMOTE_ADDR'] ?? '']);
             logExamActivity($db, $attemptId, 'device_fingerprint', ['hash' => $fpHash]);
+        } else {
+            $attemptId = $attempt['id'];
         }
 
         $questionStmt = $db->prepare("SELECT teq.id as teq_id, teq.question_order, eq.* FROM teacher_exam_questions teq JOIN exam_questions eq ON teq.question_id = eq.id WHERE teq.exam_id = ? ORDER BY teq.question_order");
@@ -135,8 +146,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['submit_exam'])) {
-        $db->prepare("UPDATE exam_attempts SET status = 'submitted', submitted_at = NOW(), submit_reason = 'student_submitted' WHERE id = ?")->execute([$attemptId]);
-        computeIntegrityScore($db, $attemptId);
+        $subStmt = $db->prepare("SELECT id, student_id FROM exam_attempts WHERE exam_id = ? AND student_id = ? AND status = 'in_progress' LIMIT 1");
+        $subStmt->execute([$examId, $userId]);
+        $subAttempt = $subStmt->fetch();
+        if ($subAttempt) {
+            $attemptId = $subAttempt['id'];
+            foreach ($_POST as $key => $value) {
+                if (strpos($key, 'q_') === 0) {
+                    $qid = (int)substr($key, 2);
+                    if ($qid) {
+                        $answer = sanitizeInput($value);
+                        $db->prepare("INSERT INTO exam_responses (attempt_id, question_id, response) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE response = VALUES(response), is_correct = FALSE, auto_score = 0")->execute([$attemptId, $qid, $answer]);
+                        $qStmt = $db->prepare("SELECT * FROM exam_questions WHERE id = ?");
+                        $qStmt->execute([$qid]);
+                        $qData = $qStmt->fetch();
+                        $isCorrect = false; $autoScore = 0;
+                        if ($qData) {
+                            if ($qData['question_type'] === 'mcq' && strtoupper($answer) === strtoupper($qData['correct_answer'])) { $isCorrect = true; $autoScore = $qData['marks']; }
+                            elseif ($qData['question_type'] === 'true_false' && strtoupper($answer) === strtoupper($qData['correct_answer'])) { $isCorrect = true; $autoScore = $qData['marks']; }
+                            elseif ($qData['question_type'] === 'fill_blank' && strtolower(trim($answer)) === strtolower(trim($qData['correct_answer']))) { $isCorrect = true; $autoScore = $qData['marks']; }
+                        }
+                        $db->prepare("UPDATE exam_responses SET is_correct = ?, auto_score = ?, total_score = ?, manual_score = 0 WHERE attempt_id = ? AND question_id = ?")->execute([$isCorrect, $autoScore, $autoScore, $attemptId, $qid]);
+                    }
+                }
+            }
+            $autoTotal = $db->prepare("SELECT COALESCE(SUM(auto_score),0) FROM exam_responses WHERE attempt_id = ?");
+            $autoTotal->execute([$attemptId]);
+            $db->prepare("UPDATE exam_attempts SET status = 'submitted', submitted_at = NOW(), submit_reason = 'student_submitted', auto_score = ?, total_score = auto_score + manual_score WHERE id = ?")->execute([$autoTotal->fetchColumn(), $attemptId]);
+            computeIntegrityScore($db, $attemptId);
+        }
         redirect('/student/exams/results.php?exam_id=' . $examId);
     }
 }
@@ -147,12 +185,16 @@ $attempt = $attemptStmt->fetch();
 
 if (!isset($_POST['security_verified'])) {
     if (!$attempt || $attempt['status'] === '') {
-        redirect('security-check.php?exam_id=' . $examId);
+        redirect('/student/exams/security-check.php?exam_id=' . $examId);
     }
     if ($attempt['status'] !== 'in_progress') {
         redirect('/student/exams/results.php?exam_id=' . $examId);
     }
     $attemptId = $attempt['id'];
+}
+
+if (empty($attemptId)) {
+    redirect('/student/exams/security-check.php?exam_id=' . $examId);
 }
 
 $questionStmt = $db->prepare("SELECT teq.id as teq_id, teq.question_order, eq.* FROM teacher_exam_questions teq JOIN exam_questions eq ON teq.question_id = eq.id WHERE teq.exam_id = ? ORDER BY teq.question_order");
@@ -226,6 +268,9 @@ body {-webkit-user-select: none;-moz-user-select:none;-ms-user-select:none;user-
             </div>
             <div class="d-flex align-items-center gap-3">
                 <span class="small text-muted"><i class="fas fa-shield-alt me-1"></i>Secured</span>
+                <?php if ($secSettings['require_camera']): ?>
+                <span class="small text-muted" id="camIndicator"><i class="fas fa-video-slash text-danger me-1"></i>Camera off</span>
+                <?php endif; ?>
                 <span><i class="fas fa-clock me-1"></i><span id="timer">--:--</span></span>
                 <button type="button" class="btn btn-danger" onclick="confirmSubmit()"><i class="fas fa-check-circle me-1"></i>Submit</button>
             </div>
@@ -288,12 +333,13 @@ body {-webkit-user-select: none;-moz-user-select:none;-ms-user-select:none;user-
                     <?php endif; ?>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" onclick="navigateQ(-1)" <?= $i === 0 ? 'disabled' : '' ?>><i class="fas fa-chevron-left me-1"></i>Previous</button>
-                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="toggleFlag(<?= $i ?>)" title="Flag for review"><i class="fas fa-flag"></i></button>
-                    <button type="button" class="btn btn-primary" onclick="navigateQ(1)" <?= $i === $totalQuestions - 1 ? 'disabled' : '' ?>>Next<i class="fas fa-chevron-right ms-1"></i></button>
+                    <button type="button" class="btn btn-outline-secondary nav-prev" <?= $i === 0 ? 'disabled' : '' ?>><i class="fas fa-chevron-left me-1"></i>Previous</button>
+                    <button type="button" class="btn btn-outline-warning btn-sm nav-flag" data-index="<?= $i ?>" title="Flag for review"><i class="fas fa-flag"></i></button>
+                    <button type="button" class="btn btn-primary nav-next" <?= $i === $totalQuestions - 1 ? 'disabled' : '' ?>>Next<i class="fas fa-chevron-right ms-1"></i></button>
                 </div>
             </div>
             <?php endforeach; ?>
+            <input type="hidden" name="submit_exam" id="submitExamInput" value="0">
         </form>
     </div>
 
@@ -302,7 +348,7 @@ body {-webkit-user-select: none;-moz-user-select:none;-ms-user-select:none;user-
             <div class="card-header"><i class="fas fa-list me-2"></i>Questions</div>
             <div class="card-body p-2 text-center">
                 <?php foreach ($questions as $i => $q): ?>
-                <button type="button" class="btn btn-outline-secondary question-btn" data-qid="<?= $q['id'] ?>" data-index="<?= $i ?>" onclick="goToQ(<?= $i ?>)"><?= $i + 1 ?></button>
+                <button type="button" class="btn btn-outline-secondary question-btn" data-qid="<?= $q['id'] ?>" data-index="<?= $i ?>"><?= $i + 1 ?></button>
                 <?php endforeach; ?>
                 <hr>
                 <div class="d-flex justify-content-center gap-2 small flex-wrap">
@@ -327,9 +373,7 @@ body {-webkit-user-select: none;-moz-user-select:none;-ms-user-select:none;user-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Review</button>
-                <form method="POST" id="submitForm">
-                    <button type="submit" name="submit_exam" class="btn btn-danger"><i class="fas fa-check-circle me-1"></i>Submit</button>
-                </form>
+                <button type="button" class="btn btn-danger" onclick="doSubmit()"><i class="fas fa-check-circle me-1"></i>Submit</button>
             </div>
         </div>
     </div>
@@ -338,8 +382,14 @@ body {-webkit-user-select: none;-moz-user-select:none;-ms-user-select:none;user-
 <?php $extraScripts = '<script src="' . BASE_URL . '/includes/exam_security.js"></script>';
 $extraScripts .= <<<SCRIPT
 <script>
+var totalQuestions = {$totalQuestions};
+var currentQuestion = 0;
 var answeredSet = new Set();
 var flaggedSet = new Set();
+
+function safeExamSecurity() {
+    return typeof ExamSecurity !== 'undefined' ? ExamSecurity : null;
+}
 
 function initAnswered() {
     document.querySelectorAll('.question-btn').forEach(function (btn) {
@@ -362,14 +412,36 @@ function goToQ(idx) {
     var btn = document.querySelector('.question-btn[data-index="' + idx + '"]');
     if (btn) btn.classList.add('current');
     currentQuestion = idx;
-    if (ExamSecurity) ExamSecurity.goToQuestion(idx);
+    var es = safeExamSecurity();
+    if (es) es.goToQuestion(idx);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function navigateQ(dir) {
-    var next = currentQuestion + dir;
-    if (next >= 0 && next < totalQuestions) goToQ(next);
+function getCurrentIndex() {
+    var active = document.querySelector('.question-card.active');
+    if (active) return parseInt(active.dataset.index);
+    return currentQuestion;
 }
+
+function navigateQ(dir) {
+    var cur = getCurrentIndex();
+    if (cur === undefined || cur === null || isNaN(cur)) cur = 0;
+    var next = cur + dir;
+    if (next >= 0 && next < totalQuestions) {
+        goToQ(next);
+    }
+}
+
+document.addEventListener('click', function (e) {
+    var t = e.target.closest('.nav-next');
+    if (t && !t.disabled) { e.preventDefault(); navigateQ(1); return; }
+    t = e.target.closest('.nav-prev');
+    if (t && !t.disabled) { e.preventDefault(); navigateQ(-1); return; }
+    t = e.target.closest('.question-btn');
+    if (t) { e.preventDefault(); goToQ(parseInt(t.dataset.index)); return; }
+    t = e.target.closest('.nav-flag');
+    if (t) { e.preventDefault(); toggleFlag(parseInt(t.dataset.index)); }
+});
 
 function saveAnswer(qid) {
     var inputs = document.querySelectorAll('[name="q_' + qid + '"]');
@@ -387,7 +459,8 @@ function saveAnswer(qid) {
         answeredSet.delete(qid);
     }
     updateAnsweredCount();
-    ExamSecurity.saveAnswer(qid, value);
+    var es = safeExamSecurity();
+    if (es) es.saveAnswer(qid, value);
 }
 
 function updateAnsweredCount() {
@@ -405,13 +478,30 @@ function toggleFlag(idx) {
     }
 }
 
+function saveAllAnswers() {
+    document.querySelectorAll('.question-btn').forEach(function (btn) {
+        var qid = parseInt(btn.dataset.qid);
+        if (!qid) return;
+        saveAnswer(qid);
+    });
+}
+
+function doSubmit() {
+    saveAllAnswers();
+    document.getElementById('submitExamInput').value = '1';
+    document.getElementById('examForm').submit();
+}
+
 function confirmSubmit() {
-    document.getElementById('answeredCount').textContent = answeredSet.size;
-    var unanswered = totalQuestions - answeredSet.size;
-    document.getElementById('unansweredWarning').innerHTML = unanswered > 0
-        ? '<i class="fas fa-exclamation-triangle me-1"></i>' + unanswered + ' question(s) unanswered. They will be marked incorrect.'
-        : '<i class="fas fa-check text-success me-1"></i>All questions answered.';
-    new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    saveAllAnswers();
+    setTimeout(function () {
+        document.getElementById('answeredCount').textContent = answeredSet.size;
+        var unanswered = totalQuestions - answeredSet.size;
+        document.getElementById('unansweredWarning').innerHTML = unanswered > 0
+            ? '<i class="fas fa-exclamation-triangle me-1"></i>' + unanswered + ' question(s) unanswered. They will be marked incorrect.'
+            : '<i class="fas fa-check text-success me-1"></i>All questions answered.';
+        new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    }, 300);
 }
 
 /* Keyboard navigation */
@@ -423,32 +513,57 @@ document.addEventListener('keydown', function (e) {
 
 /* Init ExamSecurity */
 var startTime = '{$attempt['started_at']}';
+function setupAutoSave() {
+    document.querySelectorAll('[data-save-qid]').forEach(function (el) {
+        el.addEventListener('change', function () { saveAnswer(parseInt(this.dataset.saveQid)); });
+        el.addEventListener('input', function () { saveAnswer(parseInt(this.dataset.saveQid)); });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     initAnswered();
     goToQ(0);
+    setupAutoSave();
 
-    ExamSecurity.init({
-        examId: {$examId},
-        attemptId: {$attemptId},
-        saveAnswerUrl: '',
-        logEventUrl: '',
-        submitUrl: '',
-        requireFullscreen: true,
-        requireCamera: {$secSettings['require_camera']},
-        maxTabSwitches: {$secSettings['max_tab_switches']},
-        maxFullscreenExits: {$secSettings['max_fullscreen_exits']},
-        maxCameraErrors: {$secSettings['max_camera_errors']},
-        maxFaceViolations: {$secSettings['max_face_violations']},
-        durationMinutes: {$exam['duration_minutes']},
-        startTime: new Date(startTime.replace(' ', 'T') + 'Z'),
-        inactivityWarningAfter: 240,
-    });
+    var es = safeExamSecurity();
+    if (es) {
+        es.init({
+            examId: {$examId},
+            attemptId: {$attemptId},
+            saveAnswerUrl: window.location.href,
+            logEventUrl: window.location.href,
+            submitUrl: window.location.href,
+            requireFullscreen: true,
+            requireCamera: {$secSettings['require_camera']},
+            maxTabSwitches: {$secSettings['max_tab_switches']},
+            maxFullscreenExits: {$secSettings['max_fullscreen_exits']},
+            maxCameraErrors: {$secSettings['max_camera_errors']},
+            maxFaceViolations: {$secSettings['max_face_violations']},
+            durationMinutes: {$exam['duration_minutes']},
+            startTime: new Date(startTime.replace(' ', 'T') + 'Z'),
+            inactivityWarningAfter: 240,
+        });
 
-    ExamSecurity.on('autosubmit', function (reason) {
-        if (reason === 'timer_expired') {
-            document.querySelector('[name="submit_exam"]').click();
-        }
-    });
+        es.on('autosubmit', function (reason) {
+            if (reason === 'timer_expired') {
+                document.querySelector('[name="submit_exam"]').click();
+            }
+        });
+
+        setInterval(function () {
+            var st = es.getState();
+            var camEl = document.getElementById('camIndicator');
+            if (camEl) {
+                if (st.cameraErrors > 0) {
+                    camEl.innerHTML = '<i class="fas fa-video-slash text-danger me-1"></i>Camera error';
+                } else if (st.faceViolations > 0) {
+                    camEl.innerHTML = '<i class="fas fa-video text-warning me-1"></i>Camera issue';
+                } else {
+                    camEl.innerHTML = '<i class="fas fa-video text-success me-1"></i>Camera on';
+                }
+            }
+        }, 3000);
+    }
 });
 
 /* Connection monitoring */
@@ -462,7 +577,8 @@ window.addEventListener('offline', function () {
 });
 
 window.addEventListener('beforeunload', function (e) {
-    if (!ExamSecurity._state.autoSubmitted) {
+    var es = safeExamSecurity();
+    if (es && !es._state.autoSubmitted) {
         e.preventDefault();
         e.returnValue = 'You have an exam in progress. Are you sure you want to leave?';
     }

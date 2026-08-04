@@ -18,6 +18,15 @@ config/database.local.php
 
 # Logs
 /logs/
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/backups/*
+!/storage/backups/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/tmp/*
+/storage/templates/*
+!/storage/templates/.gitkeep
 *.log
 error_log
 
@@ -50,6 +59,10 @@ error_log
 *.sql.zip
 *.bak
 *.sql.bak
+
+# Composer / PHPUnit artefacts
+.phpunit.cache/
+/backups/
 
 # Keep schema files
 !database/*_schema.sql

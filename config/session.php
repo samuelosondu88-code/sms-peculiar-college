@@ -1,7 +1,30 @@
 <?php
+// Bootstrap the modular app (env, autoloader, helpers, logger) and register the
+// central error/exception handler before any session work runs.
+require_once __DIR__ . '/../app/Config/bootstrap.php';
+App\Core\ErrorHandler::register();
+
 require_once __DIR__ . '/../includes/security.php';
 
 initSecureSession();
+sendSecurityHeaders();
+
+// ── Maintenance mode ────────────────────────────────────────────────────────
+// When enabled, non-admin traffic is served the maintenance page. An
+// authenticated admin (or a valid `?down_for_maintenance=` bypass token) is
+// allowed through so the site can be taken down and restored remotely.
+if (is_maintenance_mode()) {
+    $bypassOk = (isset($_GET['down_for_maintenance']) && is_string($_GET['down_for_maintenance'])
+        && hash_equals(maintenance_bypass_token(), $_GET['down_for_maintenance']))
+        || (($_SESSION['role'] ?? '') === 'admin');
+    if (!$bypassOk) {
+        if (!headers_sent()) {
+            http_response_code(503);
+        }
+        require __DIR__ . '/../maintenance.php';
+        exit;
+    }
+}
 
 // Auto-verify CSRF for all POST requests (except login/logout)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isLoggedIn()) {

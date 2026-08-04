@@ -101,6 +101,11 @@ class Validator {
         return empty($this->errors);
     }
 
+    public function addError(string $field, string $message): self {
+        $this->errors[$field] = $message;
+        return $this;
+    }
+
     public function getErrors(): array {
         return $this->errors;
     }

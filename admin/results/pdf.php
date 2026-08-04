@@ -65,6 +65,34 @@ if ($action === 'download' && $selectedStudent && $selectedSession && $selectedT
     $c->execute([$selectedStudent, $selectedSession, $selectedTerm]); $comments = $c->fetch() ?: [];
     $settings = getResultSettings($db, $selectedSession, $selectedTerm);
 
+    $logoFile = __DIR__ . '/../../assets/images/logo.jpg';
+    $avatarFile = !empty($student['avatar']) ? __DIR__ . '/../../' . $student['avatar'] : '';
+    $watermarkFile = __DIR__ . '/../../lib/font/watermark.png';
+
+    $filename = 'ReportCard_' . $student['admission_no'] . '_' . str_replace(' ', '_', $termName) . '.pdf';
+
+    // Preferred engine: mPDF (HTML) when Composer dependency is present.
+    if (class_exists(\App\Services\ReportCardService::class) && \App\Services\ReportCardService::mpdfAvailable()) {
+        while (ob_get_level()) ob_end_clean();
+        \App\Services\ReportCardService::stream([
+            'student' => $student,
+            'sessionName' => $sessionName,
+            'termName' => $termName,
+            'summary' => $summary,
+            'results' => $summary['results'],
+            'position' => $position,
+            'attendance' => $attendance,
+            'psychomotor' => $psychomotor,
+            'affective' => $affective,
+            'comments' => $comments,
+            'settings' => $settings,
+            'logoPath' => $logoFile,
+            'passportPath' => $avatarFile,
+            'watermarkFile' => is_file($watermarkFile) ? $watermarkFile : '',
+        ], $filename);
+        exit;
+    }
+
     class ReportCardPdf extends FPDF {
         private $navy = [11, 31, 58];
         private $gold = [212, 175, 55];

@@ -23,6 +23,7 @@ $currentPath = $currentDir . '/' . $currentPage;
             <div class="collapse show" id="resultsMenu">
                 <ul class="nav flex-column ms-3">
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/index.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/status.php"><i class="fas fa-tasks me-2"></i>Processing Status</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/enter.php"><i class="fas fa-pen me-2"></i>Enter Scores</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/preview.php"><i class="fas fa-eye me-2"></i>Preview</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/submit.php"><i class="fas fa-paper-plane me-2"></i>Submit</a></li>

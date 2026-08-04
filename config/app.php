@@ -1,23 +1,46 @@
 <?php
-@ini_set('display_errors', 0);
-!defined('APP_NAME') && define('APP_NAME', 'Peculiar International College - School Management System');
+@ini_set('display_errors', getenv('PHP_DISPLAY_ERRORS') ?: '0');
+$errorReporting = getenv('PHP_ERROR_REPORTING') ?: '';
+$errorReporting = is_numeric($errorReporting) ? (int)$errorReporting : (defined($errorReporting) ? constant($errorReporting) : E_ALL);
+error_reporting($errorReporting);
+
+$appUrl = getenv('APP_URL') ?: 'https://peculiar-college.example.com';
+$schoolName = getenv('SCHOOL_NAME') ?: 'Peculiar International College';
+$schoolPhone = getenv('SCHOOL_PHONE') ?: '+234-XXX-XXX-XXXX';
+$schoolEmail = getenv('SCHOOL_EMAIL') ?: 'info@peculiarcollege.edu.ng';
+$baseUrl = getenv('BASE_URL') ?: '/sms-peculiar-college';
+
+!defined('APP_ENV') && define('APP_ENV', getenv('APP_ENV') ?: 'production');
+!defined('APP_DEBUG') && define('APP_DEBUG', (bool)(getenv('APP_DEBUG') ?: false));
+!defined('APP_NAME') && define('APP_NAME', getenv('APP_NAME') ?: 'Peculiar International College - School Management System');
 !defined('APP_SHORT_NAME') && define('APP_SHORT_NAME', 'PIC SMS');
 !defined('APP_VERSION') && define('APP_VERSION', '2.0.0');
-!defined('APP_URL') && define('APP_URL', 'https://peculiar-college.example.com');
-!defined('APP_KEY') && define('APP_KEY', 'change-this-to-a-random-secret-key-in-production');
-!defined('SCHOOL_NAME') && define('SCHOOL_NAME', 'Peculiar International College');
-!defined('SCHOOL_ADDRESS') && define('SCHOOL_ADDRESS', 'After Technical College Bukuru, Trade Centre Kuru, Plateau State');
-!defined('SCHOOL_PHONE') && define('SCHOOL_PHONE', '+234-XXX-XXX-XXXX');
-!defined('SCHOOL_EMAIL') && define('SCHOOL_EMAIL', 'info@peculiarcollege.edu.ng');
+!defined('APP_URL') && define('APP_URL', $appUrl);
+
+$appKey = getenv('APP_KEY') ?: '';
+if (empty($appKey)) {
+    error_log('APP_KEY not set in .env. Run: php -r "echo bin2hex(random_bytes(32));" and set APP_KEY.');
+} elseif (strlen($appKey) !== 64 || !ctype_xdigit($appKey)) {
+    error_log('APP_KEY must be a 64-character hex string. Generate with: php -r "echo bin2hex(random_bytes(32));"');
+    $appKey = '';
+}
+!defined('APP_KEY') && define('APP_KEY', $appKey);
+
+!defined('SCHOOL_NAME') && define('SCHOOL_NAME', $schoolName);
+!defined('SCHOOL_ADDRESS') && define('SCHOOL_ADDRESS', getenv('SCHOOL_ADDRESS') ?: 'After Technical College Bukuru, Trade Centre Kuru, Plateau State');
+!defined('SCHOOL_PHONE') && define('SCHOOL_PHONE', $schoolPhone);
+!defined('SCHOOL_EMAIL') && define('SCHOOL_EMAIL', $schoolEmail);
 !defined('SCHOOL_MOTTO') && define('SCHOOL_MOTTO', 'Excellence in Education, Character in Life');
 !defined('SCHOOL_VISION') && define('SCHOOL_VISION', 'To be a leading institution of academic excellence, producing well-rounded graduates with strong moral character, critical thinking skills, and a global perspective who will positively impact their communities and the world.');
 !defined('SCHOOL_MISSION') && define('SCHOOL_MISSION', 'To provide a holistic, student-centered education that fosters academic excellence, character development, and lifelong learning through innovative teaching methods, modern facilities, and a supportive environment that nurtures each student\'s unique potential.');
 !defined('SCHOOL_VALUES') && define('SCHOOL_VALUES', 'Integrity, Excellence, Discipline, Innovation, Respect, Responsibility');
 !defined('TIMEZONE') && define('TIMEZONE', 'Africa/Lagos');
-!defined('BASE_URL') && define('BASE_URL', '/sms-peculiar-college');
-!defined('UPLOAD_MAX_SIZE') && define('UPLOAD_MAX_SIZE', 2 * 1024 * 1024);
+!defined('BASE_URL') && define('BASE_URL', $baseUrl);
+!defined('UPLOAD_MAX_SIZE') && define('UPLOAD_MAX_SIZE', (int)(getenv('UPLOAD_MAX_SIZE') ?: 2 * 1024 * 1024));
 !defined('ALLOWED_EXTENSIONS') && define('ALLOWED_EXTENSIONS', ['jpg','jpeg','png','pdf','doc','docx','xls','xlsx']);
 !defined('PAGINATION_LIMIT') && define('PAGINATION_LIMIT', 20);
 !defined('ADMISSION_FORM_PRICE') && define('ADMISSION_FORM_PRICE', 4000.00);
+!defined('PAYSTACK_PUBLIC_KEY') && define('PAYSTACK_PUBLIC_KEY', getenv('PAYSTACK_PUBLIC_KEY') ?: '');
+!defined('PAYSTACK_SECRET_KEY') && define('PAYSTACK_SECRET_KEY', getenv('PAYSTACK_SECRET_KEY') ?: '');
 
 date_default_timezone_set(TIMEZONE);

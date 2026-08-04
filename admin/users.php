@@ -32,6 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                   ->unique('email', $data['email'], 'users', 'email')
                   ->unique('username', $data['username'], 'users', 'username');
 
+        if ($validator->passes() && class_exists(\App\Services\AuthService::class)) {
+            $policy = \App\Services\AuthService::meetsPolicy($data['password']);
+            if (!$policy['ok']) {
+                $validator->addError('password', $policy['message']);
+            }
+        }
+
         if ($validator->passes()) {
             $hash = generatePasswordHash($data['password']);
             $stmt = $db->prepare("INSERT INTO users (username, email, password_hash, role, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -52,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
 
             logActivity($_SESSION['user_id'], 'add_user', 'users', $userId);
+            logger('auth')->info('User created', ['by_user_id' => (int)$_SESSION['user_id'], 'new_user_id' => (int)$userId, 'role' => $data['role'], 'email' => $data['email'], 'ip' => $_SERVER['REMOTE_ADDR'] ?? null]);
             $success = 'User added successfully.';
         } else {
             $error = $validator->getFirstError();
@@ -62,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $db->prepare("UPDATE users SET status = ? WHERE id = ?");
         $stmt->execute([$newStatus, $userId]);
         logActivity($_SESSION['user_id'], 'toggle_user_status', 'users', $userId, '', $newStatus);
+        logger('auth')->info('User status changed', ['by_user_id' => (int)$_SESSION['user_id'], 'user_id' => $userId, 'new_status' => $newStatus, 'ip' => $_SERVER['REMOTE_ADDR'] ?? null]);
         redirect('/admin/users.php?msg=Status updated');
     }
 }

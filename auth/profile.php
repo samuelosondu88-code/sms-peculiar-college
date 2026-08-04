@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     $stmt->execute([$firstName, $lastName, $phone, $address, $userId]);
     $_SESSION['user_name'] = $firstName . ' ' . $lastName;
     $msg = 'Profile updated successfully.';
+    logger('auth')->info('Profile updated', ['user_id' => (int)$userId, 'ip' => $_SERVER['REMOTE_ADDR'] ?? null]);
 
     $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->execute([$userId]);

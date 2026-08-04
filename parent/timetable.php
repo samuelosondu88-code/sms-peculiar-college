@@ -28,14 +28,14 @@ if ($studentId) {
     $stmt->execute([$studentId]);
     $stu = $stmt->fetch();
     if ($stu) {
-        $entries = $db->prepare("SELECT t.*, sub.name as subject_name, u.first_name, u.last_name FROM timetable t JOIN subjects sub ON t.subject_id = sub.id LEFT JOIN users u ON t.teacher_id = u.id WHERE t.class_id = ? AND t.term_id = ? ORDER BY FIELD(t.day, 'monday','tuesday','wednesday','thursday','friday'), t.time_start");
-        $entries->execute([$stu['class_id'], $term['id'] ?? 0]);
+        $entries = $db->prepare("SELECT t.*, sub.name as subject_name, u.first_name, u.last_name FROM timetable t JOIN subjects sub ON t.subject_id = sub.id LEFT JOIN users u ON t.teacher_id = u.id WHERE t.class_id = ? ORDER BY FIELD(t.day_of_week, 'monday','tuesday','wednesday','thursday','friday'), t.start_time");
+        $entries->execute([$stu['class_id']]);
         $entries = $entries->fetchAll();
     }
 }
 
 $grouped = [];
-foreach ($entries as $e) { $grouped[$e['day']][] = $e; }
+foreach ($entries as $e) { $grouped[$e['day_of_week']][] = $e; }
 
 require_once __DIR__ . '/../includes/header.php';
 ?>
@@ -72,7 +72,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php foreach ($days as $day): ?>
                 <td>
                     <?php foreach ($grouped[$day] ?? [] as $e):
-                        if ((int)substr($e['time_start'], 0, 2) === $h): ?>
+                        if ((int)substr($e['start_time'], 0, 2) === $h): ?>
                     <div class="p-2 mb-1 bg-light rounded border-start border-primary border-3">
                         <strong><?= sanitizeInput($e['subject_name']) ?></strong><br>
                         <small><?= sanitizeInput($e['first_name'] . ' ' . $e['last_name']) ?></small><br>

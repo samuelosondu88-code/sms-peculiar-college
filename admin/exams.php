@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_exam'])) {
     $maxScore = (float)($_POST['max_score'] ?? 100);
 
     if ($name && $termId) {
-        $stmt = $db->prepare("INSERT INTO exams (name, term_id, class_id, start_date, end_date, max_score, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $termId, $classId ?: null, $startDate, $endDate, $maxScore, $_SESSION['user_id']]);
+        $stmt = $db->prepare("INSERT INTO exams (exam_name, term_id, class_id, exam_date, total_marks) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$name, $termId, $classId ?: null, $startDate, $maxScore]);
         $msg = 'Exam created.';
     }
 }
@@ -40,16 +40,16 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
-                <thead><tr><th>Exam Name</th><th>Term</th><th>Class</th><th>Period</th><th>Max Score</th><th>Published</th></tr></thead>
+                <thead><tr><th>Exam Name</th><th>Term</th><th>Class</th><th>Date</th><th>Total Marks</th><th>Published</th></tr></thead>
                 <tbody>
                     <?php foreach ($exams as $e): ?>
                     <tr>
-                        <td><strong><?= sanitizeInput($e['name']) ?></strong></td>
+                        <td><strong><?= sanitizeInput($e['exam_name']) ?></strong></td>
                         <td><?= sanitizeInput($e['term_name'] ?? '-') ?></td>
                         <td><?= sanitizeInput($e['class_name'] ?? 'All') ?></td>
-                        <td><small><?= $e['start_date'] ? formatDate($e['start_date']) : '' ?> - <?= $e['end_date'] ? formatDate($e['end_date']) : '' ?></small></td>
-                        <td><?= $e['max_score'] ?></td>
-                        <td><?= $e['is_published'] ? getStatusBadge('active') : getStatusBadge('inactive') ?></td>
+                        <td><small><?= $e['exam_date'] ? formatDate($e['exam_date']) : '' ?></small></td>
+                        <td><?= $e['total_marks'] ?></td>
+                        <td><?= ($e['status'] === 'completed' || $e['status'] === 'graded') ? getStatusBadge('active') : getStatusBadge('inactive') ?></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php if (empty($exams)): ?><tr><td colspan="6" class="text-center text-muted py-3">No exams created.</td></tr><?php endif; ?>

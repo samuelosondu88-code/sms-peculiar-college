@@ -34,12 +34,12 @@ if (isset($_SESSION['user_id'])) {
         <div class="dropdown">
             <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
                 <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px; font-size: 14px; background: var(--gradient-gold); color: var(--primary); font-weight: 700;">
-                    <?= strtoupper(substr($currentUser['first_name'] ?? 'U', 0, 1) . substr($currentUser['last_name'] ?? 'U', 0, 1)) ?>
+                    <?= strtoupper(substr(sanitizeInput($currentUser['first_name'] ?? 'U'), 0, 1) . substr(sanitizeInput($currentUser['last_name'] ?? 'U'), 0, 1)) ?>
                 </div>
-                <span class="d-none d-md-block"><?= ($currentUser['first_name'] ?? '') . ' ' . ($currentUser['last_name'] ?? '') ?></span>
+                <span class="d-none d-md-block"><?= sanitizeInput(($currentUser['first_name'] ?? '') . ' ' . ($currentUser['last_name'] ?? '')) ?></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-                <li><span class="dropdown-item-text small text-muted"><?= ucfirst($currentUser['role'] ?? '') ?></span></li>
+                <li><span class="dropdown-item-text small text-muted"><?= ucfirst(sanitizeInput($currentUser['role'] ?? '')) ?></span></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="<?= BASE_URL ?>/auth/profile.php"><i class="fas fa-user me-2"></i>Profile</a></li>
                 <li><a class="dropdown-item" href="<?= BASE_URL ?>/auth/change-password.php"><i class="fas fa-key me-2"></i>Change Password</a></li>

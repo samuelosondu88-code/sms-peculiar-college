@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Current password is incorrect.';
     } elseif (strlen($newPassword) < 8) {
         $error = 'New password must be at least 8 characters.';
+    } elseif (class_exists(\App\Services\AuthService::class) && !\App\Services\AuthService::meetsPolicy($newPassword)['ok']) {
+        $error = 'Password must include upper/lowercase letters, a number and a special character.';
     } elseif ($newPassword !== $confirmPassword) {
         $error = 'Passwords do not match.';
     } else {
@@ -29,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$hash, $_SESSION['user_id']]);
         $success = 'Password changed successfully.';
         logActivity($_SESSION['user_id'], 'change_password');
+        logger('auth')->info('Password changed', ['user_id' => (int)$_SESSION['user_id'], 'ip' => $_SERVER['REMOTE_ADDR'] ?? null]);
     }
 }
 

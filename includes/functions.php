@@ -8,8 +8,8 @@ function redirect(string $path): void {
     exit;
 }
 
-function sanitizeInput(string $data): string {
-    return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
+function sanitizeInput(?string $data): string {
+    return htmlspecialchars(trim($data ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
 function generateReference(string $prefix = 'PEC'): string {
@@ -21,10 +21,16 @@ function generateReceiptNo(): string {
 }
 
 function generatePasswordHash(string $password): string {
+    if (class_exists(\App\Services\AuthService::class)) {
+        return \App\Services\AuthService::hashPassword($password);
+    }
     return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 }
 
 function verifyPassword(string $password, string $hash): bool {
+    if (class_exists(\App\Services\AuthService::class)) {
+        return \App\Services\AuthService::verify($password, $hash);
+    }
     return password_verify($password, $hash);
 }
 
@@ -157,6 +163,11 @@ function logActivity(int $userId, string $action, ?string $table = null, ?int $r
 }
 
 function uploadFile(array $file, string $subfolder = 'documents'): ?string {
+    // Preferred: hardened UploadService (magic-byte + name checks).
+    if (class_exists(\App\Services\UploadService::class)) {
+        return \App\Services\UploadService::store($file, $subfolder, ALLOWED_EXTENSIONS, UPLOAD_MAX_SIZE);
+    }
+
     $targetDir = __DIR__ . '/../' . $subfolder . '/';
     if (!is_dir($targetDir)) {
         mkdir($targetDir, 0755, true);
@@ -177,11 +188,22 @@ function paginate(int $total, int $page, int $limit = PAGINATION_LIMIT): array {
 }
 
 function sendEmail(string $to, string $subject, string $body): bool {
+    // Prefer the modular MailService (SMTP via PHPMailer) when reachable;
+    // otherwise fall back to PHP mail() so existing callers keep working.
+    if (class_exists(\App\Services\MailService::class)) {
+        $ok = \App\Services\MailService::send($to, $subject, $body);
+        if ($ok) return true;
+    }
+
     $headers = "From: " . SCHOOL_NAME . " <" . SCHOOL_EMAIL . ">\r\n";
     $headers .= "Reply-To: " . SCHOOL_EMAIL . "\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    return mail($to, $subject, $body, $headers);
+    $result = @mail($to, $subject, $body, $headers);
+    if (!$result) {
+        error_log("sendEmail failed: to=$to subject=$subject");
+    }
+    return $result;
 }
 
 function sendSMS(string $phone, string $message): bool {

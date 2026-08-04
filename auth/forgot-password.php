@@ -7,8 +7,16 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitizeInput($_POST['email'] ?? '');
-    if (empty($email)) {
+    $csrf = $_POST['csrf_token'] ?? '';
+
+    if (!verifyCsrfToken($csrf)) {
+        $error = 'Invalid form submission. Please try again.';
+    } elseif (empty($email)) {
         $error = 'Please enter your email address.';
+    } elseif (!validateEmail($email)) {
+        $error = 'Please enter a valid email address.';
+    } elseif (!checkRateLimit('forgot_pwd_' . $email, 3, 900)) {
+        $error = 'Too many requests. Please try again in 15 minutes.';
     } else {
         $db = getDB();
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
@@ -22,10 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $resetLink = APP_URL . "/auth/reset-password.php?token=" . $token;
             $subject = "Password Reset - " . SCHOOL_NAME;
-            $body = "<p>Hello,</p><p>Click the link below to reset your password:</p><p><a href='{$resetLink}'>{$resetLink}</a></p><p>This link expires in 1 hour.</p>";
-            sendEmail($email, $subject, $body);
+            $body = "<p>Hello,</p><p>Click the link below to reset your password:</p><p><a href='{$resetLink}'>{$resetLink}</a></p><p>This link expires in 1 hour.</p><p>If you did not request this, please ignore this email.</p>";
+            $sent = sendEmail($email, $subject, $body);
+            if (!$sent) {
+                error_log("Password reset email failed for: $email");
+            }
         }
-        $message = 'If the email exists, a reset link has been sent.';
+
+        $message = 'If that email is registered, a reset link has been sent.';
     }
 }
 ?>
@@ -62,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?= getCsrfField() ?>
             <div class="mb-3">
                 <label class="form-label fw500">Email Address</label>
                 <div class="input-group">

@@ -215,7 +215,16 @@ var ExamSecurity = (function () {
         }
         state.videoElement = document.createElement('video');
         state.videoElement.setAttribute('playsinline', '');
-        state.videoElement.style.display = 'none';
+        state.videoElement.muted = true;
+        state.videoElement.style.position = 'fixed';
+        state.videoElement.style.bottom = '60px';
+        state.videoElement.style.right = '16px';
+        state.videoElement.style.width = '120px';
+        state.videoElement.style.borderRadius = '8px';
+        state.videoElement.style.border = '2px solid #059669';
+        state.videoElement.style.zIndex = '9998';
+        state.videoElement.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+        state.videoElement.style.objectFit = 'cover';
         document.body.appendChild(state.videoElement);
 
         state.canvasElement = document.createElement('canvas');
@@ -228,6 +237,16 @@ var ExamSecurity = (function () {
                 state.videoElement.srcObject = stream;
                 state.videoElement.play();
                 _logEvent('camera_started', {});
+                stream.getVideoTracks().forEach(function (track) {
+                    track.onended = function () {
+                        _logEvent('camera_disconnected', {});
+                        _showWarning('Camera disconnected. Please reconnect or refresh.', 'danger');
+                        state.cameraErrors++;
+                        if (state.cameraErrors >= config.maxCameraErrors) {
+                            _autoSubmit('camera_disconnected');
+                        }
+                    };
+                });
                 _loadFaceDetector();
             })
             .catch(function (err) {
@@ -300,6 +319,9 @@ var ExamSecurity = (function () {
         if (avgBrightness < 5) {
             state.faceViolations++;
             _logEvent('face_obstructed', { brightness: avgBrightness });
+            if (state.faceViolations % 2 === 0) {
+                _showWarning('Camera appears obstructed (' + state.faceViolations + '/' + config.maxFaceViolations + '). Ensure good lighting and camera is not covered.', 'warning');
+            }
             if (state.faceViolations >= config.maxFaceViolations) {
                 _autoSubmit('camera_obstructed');
             }
@@ -314,7 +336,7 @@ var ExamSecurity = (function () {
         canvas.height = video.videoHeight || 240;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.35);
         var params = 'attempt_id=' + config.attemptId + '&violation_type=' + encodeURIComponent(violationType) + '&face_count=' + faceCount + '&image_data=' + encodeURIComponent(dataUrl);
         fetch(config.submitUrl, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=capture_evidence&' + params });
     }
@@ -435,6 +457,15 @@ var ExamSecurity = (function () {
             for (var t in timers) { if (timers[t]) clearInterval(timers[t]); }
             if (state.cameraStream) {
                 state.cameraStream.getTracks().forEach(function (t) { t.stop(); });
+                state.cameraStream = null;
+            }
+            if (state.videoElement && state.videoElement.parentNode) {
+                state.videoElement.parentNode.removeChild(state.videoElement);
+                state.videoElement = null;
+            }
+            if (state.canvasElement && state.canvasElement.parentNode) {
+                state.canvasElement.parentNode.removeChild(state.canvasElement);
+                state.canvasElement = null;
             }
             document.removeEventListener('fullscreenchange', _checkFullscreen);
             document.removeEventListener('visibilitychange', _onVisibilityChange);

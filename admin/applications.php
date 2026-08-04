@@ -30,7 +30,7 @@ $countStmt->execute($params);
 $total = (int)$countStmt->fetchColumn();
 
 $pagination = paginate($total, $page);
-$stmt = $db->prepare("SELECT a.*, af.form_name FROM applications a JOIN admission_forms af ON a.form_id = af.id WHERE $whereClause ORDER BY a.submitted_at DESC LIMIT ? OFFSET ?");
+$stmt = $db->prepare("SELECT a.*, af.class_applied AS form_name FROM applications a JOIN admission_forms af ON a.form_id = af.id WHERE $whereClause ORDER BY a.submitted_at DESC LIMIT ? OFFSET ?");
 $params[] = $pagination['limit'];
 $params[] = $pagination['offset'];
 $stmt->execute($params);

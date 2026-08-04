@@ -15,15 +15,15 @@ $stmt = $db->prepare("
     FROM timetable t
     JOIN subjects sub ON t.subject_id = sub.id
     JOIN classes c ON t.class_id = c.id
-    WHERE t.teacher_id = ? AND t.term_id = ?
-    ORDER BY FIELD(t.day, 'monday','tuesday','wednesday','thursday','friday','saturday'), t.time_start
+    WHERE t.teacher_id = ?
+    ORDER BY FIELD(t.day_of_week, 'monday','tuesday','wednesday','thursday','friday','saturday'), t.start_time
 ");
-$stmt->execute([$userId, $term['id'] ?? 0]);
+$stmt->execute([$userId]);
 $entries = $stmt->fetchAll();
 
 $grouped = [];
 foreach ($entries as $e) {
-    $grouped[$e['day']][] = $e;
+    $grouped[$e['day_of_week']][] = $e;
 }
 
 require_once __DIR__ . '/../includes/header.php';
@@ -50,7 +50,7 @@ require_once __DIR__ . '/../includes/header.php';
                 $hasEntries = false;
                 foreach ($days as $day) {
                     foreach ($grouped[$day] ?? [] as $e) {
-                        $startH = (int)substr($e['time_start'], 0, 2);
+                        $startH = (int)substr($e['start_time'], 0, 2);
                         if ($startH === $h) { $hasEntries = true; break 2; }
                     }
                 }
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php foreach ($days as $day): ?>
                 <td>
                     <?php foreach ($grouped[$day] ?? [] as $e):
-                        $startH = (int)substr($e['time_start'], 0, 2);
+                        $startH = (int)substr($e['start_time'], 0, 2);
                         if ($startH === $h): ?>
                     <div class="p-2 mb-1 bg-light rounded border-start border-primary border-3">
                         <strong><?= sanitizeInput($e['subject_name']) ?></strong><br>

@@ -24,11 +24,8 @@ function requireCsrfToken(): void {
     $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
     if (!verifyCsrfToken($token)) {
         logSecurityEvent('csrf_attack', ['ip' => $_SERVER['REMOTE_ADDR'] ?? '']);
-        $base_url = defined('BASE_URL') ? BASE_URL : '';
-        $_SESSION = [];
-        session_destroy();
-        header('Location: ' . $base_url . '/auth/login.php');
-        exit;
+        http_response_code(403);
+        die('Invalid or missing CSRF token. Please go back and try again.');
     }
 }
 
@@ -118,8 +115,16 @@ function checkSessionTimeout(): void {
     $_SESSION['_last_activity'] = time();
 }
 
+function computeFingerprint(): string {
+    $parts = [$_SERVER['HTTP_USER_AGENT'] ?? '', session_id()];
+    if (!empty($_SESSION['_device_fp'])) {
+        $parts[] = $_SESSION['_device_fp'];
+    }
+    return hash('sha256', implode('|||', $parts));
+}
+
 function setSessionFingerprint(): void {
-    $_SESSION['_fingerprint'] = hash('sha256', ($_SERVER['HTTP_USER_AGENT'] ?? '') . '-' . ($_SERVER['REMOTE_ADDR'] ?? ''));
+    $_SESSION['_fingerprint'] = computeFingerprint();
 }
 
 function checkSessionFingerprint(): void {
@@ -127,11 +132,9 @@ function checkSessionFingerprint(): void {
         setSessionFingerprint();
         return;
     }
-    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-    $current = hash('sha256', $ua . '-' . $ip);
+    $current = computeFingerprint();
     if ($_SESSION['_fingerprint'] !== $current) {
-        error_log('[SESSION HIJACK] stored=' . $_SESSION['_fingerprint'] . ' current=' . $current . ' ua=' . $ua . ' ip=' . $ip . ' session_id=' . session_id());
+        error_log('[SESSION HIJACK] stored=' . $_SESSION['_fingerprint'] . ' current=' . $current . ' ua=' . ($_SERVER['HTTP_USER_AGENT'] ?? '') . ' session_id=' . session_id());
         $_SESSION = [];
         session_destroy();
         $url = defined('BASE_URL') ? BASE_URL : '';
@@ -217,6 +220,14 @@ function validateFileUpload(array $file, array $allowedTypes = null, int $maxSiz
 }
 
 function uploadSecureFile(array $file, string $subfolder = 'documents', array $allowedTypes = null, int $maxSize = null): ?string {
+    $allowedTypes = $allowedTypes ?? ALLOWED_EXTENSIONS;
+    $maxSize = $maxSize ?? UPLOAD_MAX_SIZE;
+
+    // Preferred: consolidated hardened validation + storage.
+    if (class_exists(\App\Services\UploadService::class)) {
+        return \App\Services\UploadService::store($file, $subfolder, $allowedTypes, $maxSize);
+    }
+
     $targetDir = __DIR__ . '/../' . $subfolder . '/';
     if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
 
@@ -234,8 +245,17 @@ function uploadSecureFile(array $file, string $subfolder = 'documents', array $a
 
 define('ENCRYPTION_METHOD', 'aes-256-gcm');
 
+function getEncryptionKey(): string {
+    static $rawKey = null;
+    if ($rawKey === null) {
+        $hex = defined('APP_KEY') ? APP_KEY : '';
+        $rawKey = !empty($hex) && strlen($hex) === 64 ? hex2bin($hex) : str_repeat("\0", 32);
+    }
+    return $rawKey;
+}
+
 function encryptData(string $data, string $key = null): string {
-    $key = $key ?? (defined('APP_KEY') ? APP_KEY : '');
+    $key = $key ?? getEncryptionKey();
     if (empty($key)) return base64_encode($data);
     $ivLen = openssl_cipher_iv_length(ENCRYPTION_METHOD);
     $iv = openssl_random_pseudo_bytes($ivLen);
@@ -245,7 +265,7 @@ function encryptData(string $data, string $key = null): string {
 }
 
 function decryptData(string $data, string $key = null): string {
-    $key = $key ?? (defined('APP_KEY') ? APP_KEY : '');
+    $key = $key ?? getEncryptionKey();
     if (empty($key)) return base64_decode($data);
     $data = base64_decode($data);
     $ivLen = openssl_cipher_iv_length(ENCRYPTION_METHOD);
@@ -266,7 +286,9 @@ function sendSecurityHeaders(): void {
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline' https://www.google.com; style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; connect-src 'self'; frame-ancestors 'none';");
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
-        header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+        header('Permissions-Policy: geolocation=(), microphone=(), camera=(self)');
+        header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
+        header('Cross-Origin-Resource-Policy: cross-origin');
     }
 }
 
@@ -308,8 +330,8 @@ function scanSecurityStatus(): array {
     $checks = [];
     $score = 100;
 
-    if (!defined('APP_KEY') || empty(APP_KEY) || APP_KEY === 'change-this-to-a-random-secret-key') {
-        $issues[] = 'APP_KEY not configured. Set a unique random key in config/app.php.';
+    if (!defined('APP_KEY') || empty(APP_KEY)) {
+        $issues[] = 'APP_KEY not configured. Set a unique random key in .env.';
         $score -= 15;
     }
 

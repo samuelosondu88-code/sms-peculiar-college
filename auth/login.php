@@ -26,11 +26,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_email'])) {
         $user = $stmt->fetch();
 
         if ($user && $user['status'] === 'active' && verifyPassword($password, $user['password_hash'])) {
+            logger('auth')->info('Email credentials accepted', ['email' => $email, 'ip' => $ip, 'role' => $user['role']]);
+            // Check 2FA
+            $tfStmt = $db->prepare("SELECT is_enabled FROM user_2fa WHERE user_id = ?");
+            $tfStmt->execute([$user['id']]);
+            $tf = $tfStmt->fetch();
+            if ($tf && $tf['is_enabled']) {
+                logger('auth')->info('2FA challenge issued', ['email' => $email, 'ip' => $ip]);
+                $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $expires = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+                $db->prepare("INSERT INTO otp_codes (user_id, code, expires_at) VALUES (?, ?, ?)")->execute([$user['id'], $otp, $expires]);
+                $body = "<h3>Your Verification Code</h3><p>Use the following code to complete your login:</p>
+                        <h2 style='background:#f0f0f0;padding:15px;text-align:center;letter-spacing:8px;font-size:32px;'>$otp</h2>
+                        <p>This code expires in 10 minutes.</p><p>If you did not request this, ignore this email.</p>";
+                sendEmail($email, 'Your 2FA Verification Code', $body);
+                $_SESSION['_2fa_pending'] = true;
+                $_SESSION['_2fa_user_id'] = (int)$user['id'];
+                $_SESSION['_2fa_email'] = $email;
+                session_write_close();
+                redirect('/auth/2fa_verify.php');
+            }
             $_SESSION['user_id'] = (int)$user['id'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['last_name'] = $user['last_name'];
+            if (!empty($_POST['device_fp'])) { $_SESSION['_device_fp'] = sanitizeInput($_POST['device_fp']); }
             if ($remember === '1') { $_SESSION['_remember'] = true; }
             regenerateSession();
             setSessionFingerprint();
@@ -38,10 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_email'])) {
             $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
             logActivity($user['id'], 'login');
+            logger('auth')->info('Login success', ['email' => $email, 'ip' => $ip, 'role' => $user['role'], 'user_id' => $user['id']]);
             session_write_close();
             redirect('/index.php');
         }
         recordLoginAttempt($email, $ip, false);
+        logger('auth')->warning('Login failed', ['email' => $email, 'ip' => $ip]);
         $error = 'Invalid email or password, or account is inactive.';
     }
 }
@@ -51,7 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
     $pin = sanitizeInput($_POST['pin'] ?? '');
     $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 
-    if (empty($admissionNo) || empty($pin)) {
+    if (isLoginThrottled($admissionNo, $ip)) {
+        $error = 'Too many login attempts. Please try again in 5 minutes.';
+    } elseif (empty($admissionNo) || empty($pin)) {
         $error = 'Please enter both admission number and PIN.';
     } else {
         $db = getDB();
@@ -67,26 +92,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
         } elseif ($student['status'] !== 'active') {
             $error = 'Account is inactive. Contact the administrator.';
         } else {
-            $pinStmt = $db->prepare("SELECT * FROM student_pins WHERE student_id = ? AND pin = ? AND status = 'active' AND (expires_at IS NULL OR expires_at >= CURDATE()) LIMIT 1");
-            $pinStmt->execute([$student['id'], $pin]);
+            $pinStmt = $db->prepare("SELECT * FROM student_pins WHERE student_id = ? AND status = 'active' AND (expires_at IS NULL OR expires_at >= CURDATE()) ORDER BY id DESC LIMIT 1");
+            $pinStmt->execute([$student['id']]);
             $pinRecord = $pinStmt->fetch();
 
-            if ($pinRecord) {
+            if ($pinRecord && password_verify($pin, $pinRecord['pin'])) {
                 $db->prepare("UPDATE student_pins SET status = 'used', used_at = NOW(), attempts = attempts + 1 WHERE id = ?")->execute([$pinRecord['id']]);
                 $db->prepare("INSERT INTO pin_login_log (student_id, pin_id, ip_address, success) VALUES (?, ?, ?, 1)")->execute([$student['id'], $pinRecord['id'], $ip]);
 
                 $newPin = strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
-                $db->prepare("INSERT INTO student_pins (student_id, pin, generated_by) VALUES (?, ?, ?)")->execute([$student['id'], $newPin, $student['user_id']]);
+                $db->prepare("INSERT INTO student_pins (student_id, pin, generated_by) VALUES (?, ?, ?)")->execute([$student['id'], password_hash($newPin, PASSWORD_BCRYPT), $student['user_id']]);
 
                 $_SESSION['user_id'] = (int)$student['user_id'];
                 $_SESSION['role'] = 'student';
                 $_SESSION['user_name'] = $student['first_name'] . ' ' . $student['last_name'];
                 $_SESSION['first_name'] = $student['first_name'];
                 $_SESSION['last_name'] = $student['last_name'];
+                if (!empty($_POST['device_fp'])) { $_SESSION['_device_fp'] = sanitizeInput($_POST['device_fp']); }
                 regenerateSession();
                 setSessionFingerprint();
                 $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
                 $stmt->execute([$student['user_id']]);
+                logger('auth')->info('Student PIN login success', ['admission_no' => $admissionNo, 'ip' => $ip]);
                 session_write_close();
                 redirect('/student/index.php');
             } else {
@@ -107,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
                     $error = 'Invalid or expired PIN.';
                 }
                 $db->prepare("INSERT INTO pin_login_log (student_id, ip_address, success) VALUES (?, ?, 0)")->execute([$student['id'], $ip]);
+                logger('auth')->warning('Student PIN login failed', ['admission_no' => $admissionNo, 'ip' => $ip, 'student_id' => $student['id']]);
             }
         }
     }
@@ -146,7 +174,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
         <?php endif; ?>
 
         <?php if ($loginMode === 'email'): ?>
-        <form method="POST">
+        <form method="POST" onsubmit="return captureDeviceFp()">
+            <input type="hidden" name="device_fp" id="deviceFp" value="">
             <div class="mb-3">
                 <label class="form-label">Email Address</label>
                 <div class="input-group">
@@ -180,7 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
         </div>
 
         <?php else: ?>
-        <form method="POST">
+        <form method="POST" onsubmit="return captureDeviceFp()">
+            <input type="hidden" name="device_fp" id="deviceFp" value="">
             <div class="mb-3">
                 <label class="form-label">Admission Number / Student ID</label>
                 <div class="input-group">
@@ -223,6 +253,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
                 field.type = 'password';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
+        }
+        function captureDeviceFp() {
+            var parts = [];
+            parts.push(navigator.userAgent);
+            parts.push(screen.width + 'x' + screen.height);
+            parts.push(screen.colorDepth);
+            parts.push(navigator.language);
+            parts.push(new Date().getTimezoneOffset());
+            parts.push(navigator.hardwareConcurrency || '');
+            parts.push(navigator.deviceMemory || '');
+            parts.push(navigator.platform || '');
+            var hash = 0, s = parts.join('|||');
+            for (var i = 0; i < s.length; i++) {
+                hash = ((hash << 5) - hash) + s.charCodeAt(i);
+                hash |= 0;
+            }
+            document.getElementById('deviceFp').value = Math.abs(hash).toString(16);
+            return true;
         }
     </script>
 </body>

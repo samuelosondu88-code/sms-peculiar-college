@@ -130,7 +130,9 @@ if ($editQ) {
     $editQuestion = $stmt->fetch();
 }
 
-$subjects = $db->query("SELECT DISTINCT s.id, s.name, c.name as class_name, c.section, c.id as class_id FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = $userId")->fetchAll();
+$subjects = $db->prepare("SELECT DISTINCT s.id, s.name, c.name as class_name, c.section, c.id as class_id FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
+$subjects->execute([$userId]);
+$subjects = $subjects->fetchAll();
 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
 $terms = $db->query("SELECT t.*, s.session_name FROM terms t JOIN academic_sessions s ON t.session_id = s.id ORDER BY s.start_date DESC")->fetchAll();
 

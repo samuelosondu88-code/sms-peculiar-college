@@ -21,7 +21,8 @@ if ($editId) {
     if (!$exam) redirect('/teacher/exams/index.php');
 }
 
-$subjects = $db->query("SELECT DISTINCT s.id, s.name, c.name as class_name, c.section, c.id as class_id FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = $userId")->fetchAll();
+$subjectsStmt = $db->prepare("SELECT DISTINCT s.id, s.name, c.name as class_name, c.section, c.id as class_id FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
+$subjectsStmt->execute([$userId]); $subjects = $subjectsStmt->fetchAll();
 $terms = $db->query("SELECT t.*, s.session_name FROM terms t JOIN academic_sessions s ON t.session_id = s.id ORDER BY s.start_date DESC")->fetchAll();
 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
 

@@ -105,7 +105,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <tbody>
                     <?php foreach ($subjects as $s): ?>
                     <tr>
-                        <td><strong><?= sanitizeInput($s['code']) ?></strong></td>
+                        <td><strong><?= sanitizeInput($s['code'] ?? '') ?></strong></td>
                         <td><?= sanitizeInput($s['name']) ?></td>
                         <td><?= sanitizeInput($s['class_name'] . ' ' . ($s['section'] ?? '')) ?></td>
                         <td><?= $s['first_name'] ? sanitizeInput($s['first_name'] . ' ' . $s['last_name']) : '<span class="text-muted">Unassigned</span>' ?></td>

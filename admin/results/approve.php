@@ -52,6 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
     }
 
     logAudit("result_{$action}_{$stage}", 'result_approvals', null, null, "Class=$classId, Session=$sessionId, Term=$termId");
+    logger('results')->info(
+        'Result approval action',
+        ['action' => $action, 'stage' => $stage, 'class_id' => $classId, 'session_id' => $sessionId, 'term_id' => $termId, 'by_user_id' => (int)$_SESSION['user_id'], 'ip' => $_SERVER['REMOTE_ADDR'] ?? null]
+    );
     $msg = "Result approval '$action' for stage '$stage' processed successfully.";
 }
 

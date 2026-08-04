@@ -21,16 +21,16 @@ if ($student) {
         FROM timetable t
         JOIN subjects sub ON t.subject_id = sub.id
         LEFT JOIN users u ON t.teacher_id = u.id
-        WHERE t.class_id = ? AND t.term_id = ?
-        ORDER BY FIELD(t.day, 'monday','tuesday','wednesday','thursday','friday'), t.time_start
+        WHERE t.class_id = ?
+        ORDER BY FIELD(t.day_of_week, 'monday','tuesday','wednesday','thursday','friday'), t.start_time
     ");
-    $stmt->execute([$student['class_id'], $term['id'] ?? 0]);
+    $stmt->execute([$student['class_id']]);
     $entries = $stmt->fetchAll();
 }
 
 $grouped = [];
 foreach ($entries as $e) {
-    $grouped[$e['day']][] = $e;
+    $grouped[$e['day_of_week']][] = $e;
 }
 
 require_once __DIR__ . '/../includes/header.php';
@@ -57,7 +57,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php foreach ($days as $day): ?>
                 <td>
                     <?php foreach ($grouped[$day] ?? [] as $e):
-                        $startH = (int)substr($e['time_start'], 0, 2);
+                        $startH = (int)substr($e['start_time'], 0, 2);
                         if ($startH === $h): ?>
                     <div class="p-2 mb-1 bg-light rounded border-start border-primary border-3">
                         <strong><?= sanitizeInput($e['subject_name']) ?></strong><br>

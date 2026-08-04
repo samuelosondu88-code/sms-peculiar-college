@@ -19,17 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_entry'])) {
 
     if ($classId && $subjectId && $teacherId && $day && $timeStart && $timeEnd) {
         if (isset($_POST['entry_id']) && $_POST['entry_id']) {
-            $stmt = $db->prepare("UPDATE timetable SET class_id=?, subject_id=?, teacher_id=?, day=?, time_start=?, time_end=?, room=? WHERE id=?");
+            $stmt = $db->prepare("UPDATE timetable SET class_id=?, subject_id=?, teacher_id=?, day_of_week=?, start_time=?, end_time=?, room=? WHERE id=?");
             $stmt->execute([$classId, $subjectId, $teacherId, $day, $timeStart, $timeEnd, $room, $_POST['entry_id']]);
         } else {
-            $stmt = $db->prepare("INSERT INTO timetable (class_id, subject_id, teacher_id, day, time_start, time_end, room, term_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$classId, $subjectId, $teacherId, $day, $timeStart, $timeEnd, $room, $termId]);
+            $stmt = $db->prepare("INSERT INTO timetable (class_id, subject_id, teacher_id, day_of_week, start_time, end_time, room) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$classId, $subjectId, $teacherId, $day, $timeStart, $timeEnd, $room]);
         }
         $msg = 'Timetable entry saved.';
     }
 }
 
-$entries = $db->query("SELECT t.*, c.name as class_name, c.section, sub.name as subject_name, u.first_name, u.last_name, ter.term_name FROM timetable t JOIN classes c ON t.class_id = c.id JOIN subjects sub ON t.subject_id = sub.id JOIN users u ON t.teacher_id = u.id JOIN terms ter ON t.term_id = ter.id ORDER BY FIELD(t.day,'monday','tuesday','wednesday','thursday','friday','saturday'), t.time_start")->fetchAll();
+$entries = $db->query("SELECT t.*, c.name as class_name, c.section, sub.name as subject_name, u.first_name, u.last_name FROM timetable t JOIN classes c ON t.class_id = c.id JOIN subjects sub ON t.subject_id = sub.id JOIN users u ON t.teacher_id = u.id ORDER BY FIELD(t.day_of_week,'monday','tuesday','wednesday','thursday','friday','saturday'), t.start_time")->fetchAll();
 
 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
 $subjects = $db->query("SELECT id, name FROM subjects ORDER BY name")->fetchAll();
@@ -51,19 +51,18 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0 datatable">
-                <thead><tr><th>Class</th><th>Subject</th><th>Teacher</th><th>Day</th><th>Time</th><th>Room</th><th>Term</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Class</th><th>Subject</th><th>Teacher</th><th>Day</th><th>Time</th><th>Room</th><th>Actions</th></tr></thead>
                 <tbody>
                     <?php foreach ($entries as $e): ?>
                     <tr>
                         <td><?= sanitizeInput($e['class_name'] . ' ' . ($e['section'] ?? '')) ?></td>
                         <td><?= sanitizeInput($e['subject_name']) ?></td>
                         <td><?= sanitizeInput($e['first_name'] . ' ' . $e['last_name']) ?></td>
-                        <td><span class="badge bg-primary"><?= ucfirst($e['day']) ?></span></td>
-                        <td><?= date('h:i A', strtotime($e['time_start'])) ?> - <?= date('h:i A', strtotime($e['time_end'])) ?></td>
+                        <td><span class="badge bg-primary"><?= ucfirst($e['day_of_week']) ?></span></td>
+                        <td><?= date('h:i A', strtotime($e['start_time'])) ?> - <?= date('h:i A', strtotime($e['end_time'])) ?></td>
                         <td><?= sanitizeInput($e['room'] ?? '-') ?></td>
-                        <td><small><?= sanitizeInput($e['term_name']) ?></small></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="editEntry(<?= $e['id'] ?>, <?= $e['class_id'] ?>, <?= $e['subject_id'] ?>, <?= $e['teacher_id'] ?>, '<?= $e['day'] ?>', '<?= $e['time_start'] ?>', '<?= $e['time_end'] ?>', '<?= addslashes($e['room'] ?? '') ?>', <?= $e['term_id'] ?>)">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editEntry(<?= $e['id'] ?>, <?= $e['class_id'] ?>, <?= $e['subject_id'] ?>, <?= $e['teacher_id'] ?>, '<?= $e['day_of_week'] ?>', '<?= $e['start_time'] ?>', '<?= $e['end_time'] ?>', '<?= addslashes($e['room'] ?? '') ?>')">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </td>
@@ -90,7 +89,6 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="col-md-4"><label class="form-label">Start Time</label><input type="time" name="time_start" id="entry_start" class="form-control" required></div>
                         <div class="col-md-4"><label class="form-label">End Time</label><input type="time" name="time_end" id="entry_end" class="form-control" required></div>
                         <div class="col-md-4"><label class="form-label">Room</label><input type="text" name="room" id="entry_room" class="form-control"></div>
-                        <div class="col-md-6"><label class="form-label">Term</label><select name="term_id" id="entry_term" class="form-select" required><?php foreach ($terms as $t): ?><option value="<?= $t['id'] ?>"><?= sanitizeInput($t['term_name'] . ' ' . $t['session_name']) ?></option><?php endforeach; ?></select></div>
                     </div>
                 </div>
                 <div class="modal-footer"><input type="hidden" name="save_entry" value="1"><button type="submit" class="btn btn-primary">Save</button></div>
@@ -100,7 +98,7 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
-function editEntry(id, classId, subjectId, teacherId, day, start, end, room, termId) {
+function editEntry(id, classId, subjectId, teacherId, day, start, end, room) {
     document.getElementById('entry_id').value = id;
     document.getElementById('entry_class').value = classId;
     document.getElementById('entry_subject').value = subjectId;
@@ -109,7 +107,6 @@ function editEntry(id, classId, subjectId, teacherId, day, start, end, room, ter
     document.getElementById('entry_start').value = start.substring(0,5);
     document.getElementById('entry_end').value = end.substring(0,5);
     document.getElementById('entry_room').value = room;
-    document.getElementById('entry_term').value = termId;
     document.getElementById('entryModalTitle').textContent = 'Edit Timetable Entry';
     new bootstrap.Modal(document.getElementById('entryModal')).show();
 }

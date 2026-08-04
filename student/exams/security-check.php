@@ -92,14 +92,30 @@ require_once __DIR__ . '/../../includes/header.php';
                 <div class="security-step" data-step="3">
                     <div class="mb-3">
                         <div class="display-1 text-info mb-3"><i class="fas fa-camera"></i></div>
-                        <h5>Camera Check</h5>
-                        <p class="text-muted">Grant camera access to verify your identity. Your webcam will be monitored throughout the exam.</p>
+                        <h5>Camera Verification</h5>
+                        <p class="text-muted">Grant camera access so we can verify your setup before the exam begins.</p>
+
+                        <p id="camStatus" class="mt-2 text-muted small">Click <strong>Start Camera</strong> to begin.</p>
+
                         <div style="position: relative; display: inline-block;">
-                            <video id="cameraPreview" autoplay muted playsinline></video>
+                            <video id="cameraPreview" autoplay muted playsinline style="display:none;width:240px;height:180px;border-radius:8px;background:#000;object-fit:cover;"></video>
+                            <div id="cameraPlaceholder" style="width:240px;height:180px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border:2px dashed #d1d5db;">
+                                <i class="fas fa-camera" style="font-size:36px;color:#9ca3af;"></i>
+                                <span style="color:#9ca3af;font-size:13px;">Camera preview appears here</span>
+                            </div>
                         </div>
-                        <p id="camStatus" class="mt-2 text-muted small"><i class="fas fa-spinner fa-spin me-1"></i>Waiting for camera...</p>
+
+                        <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+                            <button type="button" class="btn btn-info" onclick="camStart()"><i class="fas fa-camera me-1"></i>Start Camera</button>
+                            <button type="button" class="btn btn-success" id="camVerifyBtn" style="display:none;" onclick="camVerify()"><i class="fas fa-check me-1"></i>Verify Camera</button>
+                            <button type="button" class="btn btn-outline-secondary" id="camRetryBtn" style="display:none;" onclick="camStart()"><i class="fas fa-redo me-1"></i>Retry</button>
+                            <button type="button" class="btn btn-link text-muted small" onclick="camSkip()"><i class="fas fa-forward me-1"></i>Skip camera check</button>
+                        </div>
+
+                        <div class="mt-3" id="camNextDiv" style="display:none;">
+                            <button type="button" class="btn btn-primary" onclick="nextStep(3)"><i class="fas fa-arrow-right me-1"></i>Continue</button>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="nextStep(3)" disabled id="camNextBtn"><i class="fas fa-check me-1"></i>Continue</button>
                 </div>
                 <?php endif; ?>
 
@@ -123,11 +139,10 @@ require_once __DIR__ . '/../../includes/header.php';
 </div>
 
 <script>
-let currentStep = 1;
-const totalSteps = <?= $secSettings['require_camera'] ? 4 : 3 ?>;
-let fullscreenOk = false;
-let cameraOk = !<?= $secSettings['require_camera'] ? 'true' : 'false' ?>;
-let cameraStream = null;
+var currentStep = 1;
+var totalSteps = <?= $secSettings['require_camera'] ? 4 : 3 ?>;
+var fullscreenOk = false;
+var cameraStream = null;
 
 function updateSteps(step) {
     document.querySelectorAll('.step-dot').forEach(function (d) {
@@ -141,6 +156,14 @@ function updateSteps(step) {
     currentStep = step;
 }
 
+function stopCamera() {
+    if (typeof camStop === 'function') { camStop(); }
+    else if (cameraStream) {
+        cameraStream.getTracks().forEach(function (t) { t.stop(); });
+        cameraStream = null;
+    }
+}
+
 function nextStep(fromStep) {
     if (fromStep === 1) {
         /* ok */
@@ -150,10 +173,7 @@ function nextStep(fromStep) {
             return;
         }
     } else if (fromStep === 3 && <?= $secSettings['require_camera'] ? 'true' : 'false' ?>) {
-        if (!cameraOk) {
-            alert('Camera check in progress. Please wait...');
-            return;
-        }
+        stopCamera();
     }
     if (fromStep < totalSteps) {
         updateSteps(fromStep + 1);
@@ -162,9 +182,28 @@ function nextStep(fromStep) {
 
 function requestFullscreen() {
     var el = document.documentElement;
-    var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
-    if (fn) fn.call(el);
-    setTimeout(checkFullscreen, 500);
+    if (el.requestFullscreen) {
+        el.requestFullscreen()['catch'](function(){});
+    } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+        el.msRequestFullscreen();
+    } else if (el.mozRequestFullScreen) {
+        el.mozRequestFullScreen();
+    }
+    pollFullscreen();
+}
+
+var fsPollCount = 0;
+
+function pollFullscreen() {
+    fsPollCount++;
+    checkFullscreen();
+    if (fullscreenOk) {
+        if (currentStep === 2) nextStep(2);
+    } else if (fsPollCount < 30) {
+        setTimeout(pollFullscreen, 250);
+    }
 }
 
 function checkFullscreen() {
@@ -176,31 +215,130 @@ function checkFullscreen() {
         el.innerHTML = fullscreenOk ? '<i class="fas fa-check me-1"></i>Full-screen mode active' : '<i class="fas fa-times me-1"></i>Not in full-screen mode';
     }
 }
-document.addEventListener('fullscreenchange', checkFullscreen);
-document.addEventListener('webkitfullscreenchange', checkFullscreen);
-document.addEventListener('msfullscreenchange', checkFullscreen);
+(function() {
+    var h = function() { checkFullscreen(); if (fullscreenOk && currentStep === 2) { setTimeout(function() { nextStep(2); }, 200); } };
+    document.addEventListener('fullscreenchange', h);
+    document.addEventListener('webkitfullscreenchange', h);
+    document.addEventListener('msfullscreenchange', h);
+    document.addEventListener('mozfullscreenchange', h);
+    if (document.documentElement) {
+        document.documentElement.addEventListener('fullscreenchange', h);
+        document.documentElement.addEventListener('webkitfullscreenchange', h);
+        document.documentElement.addEventListener('msfullscreenchange', h);
+        document.documentElement.addEventListener('mozfullscreenchange', h);
+    }
+})();
 
-/* Camera setup */
+/* Camera verification — inline functions */
 <?php if ($secSettings['require_camera']): ?>
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240, facingMode: 'user' } })
-        .then(function (stream) {
-            cameraStream = stream;
-            var video = document.getElementById('cameraPreview');
-            if (video) {
-                video.srcObject = stream;
-                video.play();
-                cameraOk = true;
-                document.getElementById('camStatus').innerHTML = '<i class="fas fa-check text-success me-1"></i>Camera working';
-                document.getElementById('camNextBtn').disabled = false;
-            }
-        })
-        .catch(function (err) {
-            document.getElementById('camStatus').innerHTML = '<i class="fas fa-times text-danger me-1"></i>Camera error: ' + err.message;
-            document.getElementById('camNextBtn').disabled = false;
-            cameraOk = true;
-        });
+var _camStream = null;
+var _camVerified = false;
+
+function camLog(msg) {
 }
+
+function camSetStatus(html, cls) {
+    var el = document.getElementById('camStatus');
+    if (!el) return;
+    el.innerHTML = html;
+    el.className = 'mt-2 small ' + (cls || 'text-muted');
+}
+
+function camShowPreview(stream) {
+    var v = document.getElementById('cameraPreview');
+    var p = document.getElementById('cameraPlaceholder');
+    if (!v) return;
+    v.srcObject = stream;
+    v.style.display = '';
+    if (p) p.style.display = 'none';
+    v.play()['catch'](function(){});
+    camLog('preview shown');
+}
+
+function camStop() {
+    if (_camStream) {
+        _camStream.getTracks().forEach(function (t) { t.stop(); });
+        _camStream = null;
+        camLog('stream stopped');
+    }
+    var v = document.getElementById('cameraPreview');
+    var p = document.getElementById('cameraPlaceholder');
+    if (v) v.style.display = 'none';
+    if (p) p.style.display = '';
+}
+
+function camStart() {
+    if (_camStream) {
+        camLog('already have stream');
+        return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        camSetStatus('<i class="fas fa-times-circle text-danger me-1"></i>Camera API not available.', 'text-danger');
+        document.getElementById('camRetryBtn').style.display = '';
+        camLog('getUserMedia not available');
+        return;
+    }
+    camSetStatus('<i class="fas fa-spinner fa-spin me-1"></i>Requesting camera access...', 'text-info');
+    camLog('requesting camera...');
+    try {
+        navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 320 }, height: { ideal: 240 }, facingMode: 'user' } })
+            .then(function (s) {
+                _camStream = s;
+                camLog('stream obtained, active=' + s.active + ' tracks=' + s.getTracks().length);
+                camShowPreview(s);
+                camSetStatus('Camera working. Click <strong>Verify Camera</strong>.', 'text-success');
+                document.getElementById('camVerifyBtn').style.display = '';
+            })
+            .catch(function (err) {
+                var msg = 'Camera access denied or unavailable.';
+                if (err.name === 'NotAllowedError') msg = 'Permission denied. Allow camera in browser settings, then Retry.';
+                else if (err.name === 'NotFoundError') msg = 'No camera found. You can Skip this step.';
+                else if (err.name === 'NotReadableError') msg = 'Camera busy (another app using it). Close it and Retry.';
+                camLog('error: ' + err.name + ' - ' + err.message);
+                camSetStatus('<i class="fas fa-times-circle text-danger me-1"></i>' + msg, 'text-danger');
+                document.getElementById('camRetryBtn').style.display = '';
+            });
+    } catch (e) {
+        camLog('sync error: ' + e.message);
+        camSetStatus('<i class="fas fa-times-circle text-danger me-1"></i>Camera error.', 'text-danger');
+        document.getElementById('camRetryBtn').style.display = '';
+    }
+}
+
+function camVerify() {
+    if (!_camStream) {
+        camSetStatus('Start the camera first, then verify.', 'text-warning');
+        return;
+    }
+    _camVerified = true;
+    try { sessionStorage.setItem('cam_verified', '1'); } catch (e) {}
+    camLog('verified');
+    camSetStatus('<i class="fas fa-check-circle text-success me-1"></i>Camera verified!', 'text-success');
+    document.getElementById('camVerifyBtn').style.display = 'none';
+    document.getElementById('camRetryBtn').style.display = 'none';
+    document.getElementById('camNextDiv').style.display = '';
+    camStop();
+}
+
+function camSkip() {
+    _camVerified = true;
+    try { sessionStorage.setItem('cam_skipped', '1'); } catch (e) {}
+    camLog('skipped');
+    camSetStatus('<i class="fas fa-check-circle text-muted me-1"></i>Skipped. You can continue.', 'text-muted');
+    document.getElementById('camNextDiv').style.display = '';
+    camStop();
+}
+
+/* Check if already verified in this session */
+(function () {
+    try {
+        if (sessionStorage.getItem('cam_verified') === '1' || sessionStorage.getItem('cam_skipped') === '1') {
+            _camVerified = true;
+            camSetStatus('Already verified.', 'text-success');
+            document.getElementById('camNextDiv').style.display = '';
+        }
+    } catch (e) {}
+})();
 <?php endif; ?>
 
 /* Device fingerprinting */
@@ -227,10 +365,10 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     document.getElementById('platform').value = navigator.platform || '';
 })();
 
-window.addEventListener('beforeunload', function (e) {
-    if (cameraStream) cameraStream.getTracks().forEach(function (t) { t.stop(); });
-});
+window.addEventListener('beforeunload', stopCamera);
+
+
 </script>
 
-<?php $extraScripts = '<script src="' . BASE_URL . '/includes/exam_security.js"></script>'; ?>
+<?php $extraScripts = ''; ?>
 <?php require_once __DIR__ . '/../../includes/footer.php'; ?>

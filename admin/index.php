@@ -47,7 +47,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0">Admin Dashboard</h4>
-        <p class="text-muted small mb-0">Welcome back, <?= $_SESSION['user_name'] ?>!</p>
+        <p class="text-muted small mb-0">Welcome back, <?= sanitizeInput($_SESSION['user_name'] ?? '') ?>!</p>
     </div>
     <div>
         <a href="<?= BASE_URL ?>/admin/applications.php" class="btn btn-warning me-2">

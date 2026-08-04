@@ -1,8 +1,15 @@
 <?php
+require_once __DIR__ . '/env.php';
+
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'sms_peculiar_college');
-define('DB_USER', getenv('DB_USER') ?: 'peculiar_user');
-define('DB_PASS', getenv('DB_PASS') ?: 'wOZLp35NnB8cYjXRbMgV');
+define('DB_USER', getenv('DB_USER') ?: '');
+define('DB_PASS', getenv('DB_PASS') ?: '');
+
+if (empty(DB_USER) || empty(DB_PASS)) {
+    error_log('Database credentials not configured. Set DB_USER and DB_PASS in .env.');
+    die('A system error occurred. Please try again later.');
+}
 
 function getDB(): PDO {
     static $pdo = null;
