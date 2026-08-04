@@ -212,7 +212,7 @@ php scripts/migrate.php --file=exam_security_schema.sql              # exam secu
 ### Tests
 ```
 composer install
-php vendor/bin/phpunit             # 15 unit tests for AuthService + UploadService
+php vendor/bin/phpunit             # 24 unit tests: AuthService + UploadService + Security/CSRF
 ```
 
 ### Security headers / password policy

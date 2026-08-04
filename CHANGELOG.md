@@ -212,6 +212,15 @@ and this project adheres to Semantic Versioning.
   `require`s `config/app.php` and emits the standard status `403`, rendering
   cleanly (previously: fatal "Undefined constant" on the logged-in builds).
 
+### Added
+- **`tests/SecurityTest.php`** — 9 unit tests for the CSRF token
+  generation/verification helpers (`generateCsrfToken`, `verifyCsrfToken`,
+  `getCsrfField`-backed flow) and the password-policy helpers
+  (`validatePasswordPolicy`, `generateStrongPassword`). Suite is now
+  **24 tests / 28 assertions**. The admin write path (CSRF token → POST →
+  `notices` insert → redirect → flash) was also exercised end-to-end against
+  the live DB and cleaned up afterwards.
+
 ## [2.0.0] - Baseline
 - Existing procedural school management system snapshot (pre-refactor).
 
