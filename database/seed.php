@@ -126,7 +126,7 @@ try {
 
     // 9. Student
     $db->exec("INSERT INTO students (user_id, admission_no, class_id, date_of_birth, gender, enrollment_date, status) VALUES
-        (4, 'PEC2025001', 1, '2012-04-15', 'male', '2025-09-15', 'active')");
+        (4, 'PIC2025001', 1, '2012-04-15', 'male', '2025-09-15', 'active')");
     echo "  Student created\n";
 
     // 10. Parent

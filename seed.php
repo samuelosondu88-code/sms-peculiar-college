@@ -54,7 +54,7 @@ try {
     $alloc->execute([2, 1, 1]); $alloc->execute([2, 5, 5]); $alloc->execute([3, 1, 2]); $alloc->execute([3, 6, 8]);
 
     // 7. Student + Parent
-    $db->exec("INSERT INTO students (user_id, admission_no, class_id, date_of_birth, gender, enrollment_date, status) VALUES (4, 'PEC2025001', 1, '2012-04-15', 'male', '2025-09-15', 'active')");
+    $db->exec("INSERT INTO students (user_id, admission_no, class_id, date_of_birth, gender, enrollment_date, status) VALUES (4, 'PIC2025001', 1, '2012-04-15', 'male', '2025-09-15', 'active')");
     $db->exec("INSERT INTO parents (user_id, occupation, relationship) VALUES (5, 'Business Owner', 'Father')");
     $db->exec("INSERT INTO student_parents (student_id, parent_id, is_guardian) VALUES (1, 1, 1)");
 

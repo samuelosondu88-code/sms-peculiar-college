@@ -383,7 +383,7 @@ $db->beginTransaction();
 
 $admissionNo = (int)$db->query("SELECT MAX(CAST(SUBSTRING(admission_no, 8) AS UNSIGNED)) FROM students")->fetchColumn();
 if (!$admissionNo) $admissionNo = 0;
-$admissionNo++; // start from next available (PEC2025001 exists → start at 2)
+$admissionNo++; // start from next available (PIC2025001 exists - start at 2)
 
 $studentUserRows = [];
 $studentDataRows = [];
@@ -408,7 +408,7 @@ foreach ($STUDENT_DIST as $classId => $count) {
 
         $studentUserRows[] = [$username, $email, hashPwd('Password@123'), $fname, $lname, $phone, 'student', 'active'];
         
-        $admNo = 'PEC2025' . str_pad($admissionNo++, 3, '0', STR_PAD_LEFT);
+        $admNo = 'PIC2025' . str_pad($admissionNo++, 3, '0', STR_PAD_LEFT);
         $dob   = sprintf('%d-%02d-%02d', mt_rand(2006, 2014), mt_rand(1, 12), mt_rand(1, 28));
         $enr   = '2025-09-' . str_pad(mt_rand(10, 20), 2, '0', STR_PAD_LEFT);
         
