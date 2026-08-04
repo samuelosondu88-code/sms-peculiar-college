@@ -5,7 +5,7 @@ RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,QSA]
 
 # Security: Block sensitive files
-RewriteRule ^(database/|config/|includes/|vendor/|cron/|backups/)(.*)$ - [F,L]
+RewriteRule ^(database/|config/|includes/|vendor/|cron/|backups/|scripts/|app/|tests/)(.*)$ - [F,L]
 RewriteRule ^logs/ - [F,L]
 RewriteRule ^\.env - [F,L]
 

@@ -235,6 +235,13 @@ and this project adheres to Semantic Versioning.
   restore was validated against a copy via a self-contained PDO harness.
 
 ### Security
+- **`app/`, `scripts/` and `tests/` were web-reachable.** `app/Config/bootstrap.php`
+  and `app/Helpers/helpers.php` returned `200` and `scripts/migrate.php` /
+  `scripts/backup.php` executed (`500`) over HTTP — only `app/Core`,
+  `app/Modules`, `app/Repositories` and `app/Services` had per-directory
+  `.htaccess` files, and `scripts/` had none. The root `.htaccess` deny rule
+  now also covers `scripts/`, `app/` and `tests/` (all return `403`, verified
+  over HTTPS); server-side PHP `require` includes are unaffected.
 - **`database/` seeder scripts were only protected by `.htaccess`.** The web root
   `.htaccess` returns 403 for `database/*` (verified), but on shared hosts where
   `AllowOverride` is disabled the unguarded `database/seed.php`,
