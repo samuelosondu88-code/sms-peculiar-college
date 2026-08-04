@@ -1,4 +1,15 @@
 <?php
+// Guard: this script TRUNCATES every table and reseeds the database.
+// It must never be reachable over HTTP.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    header('Content-Type: text/plain');
+    exit("Forbidden: seed.php may only be run from the command line.\n");
+}
+if (!in_array('--confirm', $argv ?? [], true)) {
+    fwrite(STDERR, "Refusing to run: pass --confirm to wipe and reseed the database.\n");
+    exit(1);
+}
 require_once __DIR__ . '/config/database.php';
 
 try {

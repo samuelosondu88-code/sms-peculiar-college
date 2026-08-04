@@ -187,6 +187,18 @@ and this project adheres to Semantic Versioning.
   `requireRole()` without requiring `includes/functions.php`, causing
   "Call to undefined function redirect()". Both now require it (all pages
   verified; no other standalone page had the gap).
+- **Remote database-wipe vector closed.** `seed.php` TRUNCATEd every table
+  and reseeded demo data, and executed over HTTP with no authentication —
+  any anonymous visitor could wipe the live database. It is now CLI-only
+  (`PHP_SAPI === 'cli'`) and additionally requires an explicit `--confirm`
+  argument. `setup.php` (HTTP-reachable DDL) is now CLI-only as well. Both
+  return HTTP 403 over the web.
+- Removed `test_sidebar2.php`, a leftover dev artifact that enabled
+  `display_errors` and forged a logged-in student session via
+  `session_id('test')` for any visitor.
+- Re-verified after hardening: admin (47/47), public (9/9) and all portal
+  crawls green; `api/students-by-class.php` returns valid JSON;
+  `index.php` 302, `result-checker.php` 200, `maintenance.php` 503.
 
 ## [2.0.0] - Baseline
 - Existing procedural school management system snapshot (pre-refactor).

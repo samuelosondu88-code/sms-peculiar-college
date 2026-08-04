@@ -2,7 +2,13 @@
 /**
  * One-time setup script: creates missing database tables.
  * DELETE THIS FILE after running!
+ * CLI-only: it performs DDL and must never be reachable over HTTP.
  */
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    header('Content-Type: text/plain');
+    exit("Forbidden: setup.php may only be run from the command line.\n");
+}
 require __DIR__ . '/config/env.php';
 
 $dbHost = getenv('DB_HOST') ?: 'localhost';
