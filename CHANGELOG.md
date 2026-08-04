@@ -199,6 +199,18 @@ and this project adheres to Semantic Versioning.
 - Re-verified after hardening: admin (47/47), public (9/9) and all portal
   crawls green; `api/students-by-class.php` returns valid JSON;
   `index.php` 302, `result-checker.php` 200, `maintenance.php` 503.
+- **2FA login flow verified end-to-end** (login → 2FA challenge → OTP →
+  dashboard) against the live DB; the flow, OTP storage/expiry and
+  session establishment all work correctly.
+- **Verified role guard**: a logged-in student hitting an admin page gets
+  `403 - Access Denied`.
+- `uploads/.htaccess` (denied script execution, `Options -Indexes -ExecCGI`)
+  cascades to subdirectories; `docs/` contains no secrets.
+- **`error-419.php` returned HTTP 500 on every access.** 419 is a
+  non-standard status that this Apache/PHP builds coerce to 500, and the page
+  also used the undefined `SCHOOL_NAME` when opened standalone. It now
+  `require`s `config/app.php` and emits the standard status `403`, rendering
+  cleanly (previously: fatal "Undefined constant" on the logged-in builds).
 
 ## [2.0.0] - Baseline
 - Existing procedural school management system snapshot (pre-refactor).

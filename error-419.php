@@ -1,4 +1,8 @@
 <?php
+// Session-expired page. 419 is a non-standard status that Apache/PHP coerces
+// to 500, so we emit 403 (a standard client error) instead.
+http_response_code(403);
+require_once __DIR__ . '/config/app.php';
 $pageTitle = 'Session Expired';
 $base_url = defined('BASE_URL') ? BASE_URL : '/';
 ?>
