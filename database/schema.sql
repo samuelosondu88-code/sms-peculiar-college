@@ -354,6 +354,7 @@ CREATE TABLE books (
     isbn VARCHAR(20) UNIQUE,
     publisher VARCHAR(100),
     category VARCHAR(100),
+    description TEXT,
     quantity INT DEFAULT 1,
     available INT DEFAULT 1,
     shelf_location VARCHAR(50),

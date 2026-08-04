@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS payments (
 CREATE TABLE IF NOT EXISTS student_pins (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
-    pin VARCHAR(20) NOT NULL,
+    pin VARCHAR(255) NOT NULL COMMENT 'bcrypt hash of the login PIN',
     status ENUM('active','used','expired','revoked') NOT NULL DEFAULT 'active',
     generated_by INT NOT NULL,
     generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

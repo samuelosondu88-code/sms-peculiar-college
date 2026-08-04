@@ -197,11 +197,16 @@ php scripts/backup.php --rotate=10 # keep the 10 most recent
 ```
 
 ### Database
-After installing the schema, run the optimisation migration once. Either via phpMyAdmin
-(Import `database/migration_indexes.sql`) or from the CLI:
+After installing the base schema, apply the schema/migration files. Use the CLI runner to
+apply any `database/*.sql` file (idempotent list-form migrations are safe to re-run):
 ```
-php scripts/migrate.php            # apply indexes (idempotent)
+php scripts/migrate.php            # apply default indexes (idempotent)
 php scripts/migrate.php --check    # dry-run: show existing indexes
+php scripts/migrate.php --file=classroom_schema.sql                  # virtual classroom tables
+php scripts/migrate.php --file=migration_admission_forms_columns.sql # admission form settings
+php scripts/migrate.php --file=migration_student_pins_pin_length.sql # bcrypt-hashed student PINs
+php scripts/migrate.php --file=migration_books_submissions_columns.sql # submissions.status / books.description
+php scripts/migrate.php --file=exam_security_schema.sql              # exam security/take-exam tables
 ```
 
 ### Tests

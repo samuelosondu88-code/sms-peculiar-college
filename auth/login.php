@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_email'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_pin'])) {
     $admissionNo = sanitizeInput($_POST['admission_no'] ?? '');
-    $pin = sanitizeInput($_POST['pin'] ?? '');
+    $pin = strtoupper(sanitizeInput($_POST['pin'] ?? ''));
     $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 
     if (isLoginThrottled($admissionNo, $ip)) {

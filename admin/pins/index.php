@@ -12,14 +12,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_pins'])) {
     $expires = sanitizeInput($_POST['expires'] ?? '');
     $maxAttempts = (int)($_POST['max_attempts'] ?? 5);
     $generated = 0;
+    $generatedPins = [];
     foreach ($studentIds as $sid) {
         $sid = (int)$sid;
         $pin = strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
         $stmt = $db->prepare("INSERT INTO student_pins (student_id, pin, generated_by, expires_at, max_attempts) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$sid, $pin, $_SESSION['user_id'], $expires ?: null, $maxAttempts]);
+        $stmt->execute([$sid, password_hash($pin, PASSWORD_BCRYPT), $_SESSION['user_id'], $expires ?: null, $maxAttempts]);
+        $generatedPins[$sid] = $pin;
         $generated++;
     }
-    $msg = "$generated PIN(s) generated successfully.";
+    if ($generated > 0) {
+        $pinNames = [];
+        $stmt = $db->prepare("SELECT s.id, u.first_name, u.last_name, s.admission_no FROM students s JOIN users u ON s.user_id = u.id WHERE s.id IN (" . implode(',', array_map('intval', array_keys($generatedPins))) . ")");
+        $stmt->execute();
+        foreach ($stmt as $r) { $pinNames[$r['id']] = $r['admission_no'] . ' - ' . $r['first_name'] . ' ' . $r['last_name']; }
+        $list = '';
+        foreach ($generatedPins as $sid => $pp) {
+            $list .= '<li>' . sanitizeInput($pinNames[$sid] ?? 'Student #' . $sid) . ': <strong>' . $pp . '</strong></li>';
+        }
+        $msg = "$generated PIN(s) generated. PINs are stored hashed and shown only here once: <ul class='mb-0 mt-1'>$list</ul>";
+    }
     logAudit('pins_generate', 'student_pins', null, null, "$generated PINs generated");
 }
 
@@ -30,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_single'])) {
     if ($sid) {
         $db->prepare("UPDATE student_pins SET status = 'expired' WHERE student_id = ? AND status = 'active'")->execute([$sid]);
         $pin = strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
-        $db->prepare("INSERT INTO student_pins (student_id, pin, generated_by, expires_at, max_attempts) VALUES (?, ?, ?, ?, ?)")->execute([$sid, $pin, $_SESSION['user_id'], $expires ?: null, $maxAttempts]);
-        $msg = "PIN generated: <strong>$pin</strong>";
+        $db->prepare("INSERT INTO student_pins (student_id, pin, generated_by, expires_at, max_attempts) VALUES (?, ?, ?, ?, ?)")->execute([$sid, password_hash($pin, PASSWORD_BCRYPT), $_SESSION['user_id'], $expires ?: null, $maxAttempts]);
+        $msg = "PIN generated (stored hashed, shown once): <strong>$pin</strong>";
         $msgType = 'success';
         logAudit('pin_generate_single', 'student_pins', $sid, null, "PIN generated for student #$sid");
     }
@@ -72,7 +84,8 @@ if (isset($_GET['print']) && $_GET['print'] === 'pins') {
             <div><strong><?= sanitizeInput($p['first_name'] . ' ' . $p['last_name']) ?></strong></div>
             <div>Admission: <?= sanitizeInput($p['admission_no']) ?></div>
             <div>Class: <?= sanitizeInput($p['class_name'] . ' ' . $p['section']) ?></div>
-            <div class="pin-code">PIN: <?= sanitizeInput($p['pin']) ?></div>
+            <div class="pin-code">PIN: <em>printed at generation</em></div>
+            <div style="font-size:10px;color:#999;margin-top:10px">PINs are stored hashed; the plain PIN is shown only once when generated.</div>
             <div style="font-size:11px;color:#666">
                 Valid until: <?= $p['expires_at'] ? formatDate($p['expires_at']) : 'No expiry' ?>
                 | Max attempts: <?= $p['max_attempts'] ?>
@@ -181,7 +194,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <td><?= sanitizeInput($p['first_name'] . ' ' . $p['last_name']) ?></td>
                         <td><?= sanitizeInput($p['admission_no']) ?></td>
                         <td><?= sanitizeInput($p['class_name'] . ' ' . $p['section']) ?></td>
-                        <td><code><?= sanitizeInput($p['pin']) ?></code></td>
+                        <td><i class="fas fa-lock text-muted" title="Stored as a one-way hash; plain PIN shown only at generation"></i></td>
                         <td><?= getStatusBadge($p['status']) ?></td>
                         <td><?= $p['attempts'] ?>/<?= $p['max_attempts'] ?></td>
                         <td><small><?= timeAgo($p['generated_at']) ?></small></td>

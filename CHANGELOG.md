@@ -155,6 +155,39 @@ and this project adheres to Semantic Versioning.
 - `bootstrap.php` logger call created a logger but never wrote; changed to
   `->info()` and restricted to CLI to avoid per-request log noise.
 
+### Fixed (portal end-to-end verification round)
+- **Student PIN login could never succeed.** `student_pins.pin` was
+  `VARCHAR(20)` while login verifies PINs with `password_verify()` against a
+  bcrypt hash (60 chars); the column truncated every stored hash, and admin
+  generation stored plaintext PINs while login expected hashes. Fixes:
+  - `database/migration_student_pins_pin_length.sql` widens `student_pins.pin`
+    to `VARCHAR(255)`; `database/security_schema.sql` updated to match for
+    fresh installs.
+  - `admin/pins/index.php` now stores `password_hash()` of each generated PIN
+    and shows the plain PIN only once, at generation time (bulk + single).
+    The PIN list and print slip no longer expose stored hashes.
+  - `auth/login.php` uppercases the submitted PIN (generated PINs are
+    uppercase) before verification.
+  - Verified end-to-end: admin-generated-style hashed PIN → 302 → student
+    dashboard; login auto-generates a successor hashed PIN.
+- **Virtual Classroom module 500s** (student/teacher/parent classroom pages):
+  `virtual_classes`, `class_enrollments`, `class_materials`,
+  `class_announcements`, `class_assignments`, `assignment_submissions`,
+  `class_attendance`, `class_discussions`, `class_schedule` were never created
+  in the live database. Applied existing `database/classroom_schema.sql`
+  (idempotent) via the migration runner.
+- **`submissions.status`** missing from the live table (declared in
+  `database/schema.sql` but the DB was created from an older definition);
+  `database/migration_books_submissions_columns.sql` adds it.
+- **`books.description`** was referenced by `student/library.php` but absent
+  from the base schema and live DB;
+  `database/migration_books_submissions_columns.sql` adds it and
+  `database/schema.sql` now declares it for fresh installs.
+- `student/results.php` and `teacher/grades.php` called `redirect()` /
+  `requireRole()` without requiring `includes/functions.php`, causing
+  "Call to undefined function redirect()". Both now require it (all pages
+  verified; no other standalone page had the gap).
+
 ## [2.0.0] - Baseline
 - Existing procedural school management system snapshot (pre-refactor).
 

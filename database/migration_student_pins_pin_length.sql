@@ -1,0 +1,11 @@
+-- Fix: student login PINs could never work.
+--
+-- The student_pins.pin column was VARCHAR(20), but authentication verifies
+-- PINs with password_verify() against a bcrypt hash (60 chars). Any hash
+-- stored in a 20-char column is silently truncated (non-strict mode) or
+-- rejected (strict mode), so PIN login always failed. Admin generation also
+-- stored plaintext PINs, inconsistent with the hash-based login verification.
+--
+-- Widen the column to hold bcrypt hashes and require PINs to be hashed at
+-- generation time (done in admin/pins/index.php).
+ALTER TABLE student_pins MODIFY pin VARCHAR(255) NOT NULL;
