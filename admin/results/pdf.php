@@ -239,7 +239,7 @@ if ($action === 'download' && $selectedStudent && $selectedSession && $selectedT
 
             $fields = [
                 ['Name:', $student['first_name'] . ' ' . $student['last_name']],
-                ['Class:', $student['class_name'] . ' ' . ($student['section'] ?? '')],
+                ['Class:', className($student['class_name'], $student['section'])],
                 ['Admission No:', $student['admission_no']],
                 ['Gender:', ucfirst($student['gender'] ?? 'N/A')],
             ];
@@ -286,21 +286,23 @@ if ($action === 'download' && $selectedStudent && $selectedSession && $selectedT
             $headers = ['#', 'Subject', 'Asgn 1', 'Asgn 2', 'Test 1', 'Test 2', 'CA Total', 'Exam', 'Total', 'Grade', 'Pos', 'Remark'];
             $keys = ['sn', 'subject', 'ca1', 'ca2', 'test', 'test2', 'ca_total', 'exam', 'total', 'grade', 'pos', 'remark'];
 
-            $this->SetFont('Arial', 'B', 6.5);
-            $this->SetFillColor($this->navy[0], $this->navy[1], $this->navy[2]);
-            $this->SetTextColor(255, 255, 255);
-            $this->SetDrawColor($this->navy[0], $this->navy[1], $this->navy[2]);
-            foreach ($headers as $i => $h) {
-                $this->Cell($colW[$keys[$i]], 7, $h, 1, 0, 'C', true);
-            }
-            $this->Ln();
-
             $this->SetDrawColor($this->borderGray[0], $this->borderGray[1], $this->borderGray[2]);
             $fill = false;
             $sn = 1;
 
+            // Keep the table tidy across A4 page breaks: never leave the
+            // column header (or a category row) orphaned at a page bottom.
+            if ($this->GetY() + 16 > $this->PageBreakTrigger) {
+                $this->AddPage();
+            }
+            $this->scoresHeaderRow($colW, $headers, $keys);
+
             foreach ($results as $r) {
                 if (($r['category'] ?? null) !== ($prevCat ?? null)) {
+                    if ($this->GetY() + 13 > $this->PageBreakTrigger) {
+                        $this->AddPage();
+                        $this->scoresHeaderRow($colW, $headers, $keys);
+                    }
                     $this->Ln(0.5);
                     $this->SetFont('Arial', 'B', 7);
                     $this->SetFillColor(232, 232, 240);
@@ -324,6 +326,11 @@ if ($action === 'download' && $selectedStudent && $selectedSession && $selectedT
 
                 $this->SetTextColor($this->dark[0], $this->dark[1], $this->dark[2]);
                 $this->SetFont('Arial', '', 6.5);
+
+                if ($this->GetY() + 8 > $this->PageBreakTrigger) {
+                    $this->AddPage();
+                    $this->scoresHeaderRow($colW, $headers, $keys);
+                }
 
                 $this->Cell($colW['sn'], 6, $sn++, 1, 0, 'C', $fill);
                 $this->Cell($colW['subject'], 6, $r['subject_name'], 1, 0, 'L', $fill);
@@ -359,6 +366,18 @@ if ($action === 'download' && $selectedStudent && $selectedSession && $selectedT
                 $fill = !$fill;
             }
             $this->Ln(3);
+        }
+
+        private function scoresHeaderRow($colW, $headers, $keys) {
+            $this->SetFont('Arial', 'B', 6.5);
+            $this->SetFillColor($this->navy[0], $this->navy[1], $this->navy[2]);
+            $this->SetTextColor(255, 255, 255);
+            $this->SetDrawColor($this->navy[0], $this->navy[1], $this->navy[2]);
+            foreach ($headers as $i => $h) {
+                $this->Cell($colW[$keys[$i]], 7, $h, 1, 0, 'C', true);
+            }
+            $this->Ln();
+            $this->SetDrawColor($this->borderGray[0], $this->borderGray[1], $this->borderGray[2]);
         }
 
         function SummaryBox($summary, $position, $attendance) {
@@ -658,7 +677,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select" onchange="this.form.submit()">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                    <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

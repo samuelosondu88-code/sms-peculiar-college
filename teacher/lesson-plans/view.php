@@ -45,7 +45,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
         <h4 class="fw-bold mb-0"><i class="fas fa-book-open me-2"></i>Lesson Plan</h4>
-        <p class="text-muted small mb-0"><?= sanitizeInput($plan['subject_name']) ?> - <?= sanitizeInput($plan['class_name'] . ' ' . $plan['section']) ?></p>
+        <p class="text-muted small mb-0"><?= sanitizeInput($plan['subject_name']) ?> - <?= sanitizeInput(className($plan['class_name'], $plan['section'])) ?></p>
     </div>
     <div class="d-flex gap-2">
         <?php if ($plan['status'] === 'draft' || $plan['status'] === 'rejected'): ?>
@@ -74,7 +74,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <tr><th style="width:180px">Teacher</th><td><?= sanitizeInput($plan['teacher_first'] . ' ' . $plan['teacher_last']) ?></td></tr>
                     <tr><th>Staff ID</th><td><?= sanitizeInput($plan['employee_id'] ?? '-') ?></td></tr>
                     <tr><th>Subject</th><td><?= sanitizeInput($plan['subject_name']) ?></td></tr>
-                    <tr><th>Class</th><td><?= sanitizeInput($plan['class_name'] . ' ' . $plan['section']) ?></td></tr>
+                    <tr><th>Class</th><td><?= sanitizeInput(className($plan['class_name'], $plan['section'])) ?></td></tr>
                     <tr><th>Term</th><td><?= sanitizeInput($plan['term_name'] ?? '-') ?></td></tr>
                     <tr><th>Academic Session</th><td><?= sanitizeInput($plan['session_name'] ?? '-') ?></td></tr>
                     <tr><th>Week</th><td><?= $plan['week_no'] ?: '-' ?></td></tr>

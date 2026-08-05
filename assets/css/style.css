@@ -189,6 +189,25 @@ a:hover { color: var(--gold); }
     color: var(--gold);
     background: rgba(212,175,55,0.08);
 }
+.sidebar-section-label {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.45);
+    padding: 14px 20px 4px;
+}
+#sidebar-wrapper .list-group-item[data-bs-toggle="collapse"] i.fa-chevron-down {
+    margin-left: auto;
+    width: auto;
+    transition: transform var(--transition);
+}
+#sidebar-wrapper .list-group-item[data-bs-toggle="collapse"].collapsed i.fa-chevron-down {
+    transform: rotate(-90deg);
+}
+#sidebar-wrapper .collapse .list-group-item {
+    padding-left: 44px;
+}
 
 /* ===== NAVBAR ===== */
 .navbar {

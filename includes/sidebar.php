@@ -15,88 +15,112 @@ $currentPath = $currentDir . '/' . $currentPage;
             <i class="fas fa-tachometer-alt me-3"></i>Dashboard
         </a>
         <?php if ($role === 'admin'): ?>
-        <li class="nav-item">
-            <a class="nav-link" href="#resultsMenu" data-bs-toggle="collapse" data-bs-target="#resultsMenu">
-                <i class="fas fa-chart-bar me-2"></i> Results
-                <i class="fas fa-chevron-down ms-auto"></i>
+        <div class="sidebar-section-label">Academics</div>
+        <a href="#academicsMenu" class="list-group-item list-group-item-action bg-transparent text-white d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#academicsMenu">
+            <i class="fas fa-graduation-cap me-3"></i>Academics
+            <i class="fas fa-chevron-down ms-auto"></i>
+        </a>
+        <div class="collapse show" id="academicsMenu">
+            <a href="<?= BASE_URL ?>/admin/classes.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'classes.php' ? 'active' : '' ?>">
+                <i class="fas fa-chalkboard me-2"></i>Classes
             </a>
-            <div class="collapse show" id="resultsMenu">
-                <ul class="nav flex-column ms-3">
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/index.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/status.php"><i class="fas fa-tasks me-2"></i>Processing Status</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/enter.php"><i class="fas fa-pen me-2"></i>Enter Scores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/preview.php"><i class="fas fa-eye me-2"></i>Preview</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/submit.php"><i class="fas fa-paper-plane me-2"></i>Submit</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/settings.php"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/manage.php"><i class="fas fa-table me-2"></i>Manage Results</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/approve.php"><i class="fas fa-check-double me-2"></i>Approvals</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/pins.php"><i class="fas fa-key me-2"></i>Result PINs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/promotion.php"><i class="fas fa-arrow-up me-2"></i>Promotion</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/psychomotor.php"><i class="fas fa-running me-2"></i>Psychomotor</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/affective.php"><i class="fas fa-heart me-2"></i>Affective</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/comments.php"><i class="fas fa-comment me-2"></i>Remarks</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/pdf.php"><i class="fas fa-file-pdf me-2 text-danger"></i>PDF Report Cards</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/annual.php"><i class="fas fa-calendar-alt me-2"></i>Annual Reports</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/import.php"><i class="fas fa-file-import me-2"></i>Import Scores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/admin/results/broadcast.php"><i class="fas fa-bullhorn me-2"></i>Broadcast</a></li>
-                </ul>
-            </div>
-        </li>
-        <a href="<?= BASE_URL ?>/admin/users.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'users.php' ? 'active' : '' ?>">
-            <i class="fas fa-users me-3"></i>Users
+            <a href="<?= BASE_URL ?>/admin/subjects.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'subjects.php' ? 'active' : '' ?>">
+                <i class="fas fa-book me-2"></i>Subjects
+            </a>
+            <a href="<?= BASE_URL ?>/admin/timetable.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'timetable.php' ? 'active' : '' ?>">
+                <i class="fas fa-calendar-alt me-2"></i>Timetable
+            </a>
+            <a href="<?= BASE_URL ?>/admin/exams.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'exams.php' ? 'active' : '' ?>">
+                <i class="fas fa-file-alt me-2"></i>Exams
+            </a>
+            <a href="<?= BASE_URL ?>/admin/lesson-plans/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'lesson-plans' ? 'active' : '' ?>">
+                <i class="fas fa-book-open me-2"></i>Lesson Plans
+            </a>
+            <a href="<?= BASE_URL ?>/admin/cbt/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'cbt' ? 'active' : '' ?>">
+                <i class="fas fa-laptop me-2"></i>CBT Exams
+            </a>
+            <a href="<?= BASE_URL ?>/admin/exams/monitor.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'exams' && $currentPage === 'monitor.php' ? 'active' : '' ?>">
+                <i class="fas fa-tv me-2"></i>Exam Monitoring
+            </a>
+        </div>
+        <div class="sidebar-section-label">Results</div>
+        <a href="#resultsMenu" class="list-group-item list-group-item-action bg-transparent text-white d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#resultsMenu">
+            <i class="fas fa-chart-bar me-3"></i>Results
+            <i class="fas fa-chevron-down ms-auto"></i>
         </a>
-        <a href="<?= BASE_URL ?>/admin/classes.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'classes.php' ? 'active' : '' ?>">
-            <i class="fas fa-chalkboard me-3"></i>Classes
+        <div class="collapse" id="resultsMenu">
+            <a href="<?= BASE_URL ?>/admin/results/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'index.php' ? 'active' : '' ?>"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+            <a href="<?= BASE_URL ?>/admin/results/status.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'status.php' ? 'active' : '' ?>"><i class="fas fa-tasks me-2"></i>Processing Status</a>
+            <a href="<?= BASE_URL ?>/admin/results/enter.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'enter.php' ? 'active' : '' ?>"><i class="fas fa-pen me-2"></i>Enter Scores</a>
+            <a href="<?= BASE_URL ?>/admin/results/preview.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'preview.php' ? 'active' : '' ?>"><i class="fas fa-eye me-2"></i>Preview</a>
+            <a href="<?= BASE_URL ?>/admin/results/submit.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'submit.php' ? 'active' : '' ?>"><i class="fas fa-paper-plane me-2"></i>Submit</a>
+            <a href="<?= BASE_URL ?>/admin/results/settings.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'settings.php' ? 'active' : '' ?>"><i class="fas fa-cog me-2"></i>Settings</a>
+            <a href="<?= BASE_URL ?>/admin/results/manage.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'manage.php' ? 'active' : '' ?>"><i class="fas fa-table me-2"></i>Manage Results</a>
+            <a href="<?= BASE_URL ?>/admin/results/approve.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'approve.php' ? 'active' : '' ?>"><i class="fas fa-check-double me-2"></i>Approvals</a>
+            <a href="<?= BASE_URL ?>/admin/results/pins.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'pins.php' ? 'active' : '' ?>"><i class="fas fa-key me-2"></i>Result PINs</a>
+            <a href="<?= BASE_URL ?>/admin/results/promotion.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'promotion.php' ? 'active' : '' ?>"><i class="fas fa-arrow-up me-2"></i>Promotion</a>
+            <a href="<?= BASE_URL ?>/admin/results/psychomotor.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'psychomotor.php' ? 'active' : '' ?>"><i class="fas fa-running me-2"></i>Psychomotor</a>
+            <a href="<?= BASE_URL ?>/admin/results/affective.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'affective.php' ? 'active' : '' ?>"><i class="fas fa-heart me-2"></i>Affective</a>
+            <a href="<?= BASE_URL ?>/admin/results/comments.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'comments.php' ? 'active' : '' ?>"><i class="fas fa-comment me-2"></i>Remarks</a>
+            <a href="<?= BASE_URL ?>/admin/results/pdf.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'pdf.php' ? 'active' : '' ?>"><i class="fas fa-file-pdf me-2 text-danger"></i>PDF Report Cards</a>
+            <a href="<?= BASE_URL ?>/admin/results/annual.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'annual.php' ? 'active' : '' ?>"><i class="fas fa-calendar-alt me-2"></i>Annual Reports</a>
+            <a href="<?= BASE_URL ?>/admin/results/import.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'import.php' ? 'active' : '' ?>"><i class="fas fa-file-import me-2"></i>Import Scores</a>
+            <a href="<?= BASE_URL ?>/admin/results/broadcast.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'results' && $currentPage === 'broadcast.php' ? 'active' : '' ?>"><i class="fas fa-bullhorn me-2"></i>Broadcast</a>
+        </div>
+        <div class="sidebar-section-label">Finance &amp; Admin</div>
+        <a href="#financeMenu" class="list-group-item list-group-item-action bg-transparent text-white d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#financeMenu">
+            <i class="fas fa-money-bill me-3"></i>Finance
+            <i class="fas fa-chevron-down ms-auto"></i>
         </a>
-        <a href="<?= BASE_URL ?>/admin/subjects.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'subjects.php' ? 'active' : '' ?>">
-            <i class="fas fa-book me-3"></i>Subjects
+        <div class="collapse show" id="financeMenu">
+            <a href="<?= BASE_URL ?>/admin/fees.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'fees.php' ? 'active' : '' ?>">
+                <i class="fas fa-money-bill me-2"></i>Fees
+            </a>
+            <a href="<?= BASE_URL ?>/admin/applications.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'applications.php' ? 'active' : '' ?>">
+                <i class="fas fa-file-signature me-2"></i>Applications
+            </a>
+            <a href="<?= BASE_URL ?>/admin/library.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'library.php' ? 'active' : '' ?>">
+                <i class="fas fa-book-open me-2"></i>Library
+            </a>
+            <a href="<?= BASE_URL ?>/admin/transport.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'transport.php' ? 'active' : '' ?>">
+                <i class="fas fa-bus me-2"></i>Transport
+            </a>
+            <a href="<?= BASE_URL ?>/admin/hostel.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'hostel.php' ? 'active' : '' ?>">
+                <i class="fas fa-bed me-2"></i>Hostel
+            </a>
+        </div>
+        <div class="sidebar-section-label">People &amp; Settings</div>
+        <a href="#peopleMenu" class="list-group-item list-group-item-action bg-transparent text-white d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#peopleMenu">
+            <i class="fas fa-users me-3"></i>People &amp; Settings
+            <i class="fas fa-chevron-down ms-auto"></i>
         </a>
-        <a href="<?= BASE_URL ?>/admin/timetable.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'timetable.php' ? 'active' : '' ?>">
-            <i class="fas fa-calendar-alt me-3"></i>Timetable
+        <div class="collapse show" id="peopleMenu">
+            <a href="<?= BASE_URL ?>/admin/users.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'users.php' ? 'active' : '' ?>">
+                <i class="fas fa-users me-2"></i>Users
+            </a>
+            <a href="<?= BASE_URL ?>/admin/notices.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'notices.php' ? 'active' : '' ?>">
+                <i class="fas fa-bullhorn me-2"></i>Notices
+            </a>
+            <a href="<?= BASE_URL ?>/admin/settings.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'settings.php' ? 'active' : '' ?>">
+                <i class="fas fa-cog me-2"></i>Settings
+            </a>
+        </div>
+        <div class="sidebar-section-label">Security &amp; Access</div>
+        <a href="#securityMenu" class="list-group-item list-group-item-action bg-transparent text-white d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#securityMenu">
+            <i class="fas fa-shield-alt me-3"></i>Security &amp; Access
+            <i class="fas fa-chevron-down ms-auto"></i>
         </a>
-        <a href="<?= BASE_URL ?>/admin/exams.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'exams.php' ? 'active' : '' ?>">
-            <i class="fas fa-file-alt me-3"></i>Exams
-        </a>
-        <a href="<?= BASE_URL ?>/admin/lesson-plans/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'lesson-plans' ? 'active' : '' ?>">
-            <i class="fas fa-book-open me-3"></i>Lesson Plans
-        </a>
-        <a href="<?= BASE_URL ?>/admin/cbt/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'cbt' ? 'active' : '' ?>">
-            <i class="fas fa-laptop me-3"></i>CBT Exams
-        </a>
-        <a href="<?= BASE_URL ?>/admin/exams/monitor.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'exams' && $currentPage === 'monitor.php' ? 'active' : '' ?>">
-            <i class="fas fa-tv me-3"></i>Exam Monitoring
-        </a>
-        <a href="<?= BASE_URL ?>/admin/fees.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'fees.php' ? 'active' : '' ?>">
-            <i class="fas fa-money-bill me-3"></i>Fees
-        </a>
-        <a href="<?= BASE_URL ?>/admin/applications.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'applications.php' ? 'active' : '' ?>">
-            <i class="fas fa-file-signature me-3"></i>Applications
-        </a>
-        <a href="<?= BASE_URL ?>/admin/library.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'library.php' ? 'active' : '' ?>">
-            <i class="fas fa-book-open me-3"></i>Library
-        </a>
-        <a href="<?= BASE_URL ?>/admin/transport.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'transport.php' ? 'active' : '' ?>">
-            <i class="fas fa-bus me-3"></i>Transport
-        </a>
-        <a href="<?= BASE_URL ?>/admin/hostel.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'hostel.php' ? 'active' : '' ?>">
-            <i class="fas fa-bed me-3"></i>Hostel
-        </a>
-        <a href="<?= BASE_URL ?>/admin/notices.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'notices.php' ? 'active' : '' ?>">
-            <i class="fas fa-bullhorn me-3"></i>Notices
-        </a>
-        <a href="<?= BASE_URL ?>/admin/settings.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'settings.php' ? 'active' : '' ?>">
-            <i class="fas fa-cog me-3"></i>Settings
-        </a>
-        <hr class="border-light my-1">
-        <a href="<?= BASE_URL ?>/admin/security/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'security' ? 'active' : '' ?>">
-            <i class="fas fa-shield-alt me-3"></i>Security
-        </a>
-        <a href="<?= BASE_URL ?>/admin/pins/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'pins' ? 'active' : '' ?>">
-            <i class="fas fa-key me-3"></i>Student PINs
-        </a>
-        <a href="<?= BASE_URL ?>/admin/subscriptions/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'subscriptions' ? 'active' : '' ?>">
-            <i class="fas fa-credit-card me-3"></i>Subscriptions
-        </a>
+        <div class="collapse show" id="securityMenu">
+            <a href="<?= BASE_URL ?>/admin/security/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'security' ? 'active' : '' ?>">
+                <i class="fas fa-shield-alt me-2"></i>Security
+            </a>
+            <a href="<?= BASE_URL ?>/admin/pins/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'pins' ? 'active' : '' ?>">
+                <i class="fas fa-key me-2"></i>Student PINs
+            </a>
+            <a href="<?= BASE_URL ?>/admin/subscriptions/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'subscriptions' ? 'active' : '' ?>">
+                <i class="fas fa-credit-card me-2"></i>Subscriptions
+            </a>
+        </div>
         <?php elseif ($role === 'teacher'): ?>
         <a href="<?= BASE_URL ?>/teacher/classes.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'classes.php' ? 'active' : '' ?>">
             <i class="fas fa-chalkboard me-3"></i>My Classes

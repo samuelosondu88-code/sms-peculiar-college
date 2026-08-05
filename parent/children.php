@@ -45,7 +45,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?= strtoupper(substr($c['first_name'], 0, 1) . substr($c['last_name'], 0, 1)) ?>
                 </div>
                 <h5 class="fw-bold"><?= sanitizeInput($c['first_name'] . ' ' . $c['last_name']) ?></h5>
-                <p class="text-muted mb-1"><?= sanitizeInput($c['class_name'] . ' ' . ($c['section'] ?? '')) ?></p>
+                <p class="text-muted mb-1"><?= sanitizeInput(className($c['class_name'], $c['section'])) ?></p>
                 <p class="small text-muted">Admission: <?= sanitizeInput($c['admission_no']) ?></p>
                 <hr>
                 <div class="d-flex flex-wrap justify-content-center gap-2">

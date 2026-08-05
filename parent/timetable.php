@@ -51,7 +51,7 @@ require_once __DIR__ . '/../includes/header.php';
         <select name="student_id" class="form-select" onchange="this.form.submit()">
             <?php foreach ($children as $c): ?>
             <option value="<?= $c['id'] ?>" <?= $studentId === $c['id'] ? 'selected' : '' ?>>
-                <?= sanitizeInput($c['first_name'] . ' ' . $c['last_name']) ?> (<?= sanitizeInput($c['class_name']) ?>)
+                <?= sanitizeInput($c['first_name'] . ' ' . $c['last_name']) ?> (<?= sanitizeInput(className($c['class_name'], $c['section'])) ?>)
             </option>
             <?php endforeach; ?>
         </select>

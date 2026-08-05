@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <div>
         <a href="index.php" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i>Back</a>
         <h4 class="fw-bold mb-0 mt-1"><i class="fas fa-chalkboard me-2"></i><?= sanitizeInput($vc['name']) ?></h4>
-        <small class="text-muted"><?= sanitizeInput($vc['subject_name']) ?> — <?= sanitizeInput($vc['class_name'] . ' ' . $vc['section']) ?> | Code: <strong><?= $vc['code'] ?></strong></small>
+        <small class="text-muted"><?= sanitizeInput($vc['subject_name']) ?> — <?= sanitizeInput(className($vc['class_name'], $vc['section'])) ?> | Code: <strong><?= $vc['code'] ?></strong></small>
     </div>
     <div>
         <span class="badge bg-secondary"><?= count($enrolled) ?> Students</span>
@@ -169,8 +169,8 @@ require_once __DIR__ . '/../../includes/header.php';
         <div class="card">
             <div class="card-header"><i class="fas fa-info-circle me-2"></i>Class Info</div>
             <div class="card-body">
-                <p><strong>Subject:</strong> <?= sanitizeInput($vc['subject_name']) ?> (<?= sanitizeInput($vc['subject_code']) ?>)</p>
-                <p><strong>Class:</strong> <?= sanitizeInput($vc['class_name'] . ' ' . $vc['section']) ?></p>
+                <p><strong>Subject:</strong> <?= sanitizeInput($vc['subject_name']) ?></p>
+                <p><strong>Class:</strong> <?= sanitizeInput(className($vc['class_name'], $vc['section'])) ?></p>
                 <p><strong>Enrollment Code:</strong> <span class="badge bg-dark fs-6"><?= $vc['code'] ?></span> <small class="text-muted">(Share with students to join)</small></p>
                 <?php if ($vc['description']): ?>
                 <p><strong>Description:</strong> <?= sanitizeInput($vc['description']) ?></p>

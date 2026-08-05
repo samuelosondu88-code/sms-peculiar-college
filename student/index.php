@@ -48,7 +48,7 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="col-md-3">
         <div class="stat-card stat-success">
             <i class="fas fa-school stat-icon"></i>
-            <div class="stat-value"><?= sanitizeInput(($student['class_name'] ?? '') . ' ' . ($student['section'] ?? '')) ?></div>
+            <div class="stat-value"><?= sanitizeInput(className($student['class_name'], $student['section'])) ?></div>
             <div class="stat-label">Class</div>
         </div>
     </div>

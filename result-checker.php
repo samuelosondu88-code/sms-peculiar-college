@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="col-md-8">
                             <table class="table table-sm table-borderless">
                                 <tr><td style="width: 140px;"><strong>Student Name:</strong></td><td><?= sanitizeInput($student['first_name'] . ' ' . $student['last_name']) ?></td></tr>
-                                <tr><td><strong>Class:</strong></td><td><?= sanitizeInput($student['class_name'] . ' ' . $student['section']) ?></td></tr>
+                                <tr><td><strong>Class:</strong></td><td><?= sanitizeInput(className($student['class_name'], $student['section'])) ?></td></tr>
                                 <tr><td><strong>Admission No:</strong></td><td><?= sanitizeInput($student['admission_no']) ?></td></tr>
                             </table>
                         </div>

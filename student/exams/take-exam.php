@@ -264,7 +264,7 @@ body {-webkit-user-select: none;-moz-user-select:none;-ms-user-select:none;user-
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h4 class="fw-bold mb-0"><?= sanitizeInput($exam['title']) ?></h4>
-                <small class="text-muted"><?= sanitizeInput($exam['subject_name']) ?> - <?= sanitizeInput($exam['class_name'] . ' ' . $exam['section']) ?></small>
+                <small class="text-muted"><?= sanitizeInput($exam['subject_name']) ?> - <?= sanitizeInput(className($exam['class_name'], $exam['section'])) ?></small>
             </div>
             <div class="d-flex align-items-center gap-3">
                 <span class="small text-muted"><i class="fas fa-shield-alt me-1"></i>Secured</span>

@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select form-select-sm" onchange="this.form.submit()">
                     <option value="">-- All Classes --</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= (int)$c['id'] === $classId ? 'selected' : '' ?>><?= sanitizeInput($c['name']) ?> <?= sanitizeInput($c['section'] ?? '') ?></option>
+                    <option value="<?= $c['id'] ?>" <?= (int)$c['id'] === $classId ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -103,7 +103,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="subject_id" class="form-select form-select-sm" onchange="this.form.submit()" <?= !$classId ? 'disabled' : '' ?>>
                     <option value="">-- Select Subject --</option>
                     <?php foreach ($allSubjects as $sub): ?>
-                    <option value="<?= $sub['id'] ?>" <?= (int)$sub['id'] === $subjectId ? 'selected' : '' ?>><?= sanitizeInput($sub['name']) ?> (<?= sanitizeInput($sub['code'] ?? 'N/A') ?>)</option>
+                    <option value="<?= $sub['id'] ?>" <?= (int)$sub['id'] === $subjectId ? 'selected' : '' ?>><?= sanitizeInput($sub['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -141,7 +141,7 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <span><i class="fas fa-table me-2"></i>Scores - <?= sanitizeInput($selectedSubject['name']) ?> (<?= sanitizeInput($selectedClass['name']) ?> <?= sanitizeInput($selectedClass['section'] ?? '') ?>)</span>
+        <span><i class="fas fa-table me-2"></i>Scores - <?= sanitizeInput($selectedSubject['name']) ?> (<?= sanitizeInput(className($selectedClass['name'], $selectedClass['section'])) ?>)</span>
         <span class="badge bg-info"><?= count($scores) ?> students</span>
     </div>
     <div class="card-body p-0">

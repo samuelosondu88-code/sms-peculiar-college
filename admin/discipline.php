@@ -30,7 +30,7 @@ $search = $_GET['search'] ?? '';
 $statusFilter = $_GET['status'] ?? '';
 $typeFilter = $_GET['type'] ?? '';
 
-$sql = "SELECT b.*, u.first_name AS sfn, u.last_name AS sln, s.admission_no, u2.first_name AS rfn, u2.last_name AS rln, c.name AS class_name
+$sql = "SELECT b.*, u.first_name AS sfn, u.last_name AS sln, s.admission_no, u2.first_name AS rfn, u2.last_name AS rln, c.name AS class_name, c.section AS class_section
         FROM behavior_records b
         JOIN students s ON b.student_id = s.id
         JOIN users u ON s.user_id = u.id
@@ -103,7 +103,7 @@ require_once __DIR__ . '/../includes/header.php';
             <tr>
                 <td class="small"><?= date('d M Y', strtotime($r['incident_date'])) ?></td>
                 <td><?= sanitizeInput($r['sfn'] . ' ' . $r['sln']) ?></td>
-                <td class="small"><?= sanitizeInput($r['class_name'] ?? '-') ?></td>
+                <td class="small"><?= $r['class_name'] ? sanitizeInput(className($r['class_name'], $r['class_section'] ?? '')) : '-' ?></td>
                 <td class="small"><?= sanitizeInput($r['admission_no']) ?></td>
                 <td><span class="badge bg-warning text-dark"><?= sanitizeInput($r['incident_type']) ?></span></td>
                 <td class="small" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?= sanitizeInput($r['description']) ?>"><?= sanitizeInput($r['description']) ?></td>

@@ -70,7 +70,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0"><i class="fas fa-clipboard-check me-2"></i>Review Lesson Plan</h4>
-        <p class="text-muted small mb-0"><?= sanitizeInput($plan['subject_name']) ?> - <?= sanitizeInput($plan['class_name'] . ' ' . $plan['section']) ?></p>
+        <p class="text-muted small mb-0"><?= sanitizeInput($plan['subject_name']) ?> - <?= sanitizeInput(className($plan['class_name'], $plan['section'])) ?></p>
     </div>
     <div>
         <a href="index.php" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back to Reviews</a>
@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <tr><th>Staff ID</th><td><?= sanitizeInput($plan['employee_id'] ?? '-') ?></td></tr>
                     <tr><th>Email</th><td><?= sanitizeInput($plan['email']) ?></td></tr>
                     <tr><th>Subject</th><td><?= sanitizeInput($plan['subject_name']) ?></td></tr>
-                    <tr><th>Class</th><td><?= sanitizeInput($plan['class_name'] . ' ' . $plan['section']) ?></td></tr>
+                    <tr><th>Class</th><td><?= sanitizeInput(className($plan['class_name'], $plan['section'])) ?></td></tr>
                     <tr><th>Term</th><td><?= sanitizeInput($plan['term_name'] ?? '-') ?> (<?= sanitizeInput($plan['session_name'] ?? '-') ?>)</td></tr>
                     <tr><th>Week</th><td><?= $plan['week_no'] ?: '-' ?></td></tr>
                     <tr><th>Date</th><td><?= $plan['date_planned'] ? formatDate($plan['date_planned']) : '-' ?></td></tr>

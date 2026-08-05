@@ -149,7 +149,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <option value="">Select Subject</option>
                         <?php foreach ($subjects as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= ($editQuestion ? $editQuestion['subject_id'] : $subject_id) == $s['id'] ? 'selected' : '' ?>>
-                            <?= sanitizeInput($s['name']) ?> (<?= $s['code'] ?>)
+                            <?= sanitizeInput($s['name']) ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
@@ -264,7 +264,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <div class="text-truncate" style="max-width: 400px;"><?= sanitizeInput($q['question_text']) ?></div>
                         <small class="text-muted">A: <?= sanitizeInput($q['option_a']) ?> | B: <?= sanitizeInput($q['option_b']) ?> | C: <?= sanitizeInput($q['option_c']) ?> | D: <?= sanitizeInput($q['option_d']) ?></small>
                     </td>
-                    <td><span class="badge bg-primary"><?= sanitizeInput($q['subject_code']) ?></span></td>
+                    <td><span class="badge bg-primary"><?= sanitizeInput($q['subject_name']) ?></span></td>
                     <td><span class="badge bg-success"><?= $q['correct_answer'] ?></span></td>
                     <td>
                         <?php $diffColors = ['easy'=>'bg-success','medium'=>'bg-warning text-dark','hard'=>'bg-danger']; ?>

@@ -126,7 +126,6 @@ require_once __DIR__ . '/../../includes/header.php';
             <thead>
                 <tr>
                     <th>Subject</th>
-                    <th>Code</th>
                     <th>Class</th>
                     <th>Students</th>
                     <th>Action</th>
@@ -139,11 +138,10 @@ require_once __DIR__ . '/../../includes/header.php';
                 ?>
                 <tr>
                     <td class="fw-medium"><?= sanitizeInput($d['subject_name']) ?></td>
-                    <td><small><?= sanitizeInput($d['subject_code'] ?? '-') ?></small></td>
-                    <td><span class="badge bg-secondary"><?= sanitizeInput($d['class_name']) ?> <?= sanitizeInput($d['section'] ?? '') ?></span></td>
+                    <td><span class="badge bg-secondary"><?= sanitizeInput(className($d['class_name'], $d['section'])) ?></span></td>
                     <td><?= $d['draft_count'] ?> / <?= $d['total_students'] ?> scored</td>
                     <td>
-                        <form method="post" class="d-inline" onsubmit="return confirm('Submit <?= sanitizeInput($d['subject_name']) ?> results for <?= sanitizeInput($d['class_name']) ?> for approval? This action cannot be undone.')">
+                        <form method="post" class="d-inline" onsubmit="return confirm('Submit <?= sanitizeInput($d['subject_name']) ?> results for <?= sanitizeInput(className($d['class_name'], $d['section'])) ?> for approval? This action cannot be undone.')">
                             <input type="hidden" name="class_id" value="<?= $d['class_id'] ?>">
                             <input type="hidden" name="subject_id" value="<?= $d['subject_id'] ?>">
                             <button type="submit" name="submit_scores" class="btn btn-primary btn-sm"><i class="fas fa-check-double me-1"></i>Submit</button>
@@ -196,7 +194,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 ?>
                 <tr>
                     <td class="fw-medium"><?= sanitizeInput($s['subject_name']) ?></td>
-                    <td><span class="badge bg-secondary"><?= sanitizeInput($s['class_name']) ?> <?= sanitizeInput($s['section'] ?? '') ?></span></td>
+                    <td><span class="badge bg-secondary"><?= sanitizeInput(className($s['class_name'], $s['section'])) ?></span></td>
                     <td><?= $s['submitted_count'] ?> / <?= $s['total_students'] ?></td>
                     <td><span class="badge bg-info text-dark"><?= $stageLabel ?></span></td>
                     <td>

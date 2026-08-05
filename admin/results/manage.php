@@ -97,7 +97,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                    <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

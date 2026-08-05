@@ -141,7 +141,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select form-select-sm" onchange="this.form.submit()">
                     <option value="">-- Select Class --</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= (int)$c['id'] === $classId ? 'selected' : '' ?>><?= sanitizeInput($c['name']) ?> <?= sanitizeInput($c['section'] ?? '') ?></option>
+                    <option value="<?= $c['id'] ?>" <?= (int)$c['id'] === $classId ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -150,7 +150,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="subject_id" class="form-select form-select-sm" onchange="this.form.submit()" <?= !$classId ? 'disabled' : '' ?>>
                     <option value="">-- Select Subject --</option>
                     <?php foreach ($subjects as $sub): ?>
-                    <option value="<?= $sub['id'] ?>" <?= (int)$sub['id'] === $subjectId ? 'selected' : '' ?>><?= sanitizeInput($sub['name']) ?> (<?= sanitizeInput($sub['code'] ?? 'N/A') ?>)</option>
+                    <option value="<?= $sub['id'] ?>" <?= (int)$sub['id'] === $subjectId ? 'selected' : '' ?>><?= sanitizeInput($sub['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -161,7 +161,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <?php if ($class && $subject): ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h5 class="mb-0"><?= sanitizeInput($subject['name']) ?> (<?= sanitizeInput($subject['code'] ?? 'N/A') ?>) - <?= sanitizeInput($class['name']) ?> <?= sanitizeInput($class['section'] ?? '') ?></h5>
+        <h5 class="mb-0"><?= sanitizeInput($subject['name']) ?> - <?= sanitizeInput(className($class['name'], $class['section'])) ?></h5>
     </div>
     <div class="d-flex gap-2">
         <a href="<?= BASE_URL ?>/admin/results/preview.php?class_id=<?= $classId ?>&subject_id=<?= $subjectId ?>" class="btn btn-info btn-sm text-white"><i class="fas fa-eye me-1"></i>Preview</a>

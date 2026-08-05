@@ -164,7 +164,7 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="fw-bold"><?= sanitizeInput($class['name']) ?> <?= sanitizeInput($class['section'] ?? '') ?></h5>
+                <h5 class="fw-bold"><?= sanitizeInput(className($class['name'], $class['section'])) ?></h5>
                 <p class="text-muted"><?= $class['student_count'] ?> Students</p>
                 <div class="d-flex gap-2">
                     <a href="<?= BASE_URL ?>/teacher/attendance.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-primary">Attendance</a>

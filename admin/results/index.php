@@ -80,7 +80,7 @@ if ($currentSessionId && $currentTermId) {
         "); $clsStmt->execute([$c['id'], $currentSessionId, $currentTermId]); $cls = $clsStmt->fetch();
         if ($cls['cls_avg'] !== null) {
             $classPerformance[] = [
-                'class' => $c['name'] . ' ' . $c['section'],
+                'class' => className($c['name'], $c['section']),
                 'average' => round((float)$cls['cls_avg'], 2)
             ];
         }

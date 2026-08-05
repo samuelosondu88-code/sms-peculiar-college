@@ -146,7 +146,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             <select name="subject_id" class="form-select" required>
                                 <option value="">Select Subject</option>
                                 <?php foreach ($mySubjects as $s): ?>
-                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>" <?= ($plan['subject_id'] ?? 0) === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . $s['class_name'] . ' ' . $s['section']) ?></option>
+                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>" <?= ($plan['subject_id'] ?? 0) === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -158,7 +158,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
                                 foreach ($classes as $c):
                                 ?>
-                                <option value="<?= $c['id'] ?>" <?= ($plan['class_id'] ?? 0) === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                                <option value="<?= $c['id'] ?>" <?= ($plan['class_id'] ?? 0) === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

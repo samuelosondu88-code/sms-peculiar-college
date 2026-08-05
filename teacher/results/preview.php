@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <option value="">-- Select Class --</option>
                     <?php foreach ($uniqueClasses as $uc): ?>
                     <option value="<?= $uc['id'] ?>" <?= (int)$uc['id'] === $classId ? 'selected' : '' ?>>
-                        <?= sanitizeInput($uc['name']) ?> <?= sanitizeInput($uc['section'] ?? '') ?>
+                        <?= sanitizeInput(className($uc['name'], $uc['section'])) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
@@ -107,7 +107,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         if ((int)$s['class_id'] !== $classId && $classId > 0) continue;
                     ?>
                     <option value="<?= $s['subject_id'] ?>" <?= (int)$s['subject_id'] === $subjectId && (int)$s['class_id'] === $classId ? 'selected' : '' ?>>
-                        <?= sanitizeInput($s['subject_name']) ?> (<?= sanitizeInput($s['code'] ?? 'N/A') ?>)
+                        <?= sanitizeInput($s['subject_name']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>

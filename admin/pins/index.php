@@ -83,7 +83,7 @@ if (isset($_GET['print']) && $_GET['print'] === 'pins') {
             <hr>
             <div><strong><?= sanitizeInput($p['first_name'] . ' ' . $p['last_name']) ?></strong></div>
             <div>Admission: <?= sanitizeInput($p['admission_no']) ?></div>
-            <div>Class: <?= sanitizeInput($p['class_name'] . ' ' . $p['section']) ?></div>
+            <div>Class: <?= sanitizeInput(className($p['class_name'], $p['section'])) ?></div>
             <div class="pin-code">PIN: <em>printed at generation</em></div>
             <div style="font-size:10px;color:#999;margin-top:10px">PINs are stored hashed; the plain PIN is shown only once when generated.</div>
             <div style="font-size:11px;color:#666">
@@ -160,7 +160,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select">
                     <option value="">All</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= $filterClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                    <option value="<?= $c['id'] ?>" <?= $filterClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -193,7 +193,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <tr>
                         <td><?= sanitizeInput($p['first_name'] . ' ' . $p['last_name']) ?></td>
                         <td><?= sanitizeInput($p['admission_no']) ?></td>
-                        <td><?= sanitizeInput($p['class_name'] . ' ' . $p['section']) ?></td>
+                        <td><?= sanitizeInput(className($p['class_name'], $p['section'])) ?></td>
                         <td><i class="fas fa-lock text-muted" title="Stored as a one-way hash; plain PIN shown only at generation"></i></td>
                         <td><?= getStatusBadge($p['status']) ?></td>
                         <td><?= $p['attempts'] ?>/<?= $p['max_attempts'] ?></td>
@@ -237,7 +237,7 @@ require_once __DIR__ . '/../../includes/header.php';
                                 <label class="form-label">Select Students</label>
                                 <select name="student_ids[]" class="form-select" multiple size="10" required>
                                     <?php foreach ($allStudents as $s): ?>
-                                    <option value="<?= $s['id'] ?>"><?= sanitizeInput($s['last_name'] . ', ' . $s['first_name'] . ' (' . $s['admission_no'] . ') - ' . $s['class_name']) ?></option>
+                                    <option value="<?= $s['id'] ?>"><?= sanitizeInput($s['last_name'] . ', ' . $s['first_name'] . ' (' . $s['admission_no'] . ') - ' . className($s['class_name'], $s['section'] ?? '')) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                                 <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>

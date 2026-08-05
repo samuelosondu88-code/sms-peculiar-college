@@ -122,7 +122,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <div class="card h-100 <?= $hasCompleted ? 'border-success' : '' ?>">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <span class="badge bg-primary"><?= sanitizeInput($e['subject_code']) ?></span>
+                    <span class="badge bg-primary"><?= sanitizeInput($e['subject_name']) ?></span>
                     <?php if ($hasCompleted): ?>
                     <span class="badge bg-success">Completed</span>
                     <?php elseif ($hasInProgress): ?>

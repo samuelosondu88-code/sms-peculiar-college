@@ -307,7 +307,7 @@ document.querySelectorAll('.question-checkbox').forEach(cb => {
                 <?php foreach ($exams as $e): ?>
                 <tr>
                     <td><strong><?= sanitizeInput($e['title']) ?></strong></td>
-                    <td><span class="badge bg-primary"><?= sanitizeInput($e['subject_code']) ?></span></td>
+                    <td><span class="badge bg-primary"><?= sanitizeInput($e['subject_name']) ?></span></td>
                     <td><?= $e['duration_minutes'] ?> min</td>
                     <td><?= $e['total_questions'] ?></td>
                     <td><?= $e['pass_score'] ?>%</td>

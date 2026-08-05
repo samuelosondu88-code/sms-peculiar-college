@@ -111,7 +111,7 @@ $filterClass = (int)($_GET['class_id'] ?? 0);
 $filterType = sanitizeInput($_GET['qtype'] ?? '');
 $search = sanitizeInput($_GET['search'] ?? '');
 
-$sql = "SELECT eq.*, sub.name as subject_name, c.name as class_name FROM exam_questions eq JOIN subjects sub ON eq.subject_id = sub.id JOIN classes c ON eq.class_id = c.id WHERE eq.teacher_id = ?";
+$sql = "SELECT eq.*, sub.name as subject_name, c.name as class_name, c.section FROM exam_questions eq JOIN subjects sub ON eq.subject_id = sub.id JOIN classes c ON eq.class_id = c.id WHERE eq.teacher_id = ?";
 $params = [$userId];
 if ($filterSubject) { $sql .= " AND eq.subject_id = ?"; $params[] = $filterSubject; }
 if ($filterClass) { $sql .= " AND eq.class_id = ?"; $params[] = $filterClass; }
@@ -173,7 +173,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select">
                     <option value="">All</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= $filterClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                    <option value="<?= $c['id'] ?>" <?= $filterClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -208,7 +208,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <tr>
                         <td><?= sanitizeInput(mb_substr($q['question_text'], 0, 100)) ?><?= mb_strlen($q['question_text']) > 100 ? '...' : '' ?></td>
                         <td><?= sanitizeInput($q['subject_name']) ?></td>
-                        <td><?= sanitizeInput($q['class_name']) ?></td>
+                        <td><?= sanitizeInput(className($q['class_name'], $q['section'] ?? '')) ?></td>
                         <td><span class="badge bg-info"><?= $qTypes[$q['question_type']] ?? $q['question_type'] ?></span></td>
                         <td><?= $q['marks'] ?></td>
                         <td class="text-end">
@@ -243,7 +243,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <select name="bulk_subject_id" class="form-select" required>
                             <option value="">Select</option>
                             <?php foreach ($subjects as $s): ?>
-                            <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . $s['class_name']) ?></option>
+                            <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -252,7 +252,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <select name="bulk_class_id" class="form-select" required>
                             <option value="">Select</option>
                             <?php foreach ($classes as $c): ?>
-                            <option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                            <option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -297,7 +297,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             <select name="subject_id" class="form-select" required>
                                 <option value="">Select</option>
                                 <?php foreach ($subjects as $s): ?>
-                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>" <?= ($editQuestion['subject_id'] ?? 0) === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . $s['class_name']) ?></option>
+                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>" <?= ($editQuestion['subject_id'] ?? 0) === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -306,7 +306,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             <select name="class_id" class="form-select" required>
                                 <option value="">Select</option>
                                 <?php foreach ($classes as $c): ?>
-                                <option value="<?= $c['id'] ?>" <?= ($editQuestion['class_id'] ?? 0) === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                                <option value="<?= $c['id'] ?>" <?= ($editQuestion['class_id'] ?? 0) === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

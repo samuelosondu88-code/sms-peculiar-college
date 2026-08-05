@@ -203,7 +203,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <span class="badge bg-warning text-dark pulse-dot"><i class="fas fa-circle me-1"></i>Live</span>
                     <?php endif; ?>
                 </div>
-                <p class="small text-muted mb-1"><?= sanitizeInput($ex['subject_name']) ?> — <?= sanitizeInput($ex['class_name'] . ' ' . $ex['section']) ?></p>
+                <p class="small text-muted mb-1"><?= sanitizeInput($ex['subject_name']) ?> — <?= sanitizeInput(className($ex['class_name'], $ex['section'])) ?></p>
                 <p class="small mb-2">
                     <span class="badge bg-primary"><?= $ex['active_count'] ?> active</span>
                     <span class="badge bg-secondary"><?= $ex['total_attempts'] ?> total</span>

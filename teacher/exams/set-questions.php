@@ -70,7 +70,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0"><i class="fas fa-list me-2"></i>Manage Questions</h4>
-        <p class="text-muted small mb-0"><?= sanitizeInput($exam['title']) ?> — <?= sanitizeInput($exam['subject_name'] . ' - ' . $exam['class_name'] . ' ' . $exam['section']) ?></p>
+        <p class="text-muted small mb-0"><?= sanitizeInput($exam['title']) ?> — <?= sanitizeInput($exam['subject_name'] . ' - ' . className($exam['class_name'], $exam['section'])) ?></p>
     </div>
     <div class="d-flex gap-2">
         <span class="badge bg-primary fs-6 mt-2"><?= count($examQList) ?> questions | <?= $exam['total_marks'] ?> marks</span>

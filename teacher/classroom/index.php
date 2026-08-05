@@ -97,7 +97,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         </ul>
                     </div>
                 </div>
-                <p class="text-muted small mb-2"><?= sanitizeInput($vc['subject_name']) ?> | <?= sanitizeInput($vc['class_name'] . ' ' . $vc['section']) ?></p>
+                <p class="text-muted small mb-2"><?= sanitizeInput($vc['subject_name']) ?> | <?= sanitizeInput(className($vc['class_name'], $vc['section'])) ?></p>
                 <span class="badge bg-info me-1"><?= $vc['student_count'] ?> Students</span>
                 <span class="badge bg-secondary">Code: <?= $vc['code'] ?></span>
                 <?php if ($vc['description']): ?>
@@ -135,7 +135,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <select name="class_id" class="form-select" required>
                             <option value="">Select Class</option>
                             <?php foreach ($uniqueClasses as $uc): ?>
-                            <option value="<?= $uc['id'] ?>"><?= sanitizeInput($uc['name'] . ' ' . $uc['section']) ?></option>
+                            <option value="<?= $uc['id'] ?>"><?= sanitizeInput(className($uc['name'], $uc['section'])) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <select name="subject_id" class="form-select" required>
                             <option value="">Select Subject</option>
                             <?php foreach ($assignable as $a): ?>
-                            <option value="<?= $a['subject_id'] ?>"><?= sanitizeInput($a['name']) ?> (<?= sanitizeInput($a['code']) ?>)</option>
+                            <option value="<?= $a['subject_id'] ?>"><?= sanitizeInput($a['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

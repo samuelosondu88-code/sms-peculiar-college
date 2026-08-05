@@ -58,7 +58,7 @@ $trendScores = [];
 $trendPass = [];
 $trendSlice = array_slice($attempts, -10);
 foreach ($trendSlice as $a) {
-    $trendLabels[] = "'" . sanitizeInput($a['subject_code']) . "'";
+    $trendLabels[] = "'" . sanitizeInput($a['subject_name']) . "'";
     $trendScores[] = $a['score'];
     $trendPass[] = $a['pass_score'];
 }
@@ -69,7 +69,7 @@ $subjScores = [];
 $subjAccuracy = [];
 $subjAttempts = [];
 foreach ($subjectPerf as $s) {
-    $subjLabels[] = "'" . sanitizeInput($s['code']) . "'";
+    $subjLabels[] = "'" . sanitizeInput($s['name']) . "'";
     $subjScores[] = $s['avg_score'];
     $subjAccuracy[] = $s['accuracy'];
     $subjAttempts[] = $s['attempts'];
@@ -315,7 +315,6 @@ require_once __DIR__ . '/../../includes/header.php';
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <strong><?= sanitizeInput($s['name']) ?></strong>
-                                <span class="badge bg-primary ms-2"><?= sanitizeInput($s['code']) ?></span>
                                 <br><small class="text-muted"><?= $s['attempts'] ?> exam(s)</small>
                             </div>
                             <div class="text-end">
@@ -359,7 +358,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <?php $passed = $a['score'] >= $a['pass_score']; ?>
                 <tr>
                     <td><?= sanitizeInput($a['exam_title']) ?></td>
-                    <td><span class="badge bg-primary"><?= sanitizeInput($a['subject_code']) ?></span></td>
+                    <td><span class="badge bg-primary"><?= sanitizeInput($a['subject_name']) ?></span></td>
                     <td>
                         <span class="badge <?= $passed ? 'bg-success' : 'bg-danger' ?>"><?= $a['score'] ?>%</span>
                     </td>

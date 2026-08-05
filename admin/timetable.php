@@ -55,7 +55,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <tbody>
                     <?php foreach ($entries as $e): ?>
                     <tr>
-                        <td><?= sanitizeInput($e['class_name'] . ' ' . ($e['section'] ?? '')) ?></td>
+                        <td><?= sanitizeInput(className($e['class_name'], $e['section'])) ?></td>
                         <td><?= sanitizeInput($e['subject_name']) ?></td>
                         <td><?= sanitizeInput($e['first_name'] . ' ' . $e['last_name']) ?></td>
                         <td><span class="badge bg-primary"><?= ucfirst($e['day_of_week']) ?></span></td>
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="modal-header"><h5 class="modal-title" id="entryModalTitle">Add Timetable Entry</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <div class="row g-3">
-                        <div class="col-md-6"><label class="form-label">Class</label><select name="class_id" id="entry_class" class="form-select" required><?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . ($c['section'] ?? '')) ?></option><?php endforeach; ?></select></div>
+                        <div class="col-md-6"><label class="form-label">Class</label><select name="class_id" id="entry_class" class="form-select" required><?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option><?php endforeach; ?></select></div>
                         <div class="col-md-6"><label class="form-label">Subject</label><select name="subject_id" id="entry_subject" class="form-select" required><?php foreach ($subjects as $s): ?><option value="<?= $s['id'] ?>"><?= sanitizeInput($s['name']) ?></option><?php endforeach; ?></select></div>
                         <div class="col-md-6"><label class="form-label">Teacher</label><select name="teacher_id" id="entry_teacher" class="form-select" required><?php foreach ($teachers as $t): ?><option value="<?= $t['id'] ?>"><?= sanitizeInput($t['first_name'] . ' ' . $t['last_name']) ?></option><?php endforeach; ?></select></div>
                         <div class="col-md-6"><label class="form-label">Day</label><select name="day" id="entry_day" class="form-select" required><?php foreach ($days as $d): ?><option value="<?= $d ?>"><?= ucfirst($d) ?></option><?php endforeach; ?></select></div>

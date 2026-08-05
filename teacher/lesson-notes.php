@@ -28,11 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_note'])) {
     }
 }
 
-$notes = $db->prepare("SELECT ln.*, sub.name as subject_name, c.name as class_name FROM lesson_notes ln JOIN subjects sub ON ln.subject_id = sub.id JOIN classes c ON ln.class_id = c.id WHERE ln.teacher_id = ? ORDER BY ln.created_at DESC");
+$notes = $db->prepare("SELECT ln.*, sub.name as subject_name, c.name as class_name, c.section FROM lesson_notes ln JOIN subjects sub ON ln.subject_id = sub.id JOIN classes c ON ln.class_id = c.id WHERE ln.teacher_id = ? ORDER BY ln.created_at DESC");
 $notes->execute([$userId]);
 $notesList = $notes->fetchAll();
 
-$subjects = $db->prepare("SELECT s.id, s.name, c.name as class_name, c.id as class_id FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
+$subjects = $db->prepare("SELECT s.id, s.name, c.name as class_name, c.section, c.id as class_id FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
 $subjects->execute([$userId]);
 $mySubjects = $subjects->fetchAll();
 
@@ -56,7 +56,7 @@ require_once __DIR__ . '/../includes/header.php';
             <small class="text-muted">Week <?= $n['week_no'] ?: '-' ?></small>
         </div>
         <p class="text-muted small">
-            <?= sanitizeInput($n['subject_name']) ?> | <?= sanitizeInput($n['class_name']) ?>
+            <?= sanitizeInput($n['subject_name']) ?> | <?= sanitizeInput(className($n['class_name'], $n['section'])) ?>
             <?= $n['date_taught'] ? '| Taught: ' . formatDate($n['date_taught']) : '' ?>
         </p>
         <?php if ($n['content']): ?>
@@ -91,7 +91,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <select name="subject_id" class="form-select" required>
                                 <option value="">Select</option>
                                 <?php foreach ($mySubjects as $s): ?>
-                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . $s['class_name']) ?></option>
+                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

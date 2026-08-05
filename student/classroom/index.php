@@ -74,7 +74,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <div class="card-body">
                 <h5 class="fw-bold mb-1"><?= sanitizeInput($vc['name']) ?></h5>
                 <p class="text-muted small mb-2">
-                    <?= sanitizeInput($vc['subject_name']) ?> | <?= sanitizeInput($vc['class_name'] . ' ' . $vc['section']) ?><br>
+                    <?= sanitizeInput($vc['subject_name']) ?> | <?= sanitizeInput(className($vc['class_name'], $vc['section'])) ?><br>
                     Teacher: <?= sanitizeInput($vc['t_first'] . ' ' . $vc['t_last']) ?>
                 </p>
                 <span class="badge bg-info me-1"><?= $vc['material_count'] ?> Materials</span>

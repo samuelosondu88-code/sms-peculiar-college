@@ -39,7 +39,7 @@ $stmt = $db->prepare($sql);
 $stmt->execute($params);
 $plans = $stmt->fetchAll();
 
-$subjects = $db->query("SELECT id, name FROM subjects ORDER BY name")->fetchAll();
+$subjects = $db->query("SELECT s.id, s.name, c.name AS class_name, c.section FROM subjects s JOIN classes c ON s.class_id = c.id ORDER BY c.name, c.section, s.name")->fetchAll();
 $teachers = $db->query("SELECT u.id, u.first_name, u.last_name FROM users u WHERE u.role = 'teacher' ORDER BY u.first_name")->fetchAll();
 
 $stmt = $db->query("SELECT COUNT(*) FROM lesson_plans WHERE status IN ('submitted','under_review')");
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="subject_id" class="form-select">
                     <option value="">All</option>
                     <?php foreach ($subjects as $s): ?>
-                    <option value="<?= $s['id'] ?>" <?= $filterSubject === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name']) ?></option>
+                    <option value="<?= $s['id'] ?>" <?= $filterSubject === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -156,7 +156,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <td><a href="review.php?id=<?= $lp['id'] ?>" class="fw-semibold"><?= sanitizeInput(mb_substr($lp['topic'], 0, 60)) ?></a></td>
                         <td><?= sanitizeInput($lp['first_name'] . ' ' . $lp['last_name']) ?></td>
                         <td><?= sanitizeInput($lp['subject_name']) ?></td>
-                        <td><?= sanitizeInput($lp['class_name'] . ' ' . $lp['section']) ?></td>
+                        <td><?= sanitizeInput(className($lp['class_name'], $lp['section'])) ?></td>
                         <td>Week <?= $lp['week_no'] ?: '-' ?></td>
                         <td>
                             <?php $badge = ['draft' => 'secondary', 'submitted' => 'primary', 'under_review' => 'warning', 'approved' => 'success', 'rejected' => 'danger']; ?>

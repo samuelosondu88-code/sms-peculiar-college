@@ -85,7 +85,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0"><i class="fas fa-comment me-2"></i>Class Teacher Remarks</h4>
-        <p class="text-muted small mb-0"><?= sanitizeInput($class['name'] ?? '') ?> <?= sanitizeInput($class['section'] ?? '') ?></p>
+        <p class="text-muted small mb-0"><?= sanitizeInput(className($class['name'], $class['section'])) ?></p>
     </div>
     <a href="<?= BASE_URL ?>/teacher/results/index.php" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
 </div>
@@ -102,7 +102,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select form-select-sm" onchange="this.form.submit()">
                     <?php foreach ($classTeacherClasses as $ctc): ?>
                     <option value="<?= $ctc['id'] ?>" <?= (int)$ctc['id'] === $classId ? 'selected' : '' ?>>
-                        <?= sanitizeInput($ctc['name']) ?> <?= sanitizeInput($ctc['section'] ?? '') ?>
+                        <?= sanitizeInput(className($ctc['name'], $ctc['section'])) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>

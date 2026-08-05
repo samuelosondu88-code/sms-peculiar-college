@@ -65,7 +65,7 @@ require_once __DIR__ . '/../includes/header.php';
                         if ($startH === $h): ?>
                     <div class="p-2 mb-1 bg-light rounded border-start border-primary border-3">
                         <strong><?= sanitizeInput($e['subject_name']) ?></strong><br>
-                        <small><?= sanitizeInput($e['class_name'] . ' ' . ($e['section'] ?? '')) ?></small><br>
+                        <small><?= sanitizeInput(className($e['class_name'], $e['section'])) ?></small><br>
                         <small class="text-muted">Rm: <?= sanitizeInput($e['room'] ?? '-') ?></small>
                     </div>
                     <?php endif; endforeach; ?>

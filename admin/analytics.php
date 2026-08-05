@@ -68,7 +68,7 @@ if ($termId) { $where .= ' AND e.term_id = ?'; $params[] = $termId; }
 if ($classId) { $where .= ' AND s.class_id = ?'; $params[] = $classId; }
 if ($subjectId) { $where .= ' AND r.subject_id = ?'; $params[] = $subjectId; }
 
-$topStmt = $db->prepare("SELECT u.first_name, u.last_name, s.admission_no, c.name as class_name, COALESCE(SUM(r.total_score), 0) as total_score FROM results r JOIN exams e ON r.exam_id = e.id JOIN students s ON r.student_id = s.id JOIN users u ON s.user_id = u.id JOIN classes c ON s.class_id = c.id $where GROUP BY s.id, u.first_name, u.last_name, s.admission_no, c.name ORDER BY total_score DESC LIMIT 20");
+$topStmt = $db->prepare("SELECT u.first_name, u.last_name, s.admission_no, c.name as class_name, c.section, COALESCE(SUM(r.total_score), 0) as total_score FROM results r JOIN exams e ON r.exam_id = e.id JOIN students s ON r.student_id = s.id JOIN users u ON s.user_id = u.id JOIN classes c ON s.class_id = c.id $where GROUP BY s.id, u.first_name, u.last_name, s.admission_no, c.name, c.section ORDER BY total_score DESC LIMIT 20");
 $topStmt->execute($params);
 $topStudents = $topStmt->fetchAll();
 
@@ -99,7 +99,7 @@ require_once __DIR__ . '/../includes/header.php';
         <select name="class_id" class="form-select form-select-sm">
             <option value="0">All Classes</option>
             <?php foreach ($classes as $c): ?>
-            <option value="<?= $c['id'] ?>" <?= $classId === (int)$c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+            <option value="<?= $c['id'] ?>" <?= $classId === (int)$c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
             <?php endforeach; ?>
         </select>
     </div>
@@ -151,7 +151,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <td><?= $rank ?></td>
                             <td><?= sanitizeInput($ts['first_name'] . ' ' . $ts['last_name']) ?></td>
                             <td><?= sanitizeInput($ts['admission_no']) ?></td>
-                            <td><?= sanitizeInput($ts['class_name']) ?></td>
+                            <td><?= sanitizeInput(className($ts['class_name'], $ts['section'])) ?></td>
                             <td><strong><?= number_format((float)$ts['total_score'], 1) ?></strong></td>
                         </tr>
                         <?php $rank++; endforeach; endif; ?>

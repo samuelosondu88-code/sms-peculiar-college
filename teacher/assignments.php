@@ -30,11 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_assignment'])) {
     }
 }
 
-$subjects = $db->prepare("SELECT s.id, s.name, c.name as class_name FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
+$subjects = $db->prepare("SELECT s.id, s.name, c.name as class_name, c.section FROM subjects s JOIN classes c ON s.class_id = c.id WHERE s.teacher_id = ?");
 $subjects->execute([$userId]);
 $mySubjects = $subjects->fetchAll();
 
-$assignments = $db->prepare("SELECT a.*, sub.name as subject_name, c.name as class_name FROM assignments a JOIN subjects sub ON a.subject_id = sub.id JOIN classes c ON a.class_id = c.id WHERE a.teacher_id = ? ORDER BY a.created_at DESC");
+$assignments = $db->prepare("SELECT a.*, sub.name as subject_name, c.name as class_name, c.section FROM assignments a JOIN subjects sub ON a.subject_id = sub.id JOIN classes c ON a.class_id = c.id WHERE a.teacher_id = ? ORDER BY a.created_at DESC");
 $assignments->execute([$userId]);
 $assignmentsList = $assignments->fetchAll();
 
@@ -59,7 +59,7 @@ require_once __DIR__ . '/../includes/header.php';
             <small class="text-muted">Due: <?= formatDate($a['due_date']) ?></small>
         </div>
         <p class="text-muted small mb-2">
-            <?= sanitizeInput($a['subject_name']) ?> | <?= sanitizeInput($a['class_name']) ?>
+            <?= sanitizeInput($a['subject_name']) ?> | <?= sanitizeInput(className($a['class_name'], $a['section'])) ?>
             | <?= timeAgo($a['created_at']) ?>
         </p>
         <?php if ($a['description']): ?>
@@ -96,7 +96,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <select name="subject_id" class="form-select" required>
                                 <option value="">Select</option>
                                 <?php foreach ($mySubjects as $s): ?>
-                                <option value="<?= $s['id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . $s['class_name']) ?></option>
+                                <option value="<?= $s['id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

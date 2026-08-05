@@ -11,7 +11,7 @@ $msgType = 'success';
 
 $sessions = $db->query("SELECT id, session_name FROM academic_sessions ORDER BY start_date DESC")->fetchAll();
 $terms = $db->query("SELECT id, term_name FROM terms ORDER BY session_id, id")->fetchAll();
-$students = $db->query("SELECT s.id, u.first_name, u.last_name, s.admission_no, c.name as class_name FROM students s JOIN users u ON s.user_id = u.id LEFT JOIN classes c ON s.class_id = c.id WHERE u.status = 'active' ORDER BY u.last_name")->fetchAll();
+$students = $db->query("SELECT s.id, u.first_name, u.last_name, s.admission_no, c.name as class_name, c.section FROM students s JOIN users u ON s.user_id = u.id LEFT JOIN classes c ON s.class_id = c.id WHERE u.status = 'active' ORDER BY u.last_name")->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_pins'])) {
     $sessionId = (int)$_POST['session_id'];
@@ -235,7 +235,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <select name="student_id" class="form-select">
                             <option value="">No specific student</option>
                             <?php foreach ($students as $s): ?>
-                            <option value="<?= $s['id'] ?>"><?= sanitizeInput($s['last_name'] . ', ' . $s['first_name'] . ' (' . $s['admission_no'] . ') - ' . $s['class_name']) ?></option>
+                            <option value="<?= $s['id'] ?>"><?= sanitizeInput($s['last_name'] . ', ' . $s['first_name'] . ' (' . $s['admission_no'] . ') - ' . className($s['class_name'], $s['section'] ?? '')) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <small class="text-muted">Leave empty for general-purpose PINs</small>

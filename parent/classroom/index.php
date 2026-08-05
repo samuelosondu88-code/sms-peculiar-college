@@ -52,7 +52,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="card mb-4">
     <div class="card-header">
         <strong><i class="fas fa-user-graduate me-2"></i><?= sanitizeInput($kid['first_name'] . ' ' . $kid['last_name']) ?></strong>
-        <span class="text-muted ms-2"><?= sanitizeInput($kid['admission_no']) ?> | <?= sanitizeInput($kid['class_name'] . ' ' . $kid['section']) ?></span>
+        <span class="text-muted ms-2"><?= sanitizeInput($kid['admission_no']) ?> | <?= sanitizeInput(className($kid['class_name'], $kid['section'])) ?></span>
     </div>
     <div class="card-body p-0">
         <?php if (empty($kidClasses)): ?>
@@ -74,7 +74,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     ?>
                     <tr>
                         <td><strong><?= sanitizeInput($kvc['name']) ?></strong></td>
-                        <td><?= sanitizeInput($kvc['subject_name']) ?> (<?= sanitizeInput($kvc['code']) ?>)</td>
+                        <td><?= sanitizeInput($kvc['subject_name']) ?></td>
                         <td><small><?= sanitizeInput($kvc['t_first'] . ' ' . $kvc['t_last']) ?></small></td>
                         <td><span class="badge bg-info"><?= $kvc['material_count'] ?></span></td>
                         <td>

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_fee_structure'])
     }
 }
 
-$structures = $db->query("SELECT fs.*, c.name as class_name, t.term_name, ac.session_name FROM fee_structure fs JOIN classes c ON fs.class_id = c.id JOIN terms t ON fs.term_id = t.id JOIN academic_sessions ac ON t.session_id = ac.id ORDER BY fs.created_at DESC")->fetchAll();
+$structures = $db->query("SELECT fs.*, c.name as class_name, c.section, t.term_name, ac.session_name FROM fee_structure fs JOIN classes c ON fs.class_id = c.id JOIN terms t ON fs.term_id = t.id JOIN academic_sessions ac ON t.session_id = ac.id ORDER BY fs.created_at DESC")->fetchAll();
 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
 $terms = $db->query("SELECT t.id, t.term_name, ac.session_name FROM terms t JOIN academic_sessions ac ON t.session_id = ac.id WHERE ac.status = 'active'")->fetchAll();
 
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php foreach ($structures as $fs): ?>
                     <tr>
                         <td><?= sanitizeInput($fs['fee_name']) ?></td>
-                        <td><?= sanitizeInput($fs['class_name']) ?></td>
+                        <td><?= sanitizeInput(className($fs['class_name'], $fs['section'])) ?></td>
                         <td><strong><?= formatCurrency($fs['amount']) ?></strong></td>
                         <td><?= sanitizeInput($fs['term_name'] . ' ' . $fs['session_name']) ?></td>
                         <td><?= $fs['due_date'] ? formatDate($fs['due_date']) : '-' ?></td>
@@ -65,7 +65,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="modal-body">
                     <div class="mb-3"><label class="form-label">Fee Name</label><input type="text" name="fee_name" class="form-control" required placeholder="e.g., Tuition Fee"></div>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6"><label class="form-label">Class</label><select name="class_id" class="form-select" required><?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . ($c['section'] ?? '')) ?></option><?php endforeach; ?></select></div>
+                        <div class="col-md-6"><label class="form-label">Class</label><select name="class_id" class="form-select" required><?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option><?php endforeach; ?></select></div>
                         <div class="col-md-6"><label class="form-label">Amount (₦)</label><input type="number" name="amount" class="form-control" step="0.01" required></div>
                     </div>
                     <div class="row g-3 mb-3">

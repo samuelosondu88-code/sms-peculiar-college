@@ -71,7 +71,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <img src="<?= $student['avatar'] ? BASE_URL . '/uploads/' . $student['avatar'] : BASE_URL . '/assets/images/logo.jpg' ?>"
                      alt="Student" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--gold);">
                 <h5 class="fw-bold"><?= sanitizeInput($student['first_name'] . ' ' . $student['last_name']) ?></h5>
-                <p class="text-muted mb-1"><?= sanitizeInput($student['class_name'] . ' ' . $student['section']) ?></p>
+                <p class="text-muted mb-1"><?= sanitizeInput(className($student['class_name'], $student['section'])) ?></p>
                 <p class="text-muted mb-0"><small>Admission No: <?= sanitizeInput($student['admission_no']) ?></small></p>
             </div>
         </div>

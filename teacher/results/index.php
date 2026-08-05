@@ -127,7 +127,6 @@ require_once __DIR__ . '/../../includes/header.php';
             <thead>
                 <tr>
                     <th>Subject</th>
-                    <th>Code</th>
                     <th>Class</th>
                     <th>Students</th>
                     <th>Entered</th>
@@ -154,8 +153,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 ?>
                 <tr>
                     <td class="fw-medium"><?= sanitizeInput($subj['name']) ?></td>
-                    <td><small><?= sanitizeInput($subj['code'] ?? '-') ?></small></td>
-                    <td><span class="badge bg-secondary"><?= sanitizeInput($subj['class_name']) ?> <?= sanitizeInput($subj['section'] ?? '') ?></span></td>
+                    <td><span class="badge bg-secondary"><?= sanitizeInput(className($subj['class_name'], $subj['section'])) ?></span></td>
                     <td><?= $studentCount ?></td>
                     <td><?= $enteredCount ?> / <?= $studentCount ?></td>
                     <td>
@@ -203,7 +201,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <tbody>
                 <?php foreach ($classTeacherClasses as $class): ?>
                 <tr>
-                    <td class="fw-medium"><?= sanitizeInput($class['name']) ?> <?= sanitizeInput($class['section'] ?? '') ?></td>
+                    <td class="fw-medium"><?= sanitizeInput(className($class['name'], $class['section'])) ?></td>
                     <td>
                         <div class="d-flex gap-1">
                             <a href="<?= BASE_URL ?>/teacher/results/psychomotor.php?class_id=<?= $class['id'] ?>" class="btn btn-sm btn-outline-gold"><i class="fas fa-running me-1"></i>Psychomotor</a>

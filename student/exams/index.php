@@ -42,7 +42,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <h5 class="card-title"><?= sanitizeInput($exam['title']) ?></h5>
                 <p class="card-text small text-muted">
                     <i class="fas fa-book me-1"></i><?= sanitizeInput($exam['subject_name']) ?><br>
-                    <i class="fas fa-users me-1"></i><?= sanitizeInput($exam['class_name'] . ' ' . $exam['section']) ?><br>
+                    <i class="fas fa-users me-1"></i><?= sanitizeInput(className($exam['class_name'], $exam['section'])) ?><br>
                     <i class="fas fa-clock me-1"></i><?= $exam['duration_minutes'] ?> mins<br>
                     <i class="fas fa-star me-1"></i><?= $exam['total_marks'] ?> marks<br>
                     <span class="badge bg-secondary"><?= $examTypes[$exam['exam_type']] ?? $exam['exam_type'] ?></span>

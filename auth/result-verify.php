@@ -125,7 +125,7 @@ if ($verified && $studentId) {
                         </tr>
                         <tr>
                             <td><strong>Class:</strong></td>
-                            <td><?= sanitizeInput($student['class_name'] . ' ' . $student['section']) ?></td>
+                            <td><?= sanitizeInput(className($student['class_name'], $student['section'])) ?></td>
                         </tr>
                         <tr>
                             <td><strong>Session:</strong></td>

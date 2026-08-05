@@ -12,6 +12,20 @@ function sanitizeInput(?string $data): string {
     return htmlspecialchars(trim($data ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
+function className(?string $name, ?string $section = ''): string {
+    $name = trim($name ?? '');
+    $section = trim($section ?? '');
+    if ($section === '') return $name;
+    $tiers = [
+        'A' => 'Gold',
+        'B' => 'Silver',
+        'Science' => 'Gold',
+        'Arts' => 'Silver',
+        'Commercial' => 'Diamond',
+    ];
+    return trim($name . ' ' . ($tiers[$section] ?? $section));
+}
+
 function generateReference(string $prefix = 'PEC'): string {
     return $prefix . '-' . date('Y') . '-' . strtoupper(uniqid());
 }

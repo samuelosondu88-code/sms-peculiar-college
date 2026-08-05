@@ -90,7 +90,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <div>
         <a href="index.php" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i>Back</a>
         <h4 class="fw-bold mb-0 mt-1"><i class="fas fa-chalkboard me-2"></i><?= sanitizeInput($vc['name']) ?></h4>
-        <small class="text-muted"><?= sanitizeInput($vc['subject_name']) ?> — <?= sanitizeInput($vc['class_name'] . ' ' . $vc['section']) ?> | Teacher: <?= sanitizeInput($vc['t_first'] . ' ' . $vc['t_last']) ?></small>
+        <small class="text-muted"><?= sanitizeInput($vc['subject_name']) ?> — <?= sanitizeInput(className($vc['class_name'], $vc['section'])) ?> | Teacher: <?= sanitizeInput($vc['t_first'] . ' ' . $vc['t_last']) ?></small>
     </div>
 </div>
 
@@ -109,7 +109,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <div class="card">
             <div class="card-header"><i class="fas fa-info-circle me-2"></i>Class Info</div>
             <div class="card-body">
-                <p><strong>Subject:</strong> <?= sanitizeInput($vc['subject_name']) ?> (<?= sanitizeInput($vc['subject_code']) ?>)</p>
+                <p><strong>Subject:</strong> <?= sanitizeInput($vc['subject_name']) ?></p>
                 <p><strong>Teacher:</strong> <?= sanitizeInput($vc['t_first'] . ' ' . $vc['t_last']) ?></p>
             </div>
         </div>

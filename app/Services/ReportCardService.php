@@ -96,7 +96,7 @@ final class ReportCardService
         $positionText = $position > 0 ? $position . self::ordinalSuffix($position) : '-';
 
         $srcName = ($student['first_name'] ?? '') . ' ' . ($student['last_name'] ?? '');
-        $srcClass = ($student['class_name'] ?? '') . ' ' . ($student['section'] ?? '');
+        $srcClass = \className($student['class_name'], $student['section']);
         $srcAdmission = $student['admission_no'] ?? '';
         $srcGender = ucfirst($student['gender'] ?? 'N/A');
 
@@ -198,6 +198,15 @@ final class ReportCardService
             </tr>
         </table>
     </div>
+    <sethtmlpagefooter name="report_footer" value="on" />
+    <htmlpagefooter name="report_footer">
+        <table style="width: 100%; border-top: 0.3mm solid #d4af37; font-family: 'dejavusans'; font-size: 7pt; color: #787878; padding-top: 1.2mm;">
+            <tr>
+                <td style="width: 50%;">SCHOOL_NAME_PLACEHOLDER</td>
+                <td style="width: 50%; text-align: right;">Generated: {DATE j F Y} &nbsp;|&nbsp; Page {PAGENO} of {nbpg}</td>
+            </tr>
+        </table>
+    </htmlpagefooter>
 </body>
 </html>
 HTML;
@@ -227,7 +236,8 @@ HTML;
             'margin_left' => 12,
             'margin_right' => 12,
             'margin_top' => 14,
-            'margin_bottom' => 18,
+            'margin_bottom' => 16,
+            'margin_footer' => 6,
             'default_font' => 'dejavusans',
         ]);
         $mpdf->WriteHTML(self::reportCss() . self::renderHtmlTyped($d));

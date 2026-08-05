@@ -69,7 +69,7 @@ require_once __DIR__ . '/../includes/header.php';
             <option value="">Select</option>
             <?php foreach ($myClasses as $c): ?>
             <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>>
-                <?= sanitizeInput($c['name'] . ' ' . ($c['section'] ?? '')) ?>
+                <?= sanitizeInput(className($c['name'], $c['section'])) ?>
             </option>
             <?php endforeach; ?>
         </select>

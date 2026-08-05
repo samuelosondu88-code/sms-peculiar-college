@@ -122,8 +122,8 @@ require_once __DIR__ . '/../../includes/header.php';
     <div>
         <h4 class="fw-bold mb-0"><i class="fas fa-edit me-2"></i>Enter Scores</h4>
         <p class="text-muted small mb-0">
-            <?= sanitizeInput($subject['name']) ?> (<?= sanitizeInput($subject['code'] ?? 'N/A') ?>) -
-            <?= sanitizeInput($class['name']) ?> <?= sanitizeInput($class['section'] ?? '') ?>
+            <?= sanitizeInput($subject['name']) ?> -
+            <?= sanitizeInput(className($class['name'], $class['section'])) ?>
         </p>
     </div>
     <a href="<?= BASE_URL ?>/teacher/results/index.php" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>

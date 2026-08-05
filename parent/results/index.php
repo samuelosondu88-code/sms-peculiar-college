@@ -64,7 +64,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <div>
                         <h5 class="fw-bold mb-0"><?= sanitizeInput($child['first_name'] . ' ' . $child['last_name']) ?></h5>
                         <small class="text-muted">
-                            <?= sanitizeInput($child['class_name'] . ' ' . $child['section']) ?> &middot;
+                            <?= sanitizeInput(className($child['class_name'], $child['section'])) ?> &middot;
                             <?= sanitizeInput($child['admission_no']) ?>
                         </small>
                     </div>

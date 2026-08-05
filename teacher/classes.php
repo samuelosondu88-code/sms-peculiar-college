@@ -22,7 +22,7 @@ $totalStudents = $db->prepare("SELECT COUNT(DISTINCT s.id) FROM students s JOIN 
 $totalStudents->execute([$teacherId]);
 $totalStudents = $totalStudents->fetchColumn();
 
-$subjects = $db->prepare("SELECT s.*, c.name as class_name FROM subject_allocations sa JOIN subjects s ON sa.subject_id = s.id JOIN classes c ON sa.class_id = c.id WHERE sa.teacher_id = ?");
+$subjects = $db->prepare("SELECT s.*, c.name as class_name, c.section FROM subject_allocations sa JOIN subjects s ON sa.subject_id = s.id JOIN classes c ON sa.class_id = c.id WHERE sa.teacher_id = ?");
 $subjects->execute([$teacherId]);
 $mySubjects = $subjects->fetchAll();
 
@@ -40,8 +40,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="fw-bold mb-0"><?= sanitizeInput($c['name']) ?></h5>
-                    <span class="badge bg-info"><?= sanitizeInput($c['section'] ?? 'N/A') ?></span>
+                    <h5 class="fw-bold mb-0"><?= sanitizeInput(className($c['name'], $c['section'])) ?></h5>
                 </div>
                 <p class="small text-muted mb-1">Students: <?= $c['student_count'] ?? 0 ?> / <?= $c['capacity'] ?? '-' ?></p>
                 <p class="small text-muted mb-3">Subjects: <?= $c['subject_count'] ?? 0 ?></p>
@@ -67,12 +66,12 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="card-header"><i class="fas fa-book me-2"></i>My Subjects</div>
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
-            <thead><tr><th>Subject</th><th>Code</th><th>Class</th></tr></thead>
-            <tbody>
-                <?php foreach ($mySubjects as $s): ?>
-                <tr><td><?= sanitizeInput($s['name']) ?></td><td><small><?= sanitizeInput($s['code'] ?? '-') ?></small></td><td><span class="badge bg-secondary"><?= sanitizeInput($s['class_name']) ?></span></td></tr>
-                <?php endforeach; ?>
-                <?php if (empty($mySubjects)): ?><tr><td colspan="3" class="text-center text-muted py-3">No subjects assigned.</td></tr><?php endif; ?>
+<thead><tr><th>Subject</th><th>Class</th></tr></thead>
+                <tbody>
+                    <?php foreach ($mySubjects as $s): ?>
+                    <tr><td><?= sanitizeInput($s['name']) ?></td><td><span class="badge bg-secondary"><?= sanitizeInput(className($s['class_name'], $s['section'])) ?></span></td></tr>
+                    <?php endforeach; ?>
+                    <?php if (empty($mySubjects)): ?><tr><td colspan="2" class="text-center text-muted py-3">No subjects assigned.</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div>

@@ -290,7 +290,7 @@ require_once __DIR__ . '/../../includes/header.php';
     <div>
         <h4 class="fw-bold mb-0"><?= sanitizeInput($attempt['exam_title']) ?></h4>
         <p class="text-muted small mb-0">
-            <span class="badge bg-primary me-2"><?= sanitizeInput($attempt['subject_code']) ?></span>
+            <span class="badge bg-primary me-2"><?= sanitizeInput($attempt['subject_name']) ?></span>
             <?= count($questions) ?> Questions
         </p>
     </div>

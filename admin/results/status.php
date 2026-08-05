@@ -140,7 +140,6 @@ require_once __DIR__ . '/../../includes/header.php';
                     <tr>
                         <th>#</th>
                         <th>Subject</th>
-                        <th>Code</th>
                         <th>Completed</th>
                         <th>Expected</th>
                         <th style="min-width: 200px;">Progress</th>
@@ -184,7 +183,6 @@ require_once __DIR__ . '/../../includes/header.php';
                     <tr>
                         <td><?= $i++ ?></td>
                         <td class="fw-semibold"><?= sanitizeInput($subj['name']) ?></td>
-                        <td><span class="badge bg-light text-dark"><?= sanitizeInput($subj['code']) ?></span></td>
                         <td><strong><?= $completed ?></strong></td>
                         <td><?= $expected ?></td>
                         <td>

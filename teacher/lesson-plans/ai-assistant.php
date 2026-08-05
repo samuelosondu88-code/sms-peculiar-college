@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
         $subjName = '';
         $className = '';
         foreach ($mySubjects as $s) {
-            if ($s['id'] === $subjectId) { $subjName = $s['name']; $className = $s['class_name'] . ' ' . $s['section']; break; }
+            if ($s['id'] === $subjectId) { $subjName = $s['name']; $className = className($s['class_name'], $s['section']); break; }
         }
 
         $target = $objectives ?: "understand and apply the concepts of $topic";
@@ -120,7 +120,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     <select name="subject_id" class="form-select" required>
                         <option value="">Select Subject</option>
                         <?php foreach ($mySubjects as $s): ?>
-                        <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . $s['class_name'] . ' ' . $s['section']) ?></option>
+                        <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -132,7 +132,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
                         foreach ($classes as $c):
                         ?>
-                        <option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                        <option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_exam'])) {
     }
 }
 
-$exams = $db->query("SELECT e.*, t.term_name, c.name as class_name FROM exams e LEFT JOIN terms t ON e.term_id = t.id LEFT JOIN classes c ON e.class_id = c.id ORDER BY e.created_at DESC")->fetchAll();
+$exams = $db->query("SELECT e.*, t.term_name, c.name as class_name, c.section FROM exams e LEFT JOIN terms t ON e.term_id = t.id LEFT JOIN classes c ON e.class_id = c.id ORDER BY e.created_at DESC")->fetchAll();
 $terms = $db->query("SELECT t.id, t.term_name, ac.session_name FROM terms t JOIN academic_sessions ac ON t.session_id = ac.id WHERE ac.status = 'active'")->fetchAll();
 $classes = $db->query("SELECT id, name, section FROM classes ORDER BY name")->fetchAll();
 
@@ -46,7 +46,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <tr>
                         <td><strong><?= sanitizeInput($e['exam_name']) ?></strong></td>
                         <td><?= sanitizeInput($e['term_name'] ?? '-') ?></td>
-                        <td><?= sanitizeInput($e['class_name'] ?? 'All') ?></td>
+                        <td><?= $e['class_name'] ? sanitizeInput(className($e['class_name'], $e['section'] ?? '')) : 'All' ?></td>
                         <td><small><?= $e['exam_date'] ? formatDate($e['exam_date']) : '' ?></small></td>
                         <td><?= $e['total_marks'] ?></td>
                         <td><?= ($e['status'] === 'completed' || $e['status'] === 'graded') ? getStatusBadge('active') : getStatusBadge('inactive') ?></td>
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="mb-3"><label class="form-label">Exam Name *</label><input type="text" name="name" class="form-control" required placeholder="e.g., First Term Examination"></div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6"><label class="form-label">Term</label><select name="term_id" class="form-select" required><?php foreach ($terms as $t): ?><option value="<?= $t['id'] ?>"><?= sanitizeInput($t['term_name'] . ' ' . $t['session_name']) ?></option><?php endforeach; ?></select></div>
-                        <div class="col-md-6"><label class="form-label">Class (optional)</label><select name="class_id" class="form-select"><option value="">All Classes</option><?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . ($c['section'] ?? '')) ?></option><?php endforeach; ?></select></div>
+                        <div class="col-md-6"><label class="form-label">Class (optional)</label><select name="class_id" class="form-select"><option value="">All Classes</option><?php foreach ($classes as $c): ?><option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option><?php endforeach; ?></select></div>
                     </div>
                     <div class="row g-3 mb-3">
                         <div class="col-md-6"><label class="form-label">Start Date</label><input type="date" name="start_date" class="form-control"></div>

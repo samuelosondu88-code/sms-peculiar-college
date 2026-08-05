@@ -99,7 +99,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <tbody>
                             <?php foreach ($pendingClasses as $pc): ?>
                             <tr>
-                                <td><?= sanitizeInput($pc['name'] . ' ' . $pc['section']) ?></td>
+                                <td><?= sanitizeInput(className($pc['name'], $pc['section'])) ?></td>
                                 <td><?= sanitizeInput($pc['session_name']) ?></td>
                                 <td><?= sanitizeInput($pc['term_name']) ?></td>
                                 <td><?= ucwords(str_replace('_', ' ', $pc['approval_stage'])) ?></td>
@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <select name="class_id" class="form-select">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
-                    <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                    <option value="<?= $c['id'] ?>" <?= $selectedClass === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

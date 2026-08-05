@@ -50,7 +50,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="avatar-circle bg-primary me-3"><?= strtoupper(substr($child['first_name'], 0, 1) . substr($child['last_name'], 0, 1)) ?></div>
                     <div>
                         <h5 class="fw-bold mb-0"><?= sanitizeInput($child['first_name'] . ' ' . $child['last_name']) ?></h5>
-                        <small class="text-muted"><?= sanitizeInput($child['class_name'] . ' ' . ($child['section'] ?? '')) ?></small>
+                        <small class="text-muted"><?= sanitizeInput(className($child['class_name'], $child['section'])) ?></small>
                     </div>
                 </div>
                 <p class="small text-muted mb-2"><i class="fas fa-id-card me-1"></i>Admission: <?= sanitizeInput($child['admission_no']) ?></p>

@@ -98,7 +98,7 @@ include __DIR__ . '/../includes/navbar.php';
                             <select name="class_id" class="form-select">
                                 <option value="">Select Class</option>
                                 <?php foreach ($classes as $c): ?>
-                                <option value="<?= $c['id'] ?>"><?= $c['name'] ?></option>
+                                <option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'] ?? '')) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

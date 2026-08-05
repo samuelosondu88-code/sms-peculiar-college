@@ -102,14 +102,13 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
-                    <tr><th>Code</th><th>Subject</th><th>Class</th><th>Category</th><th>Level</th><th>Teacher</th><th>Actions</th></tr>
+                    <tr><th>Subject</th><th>Class</th><th>Category</th><th>Level</th><th>Teacher</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                     <?php foreach ($subjects as $s): ?>
                     <tr>
-                        <td><strong><?= sanitizeInput($s['code'] ?? '') ?></strong></td>
                         <td><?= sanitizeInput($s['name']) ?></td>
-                        <td><?= sanitizeInput($s['class_name'] . ' ' . ($s['section'] ?? '')) ?></td>
+                        <td><?= sanitizeInput(className($s['class_name'], $s['section'])) ?></td>
                         <td><span class="badge bg-secondary"><?= sanitizeInput(ucfirst($s['category'] ?? 'core')) ?></span></td>
                         <td><?= sanitizeInput($s['level'] ?? '-') ?></td>
                         <td><?= $s['first_name'] ? sanitizeInput($s['first_name'] . ' ' . $s['last_name']) : '<span class="text-muted">Unassigned</span>' ?></td>
@@ -143,8 +142,8 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php foreach ($allocations as $a): ?>
                     <tr>
                         <td><?= sanitizeInput($a['first_name'] . ' ' . $a['last_name']) ?></td>
-                        <td><?= sanitizeInput($a['class_name'] . ' ' . ($a['section'] ?? '')) ?></td>
-                        <td><?= sanitizeInput($a['subject_name']) ?> (<?= sanitizeInput($a['subject_code']) ?>)</td>
+                        <td><?= sanitizeInput(className($a['class_name'], $a['section'])) ?></td>
+                        <td><?= sanitizeInput($a['subject_name']) ?></td>
                         <td><?= sanitizeInput($a['session_name']) ?></td>
                         <td>
                             <a href="?delete_allocation=<?= $a['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this allocation?')">
@@ -185,7 +184,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <select name="class_id" id="subject_class" class="form-select" required>
                             <option value="">Select</option>
                             <?php foreach ($classes as $c): ?>
-                            <option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . ($c['section'] ?? '')) ?></option>
+                            <option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -254,7 +253,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <select name="alloc_class_id" class="form-select" required>
                             <option value="">Select Class</option>
                             <?php foreach ($classes as $c): ?>
-                            <option value="<?= $c['id'] ?>"><?= sanitizeInput($c['name'] . ' ' . ($c['section'] ?? '')) ?></option>
+                            <option value="<?= $c['id'] ?>"><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -263,7 +262,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <select name="alloc_subject_id" class="form-select" required>
                             <option value="">Select Subject</option>
                             <?php foreach ($allSubjects as $sub): ?>
-                            <option value="<?= $sub['id'] ?>"><?= sanitizeInput($sub['name']) ?> (<?= sanitizeInput($sub['code']) ?>)</option>
+                            <option value="<?= $sub['id'] ?>"><?= sanitizeInput($sub['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

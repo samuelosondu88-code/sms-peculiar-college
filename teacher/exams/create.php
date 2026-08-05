@@ -97,7 +97,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             <select name="subject_id" class="form-select" required>
                                 <option value="">Select</option>
                                 <?php foreach ($subjects as $s): ?>
-                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>" <?= ($exam['subject_id'] ?? 0) === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . $s['class_name']) ?></option>
+                                <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>" <?= ($exam['subject_id'] ?? 0) === $s['id'] ? 'selected' : '' ?>><?= sanitizeInput($s['name'] . ' - ' . className($s['class_name'], $s['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -106,7 +106,7 @@ require_once __DIR__ . '/../../includes/header.php';
                             <select name="class_id" class="form-select" required>
                                 <option value="">Select</option>
                                 <?php foreach ($classes as $c): ?>
-                                <option value="<?= $c['id'] ?>" <?= ($exam['class_id'] ?? 0) === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput($c['name'] . ' ' . $c['section']) ?></option>
+                                <option value="<?= $c['id'] ?>" <?= ($exam['class_id'] ?? 0) === $c['id'] ? 'selected' : '' ?>><?= sanitizeInput(className($c['name'], $c['section'])) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
