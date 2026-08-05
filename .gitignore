@@ -12,6 +12,9 @@ desktop.ini
 .env.production
 config/database.local.php
 
+# One-off deploy helpers (may embed secrets; delete after use)
+_deploy_migration.php
+
 # Dependencies
 /vendor/
 /node_modules/
