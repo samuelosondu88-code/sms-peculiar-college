@@ -12,10 +12,10 @@
 require_once __DIR__ . '/../config/env.php';
 
 $backupDir = __DIR__ . '/../backups/';
-$dbName = getenv('DB_NAME') ?: 'sms_peculiar_college';
-$dbUser = getenv('DB_USER') ?: '';
-$dbPass = getenv('DB_PASS') ?: '';
-$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbName = env('DB_NAME') ?: 'sms_peculiar_college';
+$dbUser = env('DB_USER') ?: '';
+$dbPass = env('DB_PASS') ?: '';
+$dbHost = env('DB_HOST') ?: 'localhost';
 $retentionDays = 30;
 $verbosity = in_array('--verbose', $_SERVER['argv'] ?? []);
 $now = date('Y-m-d_H-i-s');

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/env.php';
+
 /**
  * Production Error Logging Configuration
  * Include at the top of public/index.php or via auto_prepend_file
@@ -64,7 +66,7 @@ function productionShutdownHandler(): void {
 }
 
 // ── Register handlers ──
-if (getenv('PHP_DISPLAY_ERRORS') === '0') {
+if (env('PHP_DISPLAY_ERRORS') === '0') {
     set_error_handler('productionErrorHandler');
     set_exception_handler('productionExceptionHandler');
     register_shutdown_function('productionShutdownHandler');

@@ -207,7 +207,10 @@ require_once __DIR__ . '/../../includes/header.php';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $i = 0; foreach ($summary['results'] as $r): $i++; ?>
+                    <?php $i = 0; $prevCat = null; foreach ($summary['results'] as $r): $i++; ?>
+                    <?php if (($r['category'] ?? null) !== $prevCat): $prevCat = $r['category'] ?? null; ?>
+                    <tr class="table-secondary"><td colspan="11" class="fw-bold"><?= sanitizeInput(getSubjectCategoryLabel($r['category'] ?? '')) ?></td></tr>
+                    <?php endif; ?>
                     <tr>
                         <td><?= $i ?></td>
                         <td><?= sanitizeInput($r['subject_name']) ?></td>

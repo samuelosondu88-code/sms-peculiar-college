@@ -1,23 +1,25 @@
 <?php
-@ini_set('display_errors', getenv('PHP_DISPLAY_ERRORS') ?: '0');
-$errorReporting = getenv('PHP_ERROR_REPORTING') ?: '';
+require_once __DIR__ . '/env.php';
+
+@ini_set('display_errors', env('PHP_DISPLAY_ERRORS') ?: '0');
+$errorReporting = env('PHP_ERROR_REPORTING') ?: '';
 $errorReporting = is_numeric($errorReporting) ? (int)$errorReporting : (defined($errorReporting) ? constant($errorReporting) : E_ALL);
 error_reporting($errorReporting);
 
-$appUrl = getenv('APP_URL') ?: 'https://peculiar-college.example.com';
-$schoolName = getenv('SCHOOL_NAME') ?: 'Peculiar International College';
-$schoolPhone = getenv('SCHOOL_PHONE') ?: '+234-XXX-XXX-XXXX';
-$schoolEmail = getenv('SCHOOL_EMAIL') ?: 'info@peculiarcollege.edu.ng';
-$baseUrl = getenv('BASE_URL') ?: '/sms-peculiar-college';
+$appUrl = env('APP_URL') ?: 'https://peculiar-college.example.com';
+$schoolName = env('SCHOOL_NAME') ?: 'Peculiar International College';
+$schoolPhone = env('SCHOOL_PHONE') ?: '+234-XXX-XXX-XXXX';
+$schoolEmail = env('SCHOOL_EMAIL') ?: 'info@peculiarcollege.edu.ng';
+$baseUrl = env('BASE_URL') ?: '/sms-peculiar-college';
 
-!defined('APP_ENV') && define('APP_ENV', getenv('APP_ENV') ?: 'production');
-!defined('APP_DEBUG') && define('APP_DEBUG', (bool)(getenv('APP_DEBUG') ?: false));
-!defined('APP_NAME') && define('APP_NAME', getenv('APP_NAME') ?: 'Peculiar International College - School Management System');
+!defined('APP_ENV') && define('APP_ENV', env('APP_ENV') ?: 'production');
+!defined('APP_DEBUG') && define('APP_DEBUG', (bool)(env('APP_DEBUG') ?: false));
+!defined('APP_NAME') && define('APP_NAME', env('APP_NAME') ?: 'Peculiar International College - School Management System');
 !defined('APP_SHORT_NAME') && define('APP_SHORT_NAME', 'PIC SMS');
 !defined('APP_VERSION') && define('APP_VERSION', '2.0.0');
 !defined('APP_URL') && define('APP_URL', $appUrl);
 
-$appKey = getenv('APP_KEY') ?: '';
+$appKey = env('APP_KEY') ?: '';
 if (empty($appKey)) {
     error_log('APP_KEY not set in .env. Run: php -r "echo bin2hex(random_bytes(32));" and set APP_KEY.');
 } elseif (strlen($appKey) !== 64 || !ctype_xdigit($appKey)) {
@@ -27,7 +29,7 @@ if (empty($appKey)) {
 !defined('APP_KEY') && define('APP_KEY', $appKey);
 
 !defined('SCHOOL_NAME') && define('SCHOOL_NAME', $schoolName);
-!defined('SCHOOL_ADDRESS') && define('SCHOOL_ADDRESS', getenv('SCHOOL_ADDRESS') ?: 'After Technical College Bukuru, Trade Centre Kuru, Plateau State');
+!defined('SCHOOL_ADDRESS') && define('SCHOOL_ADDRESS', env('SCHOOL_ADDRESS') ?: 'After Technical College Bukuru, Trade Centre Kuru, Plateau State');
 !defined('SCHOOL_PHONE') && define('SCHOOL_PHONE', $schoolPhone);
 !defined('SCHOOL_EMAIL') && define('SCHOOL_EMAIL', $schoolEmail);
 !defined('SCHOOL_MOTTO') && define('SCHOOL_MOTTO', 'Excellence in Education, Character in Life');
@@ -36,11 +38,11 @@ if (empty($appKey)) {
 !defined('SCHOOL_VALUES') && define('SCHOOL_VALUES', 'Integrity, Excellence, Discipline, Innovation, Respect, Responsibility');
 !defined('TIMEZONE') && define('TIMEZONE', 'Africa/Lagos');
 !defined('BASE_URL') && define('BASE_URL', $baseUrl);
-!defined('UPLOAD_MAX_SIZE') && define('UPLOAD_MAX_SIZE', (int)(getenv('UPLOAD_MAX_SIZE') ?: 2 * 1024 * 1024));
+!defined('UPLOAD_MAX_SIZE') && define('UPLOAD_MAX_SIZE', (int)(env('UPLOAD_MAX_SIZE') ?: 2 * 1024 * 1024));
 !defined('ALLOWED_EXTENSIONS') && define('ALLOWED_EXTENSIONS', ['jpg','jpeg','png','pdf','doc','docx','xls','xlsx']);
 !defined('PAGINATION_LIMIT') && define('PAGINATION_LIMIT', 20);
 !defined('ADMISSION_FORM_PRICE') && define('ADMISSION_FORM_PRICE', 4000.00);
-!defined('PAYSTACK_PUBLIC_KEY') && define('PAYSTACK_PUBLIC_KEY', getenv('PAYSTACK_PUBLIC_KEY') ?: '');
-!defined('PAYSTACK_SECRET_KEY') && define('PAYSTACK_SECRET_KEY', getenv('PAYSTACK_SECRET_KEY') ?: '');
+!defined('PAYSTACK_PUBLIC_KEY') && define('PAYSTACK_PUBLIC_KEY', env('PAYSTACK_PUBLIC_KEY') ?: '');
+!defined('PAYSTACK_SECRET_KEY') && define('PAYSTACK_SECRET_KEY', env('PAYSTACK_SECRET_KEY') ?: '');
 
 date_default_timezone_set(TIMEZONE);

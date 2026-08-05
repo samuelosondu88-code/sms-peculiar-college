@@ -1,10 +1,10 @@
 <?php
 require_once __DIR__ . '/env.php';
 
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'sms_peculiar_college');
-define('DB_USER', getenv('DB_USER') ?: '');
-define('DB_PASS', getenv('DB_PASS') ?: '');
+define('DB_HOST', env('DB_HOST') ?: 'localhost');
+define('DB_NAME', env('DB_NAME') ?: 'sms_peculiar_college');
+define('DB_USER', env('DB_USER') ?: '');
+define('DB_PASS', env('DB_PASS') ?: '');
 
 if (empty(DB_USER) || empty(DB_PASS)) {
     error_log('Database credentials not configured. Set DB_USER and DB_PASS in .env.');

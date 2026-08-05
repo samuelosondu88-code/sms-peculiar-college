@@ -101,14 +101,31 @@ if (!defined('RESULT_FUNCTIONS_LOADED')) {
 
     function getStudentTermResults(PDO $db, int $studentId, int $sessionId, int $termId): array {
         $stmt = $db->prepare("
-            SELECT rs.*, s.name as subject_name, s.code as subject_code
+            SELECT rs.*, s.name as subject_name, s.code as subject_code, s.category
             FROM result_scores rs
             JOIN subjects s ON rs.subject_id = s.id
             WHERE rs.student_id = ? AND rs.session_id = ? AND rs.term_id = ?
-            ORDER BY s.name
+            ORDER BY CASE COALESCE(s.category,'')
+                         WHEN 'core' THEN 1 WHEN 'science' THEN 2
+                         WHEN 'humanities' THEN 3 WHEN 'business' THEN 4
+                         WHEN 'trade' THEN 5 ELSE 6 END, s.name
         ");
         $stmt->execute([$studentId, $sessionId, $termId]);
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Human-readable label for a subject discipline category.
+     */
+    function getSubjectCategoryLabel(?string $category): string {
+        return match (strtolower((string)$category)) {
+            'core' => 'CORE SUBJECTS',
+            'science' => 'SCIENCE SUBJECTS',
+            'humanities' => 'HUMANITIES & ARTS',
+            'business' => 'BUSINESS & COMMERCIAL STUDIES',
+            'trade' => 'TRADE / VOCATIONAL SUBJECTS',
+            default => 'SUBJECTS',
+        };
     }
 
     function getStudentTermSummary(PDO $db, int $studentId, int $sessionId, int $termId): array {

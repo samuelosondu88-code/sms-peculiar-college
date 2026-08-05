@@ -12,13 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_subject'])) {
     $code = sanitizeInput(strtoupper($_POST['code'] ?? ''));
     $classId = (int)($_POST['class_id'] ?? 0);
     $teacherId = (int)($_POST['teacher_id'] ?? 0);
+    $category = sanitizeInput($_POST['category'] ?? 'core');
+    $level = sanitizeInput($_POST['level'] ?? (strpos($name, 'SS') === 0 ? 'SS' : 'JSS'));
 
     if (isset($_POST['subject_id']) && $_POST['subject_id']) {
-        $stmt = $db->prepare("UPDATE subjects SET name = ?, code = ?, class_id = ?, teacher_id = ? WHERE id = ?");
-        $stmt->execute([$name, $code, $classId, $teacherId ?: null, $_POST['subject_id']]);
+        $stmt = $db->prepare("UPDATE subjects SET name = ?, code = ?, class_id = ?, teacher_id = ?, category = ?, level = ? WHERE id = ?");
+        $stmt->execute([$name, $code, $classId, $teacherId ?: null, $category, $level, $_POST['subject_id']]);
     } else {
-        $stmt = $db->prepare("INSERT INTO subjects (name, code, class_id, teacher_id) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$name, $code, $classId, $teacherId ?: null]);
+        $stmt = $db->prepare("INSERT INTO subjects (name, code, class_id, teacher_id, category, level) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$name, $code, $classId, $teacherId ?: null, $category, $level]);
     }
     redirect('/admin/subjects.php?msg=Subject saved');
 }
@@ -100,7 +102,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
-                    <tr><th>Code</th><th>Subject</th><th>Class</th><th>Teacher</th><th>Actions</th></tr>
+                    <tr><th>Code</th><th>Subject</th><th>Class</th><th>Category</th><th>Level</th><th>Teacher</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                     <?php foreach ($subjects as $s): ?>
@@ -108,9 +110,11 @@ require_once __DIR__ . '/../includes/header.php';
                         <td><strong><?= sanitizeInput($s['code'] ?? '') ?></strong></td>
                         <td><?= sanitizeInput($s['name']) ?></td>
                         <td><?= sanitizeInput($s['class_name'] . ' ' . ($s['section'] ?? '')) ?></td>
+                        <td><span class="badge bg-secondary"><?= sanitizeInput(ucfirst($s['category'] ?? 'core')) ?></span></td>
+                        <td><?= sanitizeInput($s['level'] ?? '-') ?></td>
                         <td><?= $s['first_name'] ? sanitizeInput($s['first_name'] . ' ' . $s['last_name']) : '<span class="text-muted">Unassigned</span>' ?></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="editSubject(<?= $s['id'] ?>, '<?= addslashes($s['name']) ?>', '<?= $s['code'] ?>', <?= $s['class_id'] ?>, <?= $s['teacher_id'] ?: 0 ?>)">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editSubject(<?= $s['id'] ?>, '<?= addslashes($s['name']) ?>', '<?= $s['code'] ?>', <?= $s['class_id'] ?>, <?= $s['teacher_id'] ?: 0 ?>, '<?= addslashes($s['category'] ?? 'core') ?>', '<?= addslashes($s['level'] ?? 'JSS') ?>')">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </td>
@@ -194,6 +198,29 @@ require_once __DIR__ . '/../includes/header.php';
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Category (Discipline)</label>
+                                <select name="category" id="subject_category" class="form-select" required>
+                                    <option value="core">Core Subjects</option>
+                                    <option value="science">Science Subjects</option>
+                                    <option value="humanities">Humanities &amp; Arts</option>
+                                    <option value="business">Business &amp; Commercial</option>
+                                    <option value="trade">Trade / Vocational</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Level</label>
+                                <select name="level" id="subject_level" class="form-select" required>
+                                    <option value="JSS">JSS (Junior Secondary)</option>
+                                    <option value="SS">SS (Senior Secondary)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" name="save_subject" value="1">
@@ -259,12 +286,14 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
-function editSubject(id, name, code, classId, teacherId) {
+function editSubject(id, name, code, classId, teacherId, category, level) {
     document.getElementById('subject_id').value = id;
     document.getElementById('subject_name').value = name;
     document.getElementById('subject_code').value = code;
     document.getElementById('subject_class').value = classId;
     document.getElementById('subject_teacher').value = teacherId;
+    document.getElementById('subject_category').value = category || 'core';
+    document.getElementById('subject_level').value = level || 'JSS';
     document.getElementById('subjectModalTitle').textContent = 'Edit Subject';
     new bootstrap.Modal(document.getElementById('subjectModal')).show();
 }

@@ -212,11 +212,11 @@ function sendSMS(string $phone, string $message): bool {
         CURLOPT_POST => true,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
-            'ApiKey: ' . (getenv('AT_API_KEY') ?: ''),
+            'ApiKey: ' . (env('AT_API_KEY') ?: ''),
             'Content-Type: application/x-www-form-urlencoded',
         ],
         CURLOPT_POSTFIELDS => http_build_query([
-            'username' => getenv('AT_USERNAME') ?: '',
+            'username' => env('AT_USERNAME') ?: '',
             'to' => $phone,
             'message' => $message,
             'from' => 'PECULIAR',

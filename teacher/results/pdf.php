@@ -323,6 +323,15 @@ if ($action === 'download' && $selectedStudent && $selectedSession && $selectedT
             $sn = 1;
 
             foreach ($results as $r) {
+                if (($r['category'] ?? null) !== ($prevCat ?? null)) {
+                    $this->Ln(0.5);
+                    $this->SetFont('Arial', 'B', 7);
+                    $this->SetFillColor(232, 232, 240);
+                    $this->SetTextColor($this->navy[0], $this->navy[1], $this->navy[2]);
+                    $this->Cell(array_sum($colW), 6, getSubjectCategoryLabel($r['category'] ?? ''), 1, 1, 'L', true);
+                    $this->SetTextColor($this->dark[0], $this->dark[1], $this->dark[2]);
+                    $prevCat = $r['category'] ?? null;
+                }
                 $grade = getGrade(
                     (float)$r['total_score'],
                     $settings['grade_a_min'], $settings['grade_b_min'],

@@ -110,7 +110,7 @@ if (!function_exists('app_env')) {
      */
     function app_env(): string
     {
-        return (string) (getenv('APP_ENV') ?: 'production');
+        return (string) (env('APP_ENV') ?: 'production');
     }
 }
 
@@ -120,7 +120,7 @@ if (!function_exists('app_debug')) {
      */
     function app_debug(): bool
     {
-        return filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN);
+        return filter_var(env('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN);
     }
 }
 
@@ -155,7 +155,7 @@ if (!function_exists('is_maintenance_mode')) {
      */
     function is_maintenance_mode(): bool
     {
-        return filter_var(getenv('APP_MAINTENANCE') ?: 'false', FILTER_VALIDATE_BOOLEAN);
+        return filter_var(env('APP_MAINTENANCE') ?: 'false', FILTER_VALIDATE_BOOLEAN);
     }
 }
 
@@ -166,7 +166,7 @@ if (!function_exists('maintenance_bypass_token')) {
      */
     function maintenance_bypass_token(): string
     {
-        $key = getenv('APP_KEY') ?: '';
+        $key = env('APP_KEY') ?: '';
         return $key ? hash_hmac('sha256', 'maintenance-bypass', $key) : '';
     }
 }

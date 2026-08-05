@@ -11,10 +11,10 @@ if (PHP_SAPI !== 'cli') {
 }
 require __DIR__ . '/config/env.php';
 
-$dbHost = getenv('DB_HOST') ?: 'localhost';
-$dbName = getenv('DB_NAME') ?: 'sms_peculiar_college';
-$dbUser = getenv('DB_USER') ?: 'peculiar_user';
-$dbPass = getenv('DB_PASS') ?: '';
+$dbHost = env('DB_HOST') ?: 'localhost';
+$dbName = env('DB_NAME') ?: 'sms_peculiar_college';
+$dbUser = env('DB_USER') ?: 'peculiar_user';
+$dbPass = env('DB_PASS') ?: '';
 
 if ($dbPass === '') {
     die("Database password not configured. Set DB_PASS in .env before running setup.\n");

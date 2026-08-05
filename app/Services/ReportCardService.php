@@ -52,7 +52,13 @@ final class ReportCardService
 
         $rows = [];
         $sn = 1;
+        $prevCat = null;
         foreach ($results as $r) {
+            $cat = (string)($r['category'] ?? '');
+            if ($cat !== $prevCat) {
+                $rows[] = '<tr class="cat"><td colspan="12" class="cat-label">' . htmlspecialchars(\getSubjectCategoryLabel($cat), ENT_QUOTES, 'UTF-8') . '</td></tr>';
+                $prevCat = $cat;
+            }
             // DB DECIMAL columns come back as strings; cast to float for the
             // strict-typed getGrade() signature (getResultSettings()).
             $grade = \getGrade(
@@ -316,6 +322,7 @@ HTML;
         .g.a { color: #007800; } .g.b { color: #0050a0; } .g.c { color: #a06e00; }
         .g.d { color: #b45a00; } .g.e { color: #be3200; } .g.f { color: #be0000; }
         table.scores tr:nth-child(even) td { background: #f7f7fc; }
+        table.scores tr.cat td { background: #e8e8f0; font-weight: bold; color: #0b1f3a; font-size: 7pt; letter-spacing: 0.4mm; }
         h3.section { background: #0b1f3a; color: #fff; font-size: 8pt; padding: 1.5mm 2mm; margin: 3mm 0 1mm 0; }
         h3.section.gold { background: #d4af37; color: #0b1f3a; }
         table.summary { width: 100%; border-collapse: collapse; }

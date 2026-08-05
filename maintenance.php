@@ -1,8 +1,9 @@
 <?php
+require_once __DIR__ . '/config/env.php';
 http_response_code(503);
 $base_url = defined('BASE_URL') ? BASE_URL : '/';
-$maintenanceMessage = getenv('APP_MAINTENANCE_MESSAGE') ?: 'We are currently performing scheduled maintenance. Please check back shortly.';
-$retrySeconds = (int)(getenv('APP_MAINTENANCE_RETRY') ?: 3600);
+$maintenanceMessage = env('APP_MAINTENANCE_MESSAGE') ?: 'We are currently performing scheduled maintenance. Please check back shortly.';
+$retrySeconds = (int)(env('APP_MAINTENANCE_RETRY') ?: 3600);
 ?>
 <!DOCTYPE html>
 <html lang="en">

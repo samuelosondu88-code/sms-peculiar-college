@@ -107,27 +107,27 @@ final class MailService
     {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         try {
-            $smtpHost = getenv('SMTP_HOST');
+            $smtpHost = env('SMTP_HOST');
             if ($smtpHost) {
                 $mail->isSMTP();
                 $mail->Host = $smtpHost;
-                $mail->Port = (int)(getenv('SMTP_PORT') ?: 587);
-                $enc = strtolower(getenv('SMTP_ENCRYPTION') ?: 'tls');
+                $mail->Port = (int)(env('SMTP_PORT') ?: 587);
+                $enc = strtolower(env('SMTP_ENCRYPTION') ?: 'tls');
                 if ($enc === 'tls') {
                     $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
                 } elseif ($enc === 'ssl') {
                     $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
                 }
-                if (getenv('SMTP_USERNAME')) {
+                if (env('SMTP_USERNAME')) {
                     $mail->SMTPAuth = true;
-                    $mail->Username = getenv('SMTP_USERNAME');
-                    $mail->Password = getenv('SMTP_PASSWORD') ?: '';
+                    $mail->Username = env('SMTP_USERNAME');
+                    $mail->Password = env('SMTP_PASSWORD') ?: '';
                 }
                 $mail->SMTPDebug = 0;
             }
 
             $mail->CharSet = 'UTF-8';
-            $from = getenv('SMTP_USERNAME') ?: (defined('SCHOOL_EMAIL') ? SCHOOL_EMAIL : 'no-reply@localhost');
+            $from = env('SMTP_USERNAME') ?: (defined('SCHOOL_EMAIL') ? SCHOOL_EMAIL : 'no-reply@localhost');
             $mail->setFrom($from, $fromName ?: (defined('SCHOOL_NAME') ? SCHOOL_NAME : ''));
             $mail->addAddress($to);
             $mail->isHTML(true);

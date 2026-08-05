@@ -22,10 +22,10 @@ declare(strict_types=1);
 
 require __DIR__ . '/../config/env.php';
 
-$host = getenv('DB_HOST') ?: 'localhost';
-$name = getenv('DB_NAME') ?: 'sms_peculiar_college';
-$user = getenv('DB_USER') ?: '';
-$pass = getenv('DB_PASS') ?: '';
+$host = env('DB_HOST') ?: 'localhost';
+$name = env('DB_NAME') ?: 'sms_peculiar_college';
+$user = env('DB_USER') ?: '';
+$pass = env('DB_PASS') ?: '';
 
 if ($user === '' || $pass === '') {
     fwrite(STDERR, "DB_USER / DB_PASS not configured.\n");
