@@ -45,4 +45,15 @@ if (empty($appKey)) {
 !defined('PAYSTACK_PUBLIC_KEY') && define('PAYSTACK_PUBLIC_KEY', env('PAYSTACK_PUBLIC_KEY') ?: '');
 !defined('PAYSTACK_SECRET_KEY') && define('PAYSTACK_SECRET_KEY', env('PAYSTACK_SECRET_KEY') ?: '');
 
+// AI Teaching Assistant provider configuration.
+// AI_PROVIDER: 'template' (default, offline) | 'openai' | 'anthropic' | 'gemini'
+!defined('AI_PROVIDER') && define('AI_PROVIDER', env('AI_PROVIDER') ?: 'template');
+!defined('AI_TIMEOUT') && define('AI_TIMEOUT', (int)(env('AI_TIMEOUT') ?: 60));
+!defined('OPENAI_API_KEY') && define('OPENAI_API_KEY', env('OPENAI_API_KEY') ?: '');
+!defined('OPENAI_MODEL') && define('OPENAI_MODEL', env('OPENAI_MODEL') ?: 'gpt-4o-mini');
+!defined('ANTHROPIC_API_KEY') && define('ANTHROPIC_API_KEY', env('ANTHROPIC_API_KEY') ?: '');
+!defined('ANTHROPIC_MODEL') && define('ANTHROPIC_MODEL', env('ANTHROPIC_MODEL') ?: 'claude-3-5-sonnet-20241022');
+!defined('GEMINI_API_KEY') && define('GEMINI_API_KEY', env('GEMINI_API_KEY') ?: '');
+!defined('GEMINI_MODEL') && define('GEMINI_MODEL', env('GEMINI_MODEL') ?: 'gemini-1.5-pro');
+
 date_default_timezone_set(TIMEZONE);

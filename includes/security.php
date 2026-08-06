@@ -181,6 +181,78 @@ function purifyHtml(string $html): string {
     return strip_tags($html, $allowed);
 }
 
+/**
+ * Whitelist sanitizer for rich-text (WYSIWYG) content. Strips every tag and
+ * attribute that is not explicitly allowed, so script/event handlers are
+ * removed even though the tag itself is permitted.
+ */
+function sanitizeRichText(?string $html): string {
+    $html = (string)$html;
+    if ($html === '') return '';
+
+    $allowedTags = ['p','br','b','strong','i','em','u','ol','ul','li','h1','h2','h3','h4','h5','h6','blockquote','pre','table','thead','tbody','tr','td','th','span','div','a'];
+    // Tags that must be removed ENTIRELY (including content), never unwrapped.
+    $removeEntirely = ['script','style','iframe','object','embed','form','input','button','textarea','select','option','video','audio','canvas','svg','math','template','noscript','link','meta','frame','frameset','applet','base'];
+
+    // Cheap fast-path: if no tags at all, plain text is already safe.
+    if (!str_contains($html, '<')) {
+        return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
+    }
+
+    if (!class_exists(\DOMDocument::class)) {
+        return purifyHtml($html);
+    }
+
+    $previous = libxml_use_internal_errors(true);
+    $doc = new \DOMDocument();
+    $doc->loadHTML('<?xml encoding="UTF-8"><div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    libxml_use_internal_errors($previous);
+
+    $root = $doc->documentElement; // the wrapper <div>
+    if (!$root) return '';
+
+    $xpath = new \DOMXPath($doc);
+    foreach ($xpath->query('//*') as $node) {
+        if ($node === $root) continue;
+        $tag = strtolower($node->nodeName);
+
+        if (in_array($tag, $removeEntirely, true)) {
+            $node->parentNode->removeChild($node);
+            continue;
+        }
+
+        if (!in_array($tag, $allowedTags, true)) {
+            $parent = $node->parentNode;
+            while ($node->firstChild) {
+                $parent->insertBefore($node->firstChild, $node);
+            }
+            $parent->removeChild($node);
+            continue;
+        }
+
+        // Strip all attributes except a safe href on <a>.
+        foreach (iterator_to_array($node->attributes) as $attr) {
+            $keep = false;
+            if ($tag === 'a' && strtolower($attr->nodeName) === 'href') {
+                $href = trim((string)$attr->nodeValue);
+                if (preg_match('#^(https?://|mailto:|tel:)#i', $href)) {
+                    $keep = true;
+                }
+            }
+            if (!$keep) {
+                $node->removeAttribute($attr->nodeName);
+            }
+        }
+    }
+
+    $inner = '';
+    foreach (iterator_to_array($root->childNodes) as $child) {
+        $inner .= $doc->saveHTML($child);
+    }
+    return trim($inner);
+}
+
 // ==================== SECURE FILE UPLOAD ====================
 
 function validateFileUpload(array $file, array $allowedTypes = null, int $maxSize = null): array {

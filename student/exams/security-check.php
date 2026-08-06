@@ -17,6 +17,19 @@ $studentStmt->execute([$userId]);
 $student = $studentStmt->fetch();
 if (!$student) redirect('/student/exams/index.php');
 
+/* Enforce the exam availability window for starting a new attempt.
+   An in-progress attempt (already started) is allowed to continue. */
+$attemptCk = $db->prepare("SELECT id FROM exam_attempts WHERE exam_id = ? AND student_id = ? AND status = 'in_progress' LIMIT 1");
+$attemptCk->execute([$examId, $userId]);
+$hasInProgress = (bool)$attemptCk->fetchColumn();
+if (!$hasInProgress) {
+    $window = examWindowStatus($exam);
+    if ($window === 'not_yet' || $window === 'closed') {
+        logSecurityEvent('exam_window_blocked', ['exam_id' => $examId, 'window' => $window]);
+        redirect('/student/exams/index.php');
+    }
+}
+
 require_once __DIR__ . '/../../includes/exam_security.php';
 $secSettings = getExamSecuritySettings($db, $examId);
 require_once __DIR__ . '/../../includes/header.php';

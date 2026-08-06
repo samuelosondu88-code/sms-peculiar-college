@@ -176,10 +176,11 @@ function logActivity(int $userId, string $action, ?string $table = null, ?int $r
     $stmt->execute([$userId, $action, $table, $recordId, $oldValue, $newValue, $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1', $_SERVER['HTTP_USER_AGENT'] ?? '']);
 }
 
-function uploadFile(array $file, string $subfolder = 'documents'): ?string {
+function uploadFile(array $file, string $subfolder = 'documents', ?array $allowed = null): ?string {
+    $allowed = $allowed ?? ALLOWED_EXTENSIONS;
     // Preferred: hardened UploadService (magic-byte + name checks).
     if (class_exists(\App\Services\UploadService::class)) {
-        return \App\Services\UploadService::store($file, $subfolder, ALLOWED_EXTENSIONS, UPLOAD_MAX_SIZE);
+        return \App\Services\UploadService::store($file, $subfolder, $allowed, UPLOAD_MAX_SIZE);
     }
 
     $targetDir = __DIR__ . '/../' . $subfolder . '/';
@@ -187,7 +188,7 @@ function uploadFile(array $file, string $subfolder = 'documents'): ?string {
         mkdir($targetDir, 0755, true);
     }
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, ALLOWED_EXTENSIONS)) return null;
+    if (!in_array($ext, $allowed)) return null;
     if ($file['size'] > UPLOAD_MAX_SIZE) return null;
     $newName = uniqid() . '.' . $ext;
     $targetPath = $targetDir . $newName;
@@ -283,4 +284,29 @@ function getGalleryByDate(): array {
         $result[] = ['date' => $date, 'label' => $info[0], 'category' => $info[1], 'images' => $imgs];
     }
     return $result;
+}
+
+/**
+ * Exam availability window status.
+ *
+ * Uses the exam_date + start_time/end_time window when configured. Returns:
+ *   'open'    – within the window (or no window configured)
+ *   'not_yet' – before the window opens
+ *   'closed'  – after the window ends
+ *   'no_date' – no exam_date configured (treated as open by callers)
+ */
+function examWindowStatus(array $exam): string
+{
+    $date = trim((string)($exam['exam_date'] ?? ''));
+    if ($date === '' || $date === '0000-00-00') {
+        return 'no_date';
+    }
+    $now = time();
+    $startTime = trim((string)($exam['start_time'] ?? ''));
+    $endTime = trim((string)($exam['end_time'] ?? ''));
+    $startTs = $startTime !== '' ? strtotime($date . ' ' . $startTime) : strtotime($date . ' 00:00:00');
+    $endTs = $endTime !== '' ? strtotime($date . ' ' . $endTime) : strtotime($date . ' 23:59:59');
+    if ($now < $startTs) return 'not_yet';
+    if ($now > $endTs) return 'closed';
+    return 'open';
 }

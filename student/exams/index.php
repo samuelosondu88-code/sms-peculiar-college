@@ -51,9 +51,21 @@ require_once __DIR__ . '/../../includes/header.php';
                 <a href="take-exam.php?exam_id=<?= $exam['id'] ?>" class="btn btn-warning w-100"><i class="fas fa-play me-1"></i>Continue</a>
                 <?php elseif ($exam['attempt_status'] === 'submitted' || $exam['attempt_status'] === 'graded'): ?>
                 <a href="results.php?exam_id=<?= $exam['id'] ?>" class="btn btn-outline-primary w-100"><i class="fas fa-eye me-1"></i>View Results</a>
+                <?php else:
+                    $window = examWindowStatus($exam);
+                    if ($window === 'not_yet'): ?>
+                    <div class="text-center">
+                        <span class="badge bg-info mb-1"><i class="fas fa-clock me-1"></i>Opens <?= date('d M Y h:i A', strtotime(($exam['start_time'] ?: '00:00:00'))) ?></span>
+                        <button class="btn btn-secondary w-100" disabled><i class="fas fa-shield-alt me-1"></i>Not Open Yet</button>
+                    </div>
+                <?php elseif ($window === 'closed'): ?>
+                    <div class="text-center">
+                        <span class="badge bg-danger mb-1"><i class="fas fa-lock me-1"></i>Window Closed</span>
+                        <button class="btn btn-secondary w-100" disabled><i class="fas fa-shield-alt me-1"></i>Unavailable</button>
+                    </div>
                 <?php else: ?>
                 <a href="security-check.php?exam_id=<?= $exam['id'] ?>" class="btn btn-primary w-100"><i class="fas fa-shield-alt me-1"></i>Start Exam</a>
-                <?php endif; ?>
+                <?php endif; endif; ?>
             </div>
         </div>
     </div>

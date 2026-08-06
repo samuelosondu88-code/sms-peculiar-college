@@ -25,6 +25,18 @@ if ((int)$exam['class_id'] !== (int)$student['class_id']) {
     redirect('/student/exams/index.php');
 }
 
+/* Enforce the exam availability window for starting a new attempt. */
+$attemptCk = $db->prepare("SELECT id FROM exam_attempts WHERE exam_id = ? AND student_id = ? AND status = 'in_progress' LIMIT 1");
+$attemptCk->execute([$examId, $userId]);
+$hasInProgress = (bool)$attemptCk->fetchColumn();
+if (!$hasInProgress) {
+    $window = examWindowStatus($exam);
+    if ($window === 'not_yet' || $window === 'closed') {
+        logSecurityEvent('exam_window_blocked', ['exam_id' => $examId, 'window' => $window]);
+        redirect('/student/exams/index.php');
+    }
+}
+
 $secSettings = getExamSecuritySettings($db, $examId);
 
 $attemptStmt = $db->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND student_id = ? ORDER BY created_at DESC LIMIT 1");

@@ -36,6 +36,9 @@ $currentPath = $currentDir . '/' . $currentPage;
             <a href="<?= BASE_URL ?>/admin/lesson-plans/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'lesson-plans' ? 'active' : '' ?>">
                 <i class="fas fa-book-open me-2"></i>Lesson Plans
             </a>
+            <a href="<?= BASE_URL ?>/admin/lesson-notes.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentPage === 'lesson-notes.php' ? 'active' : '' ?>">
+                <i class="fas fa-sticky-note me-2"></i>Lesson Notes
+            </a>
             <a href="<?= BASE_URL ?>/admin/cbt/index.php" class="list-group-item list-group-item-action bg-transparent text-white ps-5 <?= $currentDir === 'cbt' ? 'active' : '' ?>">
                 <i class="fas fa-laptop me-2"></i>CBT Exams
             </a>
@@ -137,6 +140,9 @@ $currentPath = $currentDir . '/' . $currentPage;
         <a href="<?= BASE_URL ?>/teacher/lesson-notes.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'lesson-notes.php' ? 'active' : '' ?>">
             <i class="fas fa-sticky-note me-3"></i>Lesson Notes
         </a>
+        <a href="<?= BASE_URL ?>/teacher/ai-assistant.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'ai-assistant.php' ? 'active' : '' ?>">
+            <i class="fas fa-robot me-3"></i>AI Assistant
+        </a>
         <a href="<?= BASE_URL ?>/teacher/lesson-plans/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'lesson-plans' ? 'active' : '' ?>">
             <i class="fas fa-book-open me-3"></i>Lesson Plans
         </a>
@@ -184,6 +190,12 @@ $currentPath = $currentDir . '/' . $currentPage;
         </a>
         <a href="<?= BASE_URL ?>/student/exams/index.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentDir === 'exams' ? 'active' : '' ?>">
             <i class="fas fa-file-alt me-3"></i>Teacher Exams
+        </a>
+        <a href="<?= BASE_URL ?>/student/lesson-notes.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'lesson-notes.php' ? 'active' : '' ?>">
+            <i class="fas fa-sticky-note me-3"></i>Lesson Notes
+        </a>
+        <a href="<?= BASE_URL ?>/student/notices.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'notices.php' ? 'active' : '' ?>">
+            <i class="fas fa-bullhorn me-3"></i>Notices
         </a>
         <a href="<?= BASE_URL ?>/student/timetable.php" class="list-group-item list-group-item-action bg-transparent text-white <?= $currentPage === 'timetable.php' ? 'active' : '' ?>">
             <i class="fas fa-calendar-alt me-3"></i>Timetable
