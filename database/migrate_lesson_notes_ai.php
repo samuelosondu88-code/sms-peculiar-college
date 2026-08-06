@@ -44,6 +44,7 @@ if (!tableExists($db, 'lesson_notes')) {
 // columns positionally-safe by omitting AFTER entirely.
 $add = [
     'file_path'           => "ALTER TABLE lesson_notes ADD COLUMN file_path VARCHAR(255) NULL",
+    'date_taught'         => "ALTER TABLE lesson_notes ADD COLUMN date_taught DATE NULL",
     'academic_session_id' => "ALTER TABLE lesson_notes ADD COLUMN academic_session_id INT NULL",
     'term_id'             => "ALTER TABLE lesson_notes ADD COLUMN term_id INT NULL",
     'lesson_plan_id'      => "ALTER TABLE lesson_notes ADD COLUMN lesson_plan_id INT NULL",

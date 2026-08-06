@@ -477,16 +477,41 @@ CREATE TABLE lesson_notes (
     teacher_id INT NOT NULL,
     subject_id INT NOT NULL,
     class_id INT NOT NULL,
+    academic_session_id INT,
     topic VARCHAR(200) NOT NULL,
     content LONGTEXT,
-    file_path VARCHAR(255),
-    week_no INT,
+    week INT,
+    term_id INT,
+    lesson_plan_id INT,
     date_taught DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    file_path VARCHAR(255),
+    status ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
+    is_ai_generated TINYINT(1) NOT NULL DEFAULT 0,
+    summary TEXT,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_lesson_notes_status (status),
+    KEY idx_lesson_notes_class (class_id, status),
+    KEY idx_lesson_notes_session (academic_session_id, term_id),
+    KEY idx_lesson_notes_plan (lesson_plan_id),
     FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
     FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- AI generation audit log (see database/migration_lesson_notes_ai.sql)
+CREATE TABLE IF NOT EXISTS ai_generation_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    teacher_id INT NOT NULL,
+    action VARCHAR(60) NOT NULL,
+    provider VARCHAR(40) NOT NULL DEFAULT 'template',
+    model VARCHAR(100) NULL,
+    prompt TEXT NULL,
+    status ENUM('success','error') NOT NULL DEFAULT 'success',
+    error_message TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_ai_gen_teacher (teacher_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Internal messaging
 CREATE TABLE messages (

@@ -18,6 +18,7 @@ ALTER TABLE lesson_notes
     ADD COLUMN academic_session_id INT NULL AFTER class_id,
     ADD COLUMN term_id INT NULL AFTER academic_session_id,
     ADD COLUMN lesson_plan_id INT NULL AFTER term_id,
+    ADD COLUMN date_taught DATE NULL AFTER lesson_plan_id,
     ADD COLUMN status ENUM('draft','published','archived') NOT NULL DEFAULT 'draft' AFTER file_path,
     ADD COLUMN is_ai_generated TINYINT(1) NOT NULL DEFAULT 0 AFTER status,
     ADD COLUMN summary TEXT NULL AFTER content,
