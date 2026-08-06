@@ -4,6 +4,7 @@
 // notes for their own class/current term, admins see everything.
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../includes/functions.php';
 requireLogin();
 
 $id = (int)($_GET['id'] ?? 0);
